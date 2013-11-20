@@ -16,7 +16,6 @@
 package edu.stanford.ramcloud;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 
 /*
  * This class provides Java bindings for RAMCloud. Right now it is a rather
@@ -57,18 +56,13 @@ public class JRamCloud implements Serializable {
     public static class multiReadObject {
         long tableId;
         byte[] key;
+        
+        public multiReadObject(long _tableId, byte[] _key){
+            tableId = _tableId;
+            key = _key;
+        }
     }
     
-    public class multiWriteObject {
-        long tableId;
-        byte[] key;
-    }
-    
-    public class multiRemoveObject {
-        long tableId;
-        byte[] key;
-    }
-
     /**
      * This class is returned by Read operations. It encapsulates the entire
      * object, including the key, value, and version.
@@ -172,12 +166,6 @@ public class JRamCloud implements Serializable {
     {
         return read(tableId, key.getBytes(), rules);
     }
-
-    public Object[]
-    multiread(multiReadObject[] mread, int number)
-    {
-        return multiRead(mread, number);
-    }
     
     /**
      * Convenience remove() wrapper that take a String key argument.
@@ -249,13 +237,11 @@ public class JRamCloud implements Serializable {
     public native long increment(long tableId, byte[] key, long incrementValue, RejectRules rules);
     public native Object read(long tableId, byte[] key);
     public native Object read(long tableId, byte[] key, RejectRules rules);
-    public native Object[] multiRead(multiReadObject[] mread, int numRequests);
+    public native Object[] multiRead(multiReadObject[] mread);
     public native long remove(long tableId, byte[] key);
     public native long remove(long tableId, byte[] key, RejectRules rules);
-    public native long multiRemove(ArrayList<multiRemoveObject> mremove, int numRequests);
     public native long write(long tableId, byte[] key, byte[] value);
     public native long write(long tableId, byte[] key, byte[] value, RejectRules rules);
-    public native long multiWrite(ArrayList<multiWriteObject> mwrite, int numRequests);
 
     /*
      * The following exceptions may be thrown by the JNI functions:
@@ -318,7 +304,7 @@ public class JRamCloud implements Serializable {
         }
 
         ramcloud.write(tableId, "thisIsTheKey", "thisIsTheValue");
-        /*
+        
         long before = System.nanoTime();
         for (int i = 0; i < 100000; i++) {
             JRamCloud.Object unused = ramcloud.read(tableId, "thisIsTheKey");
@@ -326,7 +312,7 @@ public class JRamCloud implements Serializable {
         long after = System.nanoTime();
         System.out.println("Avg read latency: " +
             ((double)(after - before) / 100000 / 1000) + " usec");
-        */
+      
         long tableId4 = ramcloud.createTable("table4");
         ramcloud.write(tableId4, "object1-1", "value:1-1");
         ramcloud.write(tableId4, "object1-2", "value:1-2");
@@ -338,14 +324,13 @@ public class JRamCloud implements Serializable {
         ramcloud.write(tableId6, "object3-2", "value:3-2");
 
         multiReadObject mread[] = new multiReadObject[2];
-        mread[0] = new multiReadObject();
-        mread[0].tableId = tableId4;
-        mread[0].key = "object1-1".getBytes();
-        JRamCloud.Object out[] = ramcloud.multiRead(mread, 1);
-        
-        System.out.println("read object: key = [" + out[0].getKey() + "], value = ["
-            + out[0].getValue() + "], version = " + out[0].version);
-        
+        mread[0] = new multiReadObject(tableId4, "object1-1".getBytes());
+        mread[1] = new multiReadObject(tableId5, "object2-1".getBytes());
+        JRamCloud.Object out[] = ramcloud.multiRead(mread);
+	for (int i = 0 ; i < 2 ; i++){
+        	System.out.println("multi read object: key = [" + out[i].getKey() + "], value = ["
+            		+ out[i].getValue() + "], version = " + out[i].version);
+	}
         ramcloud.dropTable("table4");
         ramcloud.dropTable("table5");
         ramcloud.dropTable("table6");
