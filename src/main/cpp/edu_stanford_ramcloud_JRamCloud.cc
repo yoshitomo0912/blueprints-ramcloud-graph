@@ -396,9 +396,7 @@ JNICALL Java_edu_stanford_ramcloud_JRamCloud_multiRead(JNIEnv *env,
 	values[i].get()->copy(0, values[i].get()->getTotalLength(), value.pointer);
 	jobject obj = env->NewObject(cls, methodId, jRamCloud, jKey[i], jValue);
 	env->SetObjectArrayElement(outJNIArray, i, obj);
-	jboolean iscopy;
-	data = env->GetByteArrayElements(jKey[i], &iscopy);
-	env->ReleaseByteArrayElements(jKey[i], data, 0);
+	env->ReleaseByteArrayElements(jKey[i], (jbyte *)objects[i].key, 0);
     }
     return outJNIArray;
 }
