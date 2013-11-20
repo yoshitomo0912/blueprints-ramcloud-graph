@@ -234,22 +234,32 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 
   @Override
   public Iterable<Vertex> getVertices(String key, Object value) { 
-    long startTimeTmp;
-    long endTimeTmp;
     List<Vertex> vertices = new ArrayList<Vertex>();
     
     getIndexedKeys(key, Vertex.class);
     if (KeyIndex.exists()) {
-        List<Object> keyMap = (List<Object>) KeyIndex.get(key, value);      
+        List<Object> keyMap = (List<Object>) KeyIndex.get(key, value);
+        JRamCloud.multiReadObject mread[] = new JRamCloud.multiReadObject[keyMap.size()];
+        
+        int vertexNum = 0;
+        for (Object vert: keyMap){
+            mread[vertexNum] = new JRamCloud.multiReadObject((Long)vert, ByteBuffer.allocate(8).order(ByteOrder.LITTLE_ENDIAN).putLong((Long)vert).array());
+            vertexNum++;
+        }
+        
+        JRamCloud.Object out[] = this.rcClient.multiRead(mread);
+        for (int i = 0; i < vertexNum ; i++){
+            vertices.add(new RamCloudVertex(out[i].key, this));
+        }
+        /*        
         for (Object vert: keyMap){
             vertices.add(getVertex(vert));
         }
-        System.out.println("read with index");
+  */
     } else {        
         JRamCloud.TableEnumerator tableEnum = rcClient.new TableEnumerator(vertPropTableId);
         JRamCloud.Object tableEntry;
     
-        startTimeTmp = System.nanoTime();
         while(tableEnum.hasNext()) {
             tableEntry = tableEnum.next();
             Map<String, Object> propMap = RamCloudElement.getPropertyMap(tableEntry.value);
@@ -258,9 +268,6 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
                 logger.log(Level.FINE, "a vertice is added2");
             }
         }
-        endTimeTmp = System.nanoTime();
-        System.out.println("read withdout index");
-        //System.out.println("read vertex time(standard) :" + (endTimeTmp - startTimeTmp));
     }
     
     return (Iterable<Vertex>)vertices;
@@ -536,7 +543,6 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
         }
         
         public void autoUpdate(final String key, final Object newValue, final Object oldValue, final T element) {
-            //System.out.println("autoUpdate key:" + key + " newValue" + newValue + " oldValue" + oldValue + " element" + element);
             if (this.exists()) {
                 if (oldValue != null) {
                     this.remove(key, oldValue, element);
