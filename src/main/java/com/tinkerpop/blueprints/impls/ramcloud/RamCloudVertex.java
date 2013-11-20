@@ -24,20 +24,25 @@ import com.tinkerpop.blueprints.util.DefaultVertexQuery;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 
 import edu.stanford.ramcloud.JRamCloud;
+import java.io.Serializable;
 
-public class RamCloudVertex extends RamCloudElement implements Vertex {
+public class RamCloudVertex extends RamCloudElement implements Vertex, Serializable {
 
   private static final Logger logger = Logger.getLogger(RamCloudGraph.class.getName());
-  
+  private static final long serialVersionUID = 7526472295622776147L;
   protected long id;
   protected byte[] rcKey;
   private RamCloudGraph graph;
-  
+    
   /*
    * Constructors
    */
+  
+  public RamCloudVertex() {      
+  }
+  
   public RamCloudVertex(long id, RamCloudGraph graph) {
-    super(idToRcKey(id), graph.vertPropTableId, graph.rcClient);
+    super(idToRcKey(id), graph.vertPropTableId, graph.rcClient, graph);
     
     this.id = id;
     this.rcKey = idToRcKey(id);
@@ -45,7 +50,7 @@ public class RamCloudVertex extends RamCloudElement implements Vertex {
   }
 
   public RamCloudVertex(byte[] rcKey, RamCloudGraph graph) {
-    super(rcKey, graph.vertPropTableId, graph.rcClient);
+    super(rcKey, graph.vertPropTableId, graph.rcClient, graph);
     
     this.id = rcKeyToId(rcKey);
     this.rcKey = rcKey;

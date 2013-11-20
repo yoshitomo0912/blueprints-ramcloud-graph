@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.impls.ramcloud;
 
+import com.tinkerpop.blueprints.Edge;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -13,22 +14,29 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.tinkerpop.blueprints.Element;
+import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 
 import edu.stanford.ramcloud.JRamCloud;
+import java.io.*;
 
-public class RamCloudElement implements Element {
+public class RamCloudElement implements Element, Serializable {
 
   private static final Logger logger = Logger.getLogger(RamCloudGraph.class.getName());
   
   private byte[] rcPropTableKey;
   private long rcPropTableId;
   private JRamCloud rcClient;
+  private RamCloudGraph graph;
   
-  public RamCloudElement(byte[] rcPropTableKey, long rcPropTableId, JRamCloud rcClient) {
+  public RamCloudElement() {
+  }
+  
+  public RamCloudElement(byte[] rcPropTableKey, long rcPropTableId, JRamCloud rcClient, RamCloudGraph graph) {
     this.rcPropTableKey = rcPropTableKey;
     this.rcPropTableId = rcPropTableId;
     this.rcClient = rcClient;
+    this.graph = graph;
   }
   
   public Map<String, Object> getPropertyMap() {
@@ -96,6 +104,7 @@ public class RamCloudElement implements Element {
 
   @Override
   public void setProperty(String key, Object value) {
+    Object oldValue;
     if(value == null) {
       throw ExceptionFactory.propertyValueCanNotBeNull();
     }
@@ -117,8 +126,16 @@ public class RamCloudElement implements Element {
     }
     
     Map<String, Object> map = getPropertyMap();
-    map.put(key, value);
+    oldValue = map.put(key, value);
     setPropertyMap(map);
+    
+    if (this instanceof RamCloudVertex){
+        graph.getIndexedKeys(key, Vertex.class);
+        RamCloudGraph.KeyIndex.autoUpdate(key, value, oldValue, this);
+    } else {
+        graph.getIndexedKeys(key, Edge.class);
+        RamCloudGraph.KeyIndex.autoUpdate(key, value, oldValue, this);
+    }
   }
 
   @Override
@@ -126,6 +143,15 @@ public class RamCloudElement implements Element {
     Map<String, Object> map = getPropertyMap();
     T retVal = (T)map.remove(key);
     setPropertyMap(map);
+
+    if (this instanceof RamCloudVertex){
+        graph.getIndexedKeys(key, Vertex.class);
+        RamCloudGraph.KeyIndex.autoRemove(key, retVal.toString(), this);
+    } else {
+        graph.getIndexedKeys(key, Edge.class);
+        RamCloudGraph.KeyIndex.autoRemove(key, retVal.toString(), this);
+        }
+
     return retVal;
   }
 

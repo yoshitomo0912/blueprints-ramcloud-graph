@@ -334,6 +334,80 @@ JNICALL Java_edu_stanford_ramcloud_JRamCloud_read__J_3BLJRamCloud_RejectRules_2(
 
 /*
  * Class:     edu_stanford_ramcloud_JRamCloud
+ * Method:    multiRead
+ * Signature: (J[B)J
+ */
+JNIEXPORT jobject
+JNICALL Java_edu_standford_ramcloud_JRamCloud_multiRead(JNIEnv *env,
+                                                        jobject jRamCloud,
+                                                        jobjectArray jmultiReadArray,
+                                                        jint jrequestNum){
+    RamCloud* ramcloud = getRamCloud(env, jRamCloud);
+    
+    MultiReadObject *mread[];
+/*    jint i, result = 0;
+    
+    multiReadobj = (*env)->GetObjectArrayElements(env, jmultiReadArray, NULL);
+    if (multiReadobj == NULL){
+        return 0;
+    }
+    
+    for (i = 0 ; i < jrequestNum; i++){
+        
+    }
+    
+    result = (*env)->NewObjectArray(env, jrequestNum, objArrCls, NULL);
+    if (result == NULL) {
+        return NULL;
+    }
+    
+    
+    (*env)->GetObjectArrayRegion(env, jmultiReadArray, 0, jrequestNum, mread);
+  */  
+    for (int i = 0 ; i < jrequestNum ; i++) {
+        mread[i]  = env->GetObjectArrayElement(env, jmultiReadArray, i);
+    }
+
+    try {
+        ramcloud->multiRead(mread, jrequestNum);
+    } EXCEPTION_CATCHER(NULL);
+    
+        RamCloud* ramcloud = getRamCloud(env, jRamCloud);
+    JByteArrayGetter key(env, jKey);
+    
+    Buffer buffer;
+    uint64_t version;
+    try {
+        ramcloud->read(jTableId, key.pointer, key.length, &buffer, NULL, &version);
+    } EXCEPTION_CATCHER(NULL);
+
+    jbyteArray jValue = env->NewByteArray(buffer.getTotalLength());
+    check_null(jValue, "NewByteArray failed");
+    JByteArrayGetter value(env, jValue);
+    buffer.copy(0, buffer.getTotalLength(), value.pointer);
+
+    // Note that using 'javap -s' on the class file will print out the method
+    // signatures (the third argument to GetMethodID).
+    jclass cls = env->FindClass(PACKAGE_PATH "JRamCloud$Object");
+    check_null(cls, "FindClass failed");
+
+    jmethodID methodId = env->GetMethodID(cls,
+                                          "<init>",
+                                          "(L" PACKAGE_PATH "JRamCloud;[B[BJ)V");
+    check_null(methodId, "GetMethodID failed");
+
+    return env->NewObject(cls,
+                          methodId,
+                          jRamCloud,
+                          jKey,
+                          jValue,
+                          static_cast<jlong>(version));
+
+}
+
+
+/*
+ * Class:     edu_stanford_ramcloud_JRamCloud
  * Method:    remove
  * Signature: (J[B)J
  */

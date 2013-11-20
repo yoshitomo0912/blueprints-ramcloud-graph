@@ -26,7 +26,7 @@ public class RamCloudEdge extends RamCloudElement implements Edge {
   private RamCloudGraph graph;
   
   public RamCloudEdge(RamCloudVertex outVertex, RamCloudVertex inVertex, String label, RamCloudGraph graph) {
-    super(edgeToRcKey(outVertex, inVertex, label), graph.edgePropTableId, graph.rcClient);
+    super(edgeToRcKey(outVertex, inVertex, label), graph.edgePropTableId, graph.rcClient, graph);
     
     this.outVertex = outVertex;
     this.inVertex = inVertex;
@@ -36,7 +36,7 @@ public class RamCloudEdge extends RamCloudElement implements Edge {
   }
   
   public RamCloudEdge(byte[] rcKey, RamCloudGraph graph) {
-    super(rcKey, graph.edgePropTableId, graph.rcClient);
+    super(rcKey, graph.edgePropTableId, graph.rcClient, graph);
     
     ByteBuffer edgeId = ByteBuffer.wrap(rcKey).order(ByteOrder.LITTLE_ENDIAN);
     outVertex = new RamCloudVertex(edgeId.getLong(), graph);

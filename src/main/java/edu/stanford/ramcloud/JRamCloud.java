@@ -15,6 +15,9 @@
 
 package edu.stanford.ramcloud;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+
 /*
  * This class provides Java bindings for RAMCloud. Right now it is a rather
  * simple subset of what RamCloud.h defines.
@@ -28,7 +31,10 @@ package edu.stanford.ramcloud;
  *      http://www.ibm.com/developerworks/java/tutorials/j-jni/section4.html
  *      http://developer.android.com/training/articles/perf-jni.html
  */
-public class JRamCloud {
+public class JRamCloud implements Serializable {
+    private static final long serialVersionUID = 7526472295622776147L;
+    public JRamCloud () {
+    }
     static {
         System.loadLibrary("edu_stanford_ramcloud_JRamCloud");
     }
@@ -46,6 +52,21 @@ public class JRamCloud {
         boolean exists = false;
         boolean versionLeGiven = false;
         boolean versionNeGiven = false;
+    }
+    
+    public static class multiReadObject {
+        long tableId;
+        byte[] key;
+    }
+    
+    public class multiWriteObject {
+        long tableId;
+        byte[] key;
+    }
+    
+    public class multiRemoveObject {
+        long tableId;
+        byte[] key;
     }
 
     /**
@@ -152,6 +173,12 @@ public class JRamCloud {
         return read(tableId, key.getBytes(), rules);
     }
 
+    public Object[]
+    multiread(multiReadObject[] mread, int number)
+    {
+        return multiRead(mread, number);
+    }
+    
     /**
      * Convenience remove() wrapper that take a String key argument.
      */
@@ -208,6 +235,10 @@ public class JRamCloud {
         return write(tableId, key.getBytes(), value, rules);
     }
     
+    public long increment(long tableId, String key, long incrementValue, RejectRules rules) {
+        return increment(tableId, key.getBytes(), incrementValue, rules);
+    }
+    
     private static native long connect(String coordinatorLocator);
     private static native void disconnect(long ramcloudObjectPointer);
 
@@ -215,12 +246,16 @@ public class JRamCloud {
     public native long createTable(String name, int serverSpan);
     public native void dropTable(String name);
     public native long getTableId(String name);
+    public native long increment(long tableId, byte[] key, long incrementValue, RejectRules rules);
     public native Object read(long tableId, byte[] key);
     public native Object read(long tableId, byte[] key, RejectRules rules);
+    public native Object[] multiRead(multiReadObject[] mread, int numRequests);
     public native long remove(long tableId, byte[] key);
     public native long remove(long tableId, byte[] key, RejectRules rules);
+    public native long multiRemove(ArrayList<multiRemoveObject> mremove, int numRequests);
     public native long write(long tableId, byte[] key, byte[] value);
     public native long write(long tableId, byte[] key, byte[] value, RejectRules rules);
+    public native long multiWrite(ArrayList<multiWriteObject> mwrite, int numRequests);
 
     /*
      * The following exceptions may be thrown by the JNI functions:
@@ -260,7 +295,7 @@ public class JRamCloud {
     public static void
     main(String argv[])
     {
-        JRamCloud ramcloud = new JRamCloud(argv[0]);
+        JRamCloud ramcloud = new JRamCloud("fast+udp:host=127.0.0.1,port=12246");
         long tableId = ramcloud.createTable("hi");
         System.out.println("created table, id = " + tableId);
         long tableId2 = ramcloud.getTableId("hi");
@@ -283,6 +318,7 @@ public class JRamCloud {
         }
 
         ramcloud.write(tableId, "thisIsTheKey", "thisIsTheValue");
+        /*
         long before = System.nanoTime();
         for (int i = 0; i < 100000; i++) {
             JRamCloud.Object unused = ramcloud.read(tableId, "thisIsTheKey");
@@ -290,5 +326,28 @@ public class JRamCloud {
         long after = System.nanoTime();
         System.out.println("Avg read latency: " +
             ((double)(after - before) / 100000 / 1000) + " usec");
+        */
+        long tableId4 = ramcloud.createTable("table4");
+        ramcloud.write(tableId4, "object1-1", "value:1-1");
+        ramcloud.write(tableId4, "object1-2", "value:1-2");
+        ramcloud.write(tableId4, "object1-3", "value:1-3");
+        long tableId5 = ramcloud.createTable("table5");
+        ramcloud.write(tableId5, "object2-1", "value:2-1");
+        long tableId6 = ramcloud.createTable("table6");
+        ramcloud.write(tableId6, "object3-1", "value:3-1");
+        ramcloud.write(tableId6, "object3-2", "value:3-2");
+
+        multiReadObject mread[] = new multiReadObject[2];
+        mread[0] = new multiReadObject();
+        mread[0].tableId = tableId4;
+        mread[0].key = "object1-1".getBytes();
+        JRamCloud.Object out[] = ramcloud.multiRead(mread, 1);
+        
+        System.out.println("read object: key = [" + out[0].getKey() + "], value = ["
+            + out[0].getValue() + "], version = " + out[0].version);
+        
+        ramcloud.dropTable("table4");
+        ramcloud.dropTable("table5");
+        ramcloud.dropTable("table6");
     }
 }
