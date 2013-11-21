@@ -41,7 +41,6 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
         this.graph = graph;
         this.indexName = indexName;
         this.indexClass = indexClass;
-        System.out.println("RamCloudIndex " + tableId + "," + indexName);
     }
     
     public RamCloudIndex(byte[] rcKey, long tableId, RamCloudGraph graph, Class<T> indexClass) {
@@ -92,7 +91,6 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
     }
     
     public void getSetProperty(String key, Object value){
-        //System.out.println("put " + tableId + "," + rcKey.toString());
         if(value == null) {
             throw ExceptionFactory.propertyValueCanNotBeNull();
         }
@@ -127,7 +125,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
     
         map.put(key, values);
         setIndexPropertyMap(map);
-        
+        /*
         System.out.println("after put");
         for (Map.Entry<String, List<Object>> entry : map.entrySet()){
             Object dkey = entry.getKey();
@@ -135,11 +133,12 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
             System.out.println("Key = " + dkey);
             System.out.println("Values = " + dvalues + "n");
         }
+        */
     }
 
     @Override
     public CloseableIterable<T> get(String string, Object value) {
-        return getIndexProperty(string);
+        return getIndexProperty(value.toString());
     }
 
     @Override
@@ -148,8 +147,14 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
     }
 
     @Override
-    public long count(String string, Object o) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public long count(String key, Object value) {
+        Map<String, List<Object>> map = getIndexPropertyMap();
+        List<Object> values = map.get(value);
+        if (null == values) {
+            return 0;
+        } else {
+            return values.size();
+        }
     }
 
     @Override
@@ -184,6 +189,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
             }
         }
         setIndexPropertyMap(map);
+        /*
         System.out.println("after remove");
         for (Map.Entry<String, List<Object>> entry : map.entrySet()){
             Object dkey = entry.getKey();
@@ -191,6 +197,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
             System.out.println("Key = " + dkey);
             System.out.println("Values = " + dvalues + "n");
         }
+        */
       
     } 
     
@@ -254,7 +261,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
       ObjectOutputStream oot = new ObjectOutputStream(baos);
       oot.writeObject(map);
       rcValue = baos.toByteArray();
-      //System.out.println("setIndexproperty size:" + rcValue.length);
+      //System.out.println("setIndex: " + rcValue);
     } catch(IOException e) {
       logger.log(Level.WARNING, "Got an exception while serializing element's property map: " + e.toString());
       return;
@@ -262,15 +269,15 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
     graph.rcClient.write(tableId, rcKey, rcValue);
   } 
   
-  public <T> T getIndexProperty(Object key) {
+  public <T> T getIndexProperty(String key) {
     Map<String, List<Object>> map = getIndexPropertyMap();
-    for (Map.Entry<String, List<Object>> entry : map.entrySet()){
+/*    for (Map.Entry<String, List<Object>> entry : map.entrySet()){
             String dkey = entry.getKey();
             List<Object> dvalues = entry.getValue();
             System.out.println("Key = " + dkey);
             System.out.println("Values = " + dvalues + "n");
         }
-    System.out.println("getIndexProperty map.get " + map.get(key));
+    System.out.println("getIndexProperty map.get " + map.get(key));*/
     return (T)map.get(key);
   }
 

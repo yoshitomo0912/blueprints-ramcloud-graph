@@ -237,25 +237,77 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
     List<Vertex> vertices = new ArrayList<Vertex>();
     
     getIndexedKeys(key, Vertex.class);
-    if (KeyIndex.exists()) {
-        List<Object> keyMap = (List<Object>) KeyIndex.get(key, value);
-        JRamCloud.multiReadObject mread[] = new JRamCloud.multiReadObject[keyMap.size()];
+    getIndex(key, Vertex.class);
+    int mreadMax = 100;
+
+    if (index.exists()) {
+        List<Object> keyMap = (List<Object>) index.getIndexProperty(value.toString());
+        JRamCloud.multiReadObject vertTableMread[] = new JRamCloud.multiReadObject[keyMap.size()];
+        JRamCloud.multiReadObject vertPropTableMread[] = new JRamCloud.multiReadObject[mreadMax];
         
         int vertexNum = 0;
         for (Object vert: keyMap){
-            mread[vertexNum] = new JRamCloud.multiReadObject((Long)vert, ByteBuffer.allocate(8).order(ByteOrder.LITTLE_ENDIAN).putLong((Long)vert).array());
+            byte[] rckey = ByteBuffer.allocate(8).order(ByteOrder.LITTLE_ENDIAN).putLong((Long)vert).array();
+            vertTableMread[vertexNum] = new JRamCloud.multiReadObject(vertTableId, rckey);
+            vertPropTableMread[vertexNum] = new JRamCloud.multiReadObject(vertPropTableId, rckey);
+
+            if (vertexNum >= (mreadMax - 1)) {
+                JRamCloud.Object outvertPropTable[] = rcClient.multiRead(vertPropTableMread);
+                for (int i = 0; i < vertexNum ; i++){
+                    vertices.add(new RamCloudVertex(outvertPropTable[i].key, this));
+                }
+                vertexNum = 0;
+            }
             vertexNum++;
         }
         
-        JRamCloud.Object out[] = this.rcClient.multiRead(mread);
-        for (int i = 0; i < vertexNum ; i++){
-            vertices.add(new RamCloudVertex(out[i].key, this));
+        if (vertexNum != 0) {
+            if ((vertexNum-1) > 0){
+                JRamCloud.Object outvertPropTable[] = rcClient.multiRead(vertPropTableMread);
+                    for (int i = 0; i < vertexNum ; i++){
+                        vertices.add(new RamCloudVertex(outvertPropTable[i].key, this));
+                }
+            }
         }
-        /*        
+        /*
         for (Object vert: keyMap){
             vertices.add(getVertex(vert));
         }
-  */
+        */
+    } else if (KeyIndex.exists()) {
+        List<Object> keyMap = (List<Object>) KeyIndex.getIndexProperty(value.toString());
+        JRamCloud.multiReadObject vertTableMread[] = new JRamCloud.multiReadObject[keyMap.size()];
+        JRamCloud.multiReadObject vertPropTableMread[] = new JRamCloud.multiReadObject[mreadMax];
+        
+        int vertexNum = 0;
+        for (Object vert: keyMap){
+            byte[] rckey = ByteBuffer.allocate(8).order(ByteOrder.LITTLE_ENDIAN).putLong((Long)vert).array();
+            vertTableMread[vertexNum] = new JRamCloud.multiReadObject(vertTableId, rckey);
+            vertPropTableMread[vertexNum] = new JRamCloud.multiReadObject(vertPropTableId, rckey);
+
+            if (vertexNum >= (mreadMax - 1)) {
+                JRamCloud.Object outvertPropTable[] = rcClient.multiRead(vertPropTableMread);
+                for (int i = 0; i < vertexNum ; i++){
+                    vertices.add(new RamCloudVertex(outvertPropTable[i].key, this));
+                }
+                vertexNum = 0;
+            }
+            vertexNum++;
+        }
+        
+        if (vertexNum != 0) {
+            if ((vertexNum-1) > 0){
+                JRamCloud.Object outvertPropTable[] = rcClient.multiRead(vertPropTableMread);
+                    for (int i = 0; i < vertexNum ; i++){
+                        vertices.add(new RamCloudVertex(outvertPropTable[i].key, this));
+                }
+            }
+        }
+        /*
+        for (Object vert: keyMap){
+            vertices.add(getVertex(vert));
+        }
+        */
     } else {        
         JRamCloud.TableEnumerator tableEnum = rcClient.new TableEnumerator(vertPropTableId);
         JRamCloud.Object tableEntry;
