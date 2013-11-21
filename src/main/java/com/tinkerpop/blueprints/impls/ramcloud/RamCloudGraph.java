@@ -238,7 +238,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
     
     getIndexedKeys(key, Vertex.class);
     getIndex(key, Vertex.class);
-    int mreadMax = 100;
+    int mreadMax = 200;
 
     if (index.exists()) {
         List<Object> keyMap = (List<Object>) index.getIndexProperty(value.toString());
