@@ -242,8 +242,9 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 
     if (index.exists()) {
         List<Object> keyMap = (List<Object>) index.getIndexProperty(value.toString());
-        JRamCloud.multiReadObject vertTableMread[] = new JRamCloud.multiReadObject[keyMap.size()];
-        JRamCloud.multiReadObject vertPropTableMread[] = new JRamCloud.multiReadObject[mreadMax];
+        final int size = Math.min(mreadMax, keyMap.size());
+        JRamCloud.multiReadObject vertTableMread[] = new JRamCloud.multiReadObject[size];
+        JRamCloud.multiReadObject vertPropTableMread[] = new JRamCloud.multiReadObject[size];
         
         int vertexNum = 0;
         for (Object vert: keyMap){
