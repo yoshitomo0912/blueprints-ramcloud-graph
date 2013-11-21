@@ -251,7 +251,8 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
             byte[] rckey = ByteBuffer.allocate(8).order(ByteOrder.LITTLE_ENDIAN).putLong((Long)vert).array();
             vertTableMread[vertexNum] = new JRamCloud.multiReadObject(vertTableId, rckey);
             vertPropTableMread[vertexNum] = new JRamCloud.multiReadObject(vertPropTableId, rckey);
-
+        }
+            /*
             if (vertexNum >= (mreadMax - 1)) {
                 JRamCloud.Object outvertPropTable[] = rcClient.multiRead(vertPropTableMread);
                 for (int i = 0; i < vertexNum ; i++){
@@ -270,6 +271,13 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
                 }
             }
         }
+        * */
+        JRamCloud.Object outvertPropTable[] = rcClient.multiRead(vertPropTableMread);
+        for (int i = 0; i < size ; i++){
+            vertices.add(new RamCloudVertex(outvertPropTable[i].key, this));
+        }
+            
+            
         /*
         for (Object vert: keyMap){
             vertices.add(getVertex(vert));
