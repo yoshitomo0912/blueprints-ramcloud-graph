@@ -235,13 +235,22 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
   @Override
   public Iterable<Vertex> getVertices(String key, Object value) { 
     List<Vertex> vertices = new ArrayList<Vertex>();
-    
+    boolean idx = false;
+    List<Object> keyMap = null;
+            
     getIndexedKeys(key, Vertex.class);
     getIndex(key, Vertex.class);
-    int mreadMax = 500;
+    int mreadMax = 400;
 
     if (index.exists()) {
-        List<Object> keyMap = (List<Object>) index.getIndexProperty(value.toString());
+        keyMap = (List<Object>) index.getIndexProperty(value.toString());
+        idx = true;
+    } else if (KeyIndex.exists()) {
+        keyMap = (List<Object>) KeyIndex.getIndexProperty(value.toString());
+        idx = true;
+    }
+    
+    if (idx) {
         final int size = Math.min(mreadMax, keyMap.size());
         JRamCloud.multiReadObject vertTableMread[] = new JRamCloud.multiReadObject[size];
         JRamCloud.multiReadObject vertPropTableMread[] = new JRamCloud.multiReadObject[size];
@@ -251,40 +260,6 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
             byte[] rckey = ByteBuffer.allocate(8).order(ByteOrder.LITTLE_ENDIAN).putLong((Long)vert).array();
             vertTableMread[vertexNum] = new JRamCloud.multiReadObject(vertTableId, rckey);
             vertPropTableMread[vertexNum] = new JRamCloud.multiReadObject(vertPropTableId, rckey);
-            if (vertexNum >= (mreadMax - 1)) {
-                JRamCloud.Object outvertPropTable[] = rcClient.multiRead(vertPropTableMread);
-                for (int i = 0; i < vertexNum ; i++){
-                    vertices.add(new RamCloudVertex(outvertPropTable[i].key, this));
-                }
-                vertexNum = 0;
-            }
-            vertexNum++;
-        }
-        
-        if (vertexNum != 0) {
-            if ((vertexNum-1) > 0){
-                JRamCloud.Object outvertPropTable[] = rcClient.multiRead(vertPropTableMread);
-                    for (int i = 0; i < vertexNum ; i++){
-                        vertices.add(new RamCloudVertex(outvertPropTable[i].key, this));
-                }
-            }
-        }
-        /*
-        for (Object vert: keyMap){
-            vertices.add(getVertex(vert));
-        }
-        */
-    } else if (KeyIndex.exists()) {
-        List<Object> keyMap = (List<Object>) KeyIndex.getIndexProperty(value.toString());
-        JRamCloud.multiReadObject vertTableMread[] = new JRamCloud.multiReadObject[keyMap.size()];
-        JRamCloud.multiReadObject vertPropTableMread[] = new JRamCloud.multiReadObject[mreadMax];
-        
-        int vertexNum = 0;
-        for (Object vert: keyMap){
-            byte[] rckey = ByteBuffer.allocate(8).order(ByteOrder.LITTLE_ENDIAN).putLong((Long)vert).array();
-            vertTableMread[vertexNum] = new JRamCloud.multiReadObject(vertTableId, rckey);
-            vertPropTableMread[vertexNum] = new JRamCloud.multiReadObject(vertPropTableId, rckey);
-
             if (vertexNum >= (mreadMax - 1)) {
                 JRamCloud.Object outvertPropTable[] = rcClient.multiRead(vertPropTableMread);
                 for (int i = 0; i < vertexNum ; i++){
@@ -507,32 +482,24 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
       }
       return index;
   }
-/*  
-  public Iterable<RamCloudIndex> getIndex(String indexName, Object value) {
-        JRamCloud.TableEnumerator tableEnum = rcClient.new TableEnumerator(idxVertTableId);
-        List<RamCloudIndex> indexlist = new ArrayList<RamCloudIndex>();
-        JRamCloud.Object tableEntry;
-    
-        while(tableEnum.hasNext()) {
-            tableEntry = tableEnum.next();
-            Map<String, List<Object>> propMap = RamCloudIndex.getIndexPropertyMap(tableEntry.value);
-            if(propMap.containsKey(indexName) && propMap.get(indexName).equals(value)) {
-                indexlist.add(new RamCloudIndex(tableEntry.key, idxVertTableId, this));
-                logger.log(Level.FINE, "a index is added2");
-            }
-        }   
-    return (Iterable<RamCloudIndex>)indexlist;
-  }
-  */
+
   @Override
   public Iterable<Index<? extends Element>> getIndices() {
     final List<Index<? extends Element>> list = new ArrayList<Index<? extends Element>>();
-    JRamCloud.TableEnumerator tableEnum = rcClient.new TableEnumerator(idxVertTableId);
-    JRamCloud.Object tableEntry;
+    JRamCloud.TableEnumerator verttableEnum = rcClient.new TableEnumerator(idxVertTableId);
+    JRamCloud.Object verttableEntry;
     
-    while(tableEnum.hasNext()) {
-      tableEntry = tableEnum.next();
-      list.add(new RamCloudIndex(tableEntry.key, idxVertTableId, this, Vertex.class));
+    while(verttableEnum.hasNext()) {
+      verttableEntry = verttableEnum.next();
+      list.add(new RamCloudIndex(verttableEntry.key, idxVertTableId, this, Vertex.class));
+    }
+    
+    JRamCloud.TableEnumerator edgetableEnum = rcClient.new TableEnumerator(idxEdgeTableId);
+    JRamCloud.Object edgetableEntry;
+    
+    while(edgetableEnum.hasNext()) {
+      edgetableEntry = edgetableEnum.next();
+      list.add(new RamCloudIndex(edgetableEntry.key, idxEdgeTableId, this, Edge.class));
     }
     return list;
   }
