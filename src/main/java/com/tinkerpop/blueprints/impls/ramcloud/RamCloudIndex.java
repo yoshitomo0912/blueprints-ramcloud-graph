@@ -125,15 +125,6 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
     
         map.put(key, values);
         setIndexPropertyMap(map);
-        /*
-        System.out.println("after put");
-        for (Map.Entry<String, List<Object>> entry : map.entrySet()){
-            Object dkey = entry.getKey();
-            List<Object> dvalues = entry.getValue();
-            System.out.println("Key = " + dkey);
-            System.out.println("Values = " + dvalues + "n");
-        }
-        */
     }
 
     @Override
@@ -189,15 +180,6 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
             }
         }
         setIndexPropertyMap(map);
-        /*
-        System.out.println("after remove");
-        for (Map.Entry<String, List<Object>> entry : map.entrySet()){
-            Object dkey = entry.getKey();
-            List<Object> dvalues = entry.getValue();
-            System.out.println("Key = " + dkey);
-            System.out.println("Values = " + dvalues + "n");
-        }
-        */
       
     } 
     
@@ -261,7 +243,6 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
       ObjectOutputStream oot = new ObjectOutputStream(baos);
       oot.writeObject(map);
       rcValue = baos.toByteArray();
-      //System.out.println("setIndex: " + rcValue);
     } catch(IOException e) {
       logger.log(Level.WARNING, "Got an exception while serializing element's property map: " + e.toString());
       return;
@@ -271,13 +252,6 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
   
   public <T> T getIndexProperty(String key) {
     Map<String, List<Object>> map = getIndexPropertyMap();
-/*    for (Map.Entry<String, List<Object>> entry : map.entrySet()){
-            String dkey = entry.getKey();
-            List<Object> dvalues = entry.getValue();
-            System.out.println("Key = " + dkey);
-            System.out.println("Values = " + dvalues + "n");
-        }
-    System.out.println("getIndexProperty map.get " + map.get(key));*/
     return (T)map.get(key);
   }
 
