@@ -125,6 +125,8 @@ public class RamCloudElement implements Element, Serializable {
       throw ExceptionFactory.propertyKeyLabelIsReservedForEdges();
     }
     
+    System.out.println("setproperty key:" + key + ", " + "value:" + value);
+    
     Map<String, Object> map = getPropertyMap();
     oldValue = map.put(key, value);
     setPropertyMap(map);

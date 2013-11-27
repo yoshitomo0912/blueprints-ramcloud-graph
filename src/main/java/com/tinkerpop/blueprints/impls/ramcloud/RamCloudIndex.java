@@ -52,6 +52,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
     }
     
     public boolean exists() {
+	System.out.println("exists tableId" + tableId + ", " + "rcKey:" + indexName);
         try {
             graph.rcClient.read(tableId, rcKey);
             return true;
