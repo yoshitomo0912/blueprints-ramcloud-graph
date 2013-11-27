@@ -148,18 +148,18 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
       try {
         longId = Long.parseLong((String) id, 10);
       } catch(NumberFormatException e) {
-        logger.log(Level.WARNING, "ID argument " + id.toString() + " of type " + id.getClass() + " is not a parseable long number: " + e.toString());
+        logger.log(Level.WARNING, "ID argument {0} of type {1} is not a parseable long number: {2}", new Object[]{id.toString(), id.getClass(), e.toString()});
         return null;
           }
     } else if(id instanceof byte[]) {
       try {
         longId = ByteBuffer.wrap((byte[]) id).getLong();
       } catch(BufferUnderflowException e) {
-        logger.log(Level.WARNING, "ID argument " + id.toString() + " of type " + id.getClass() + " is not a parseable long number: " + e.toString());
+        logger.log(Level.WARNING, "ID argument {0} of type {1} is not a parseable long number: {2}", new Object[]{id.toString(), id.getClass(), e.toString()});
         return null;
       }
     } else {
-      logger.log(Level.WARNING, "ID argument " + id.toString() + " of type " + id.getClass() + " is not supported. Returning null.");
+      logger.log(Level.WARNING, "ID argument {0} of type {1} is not supported. Returning null.", new Object[]{id.toString(), id.getClass()});
       return null;
     }
     
@@ -171,7 +171,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
       newVertex.create();
       return newVertex;
     } catch(IllegalArgumentException e) {
-      logger.log(Level.WARNING, "Tried to create vertex " + newVertex.toString() + ": " + e.getMessage());
+      logger.log(Level.WARNING, "Tried to create vertex {0}: {1}", new Object[]{newVertex.toString(), e.getMessage()});
       return null;
     }
   }
@@ -190,18 +190,18 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
       try {
         longId = Long.parseLong((String) id, 10);
       } catch(NumberFormatException e) {
-        logger.log(Level.WARNING, "ID argument " + id.toString() + " of type " + id.getClass() + " is not a parseable long number: " + e.toString());
+        logger.log(Level.WARNING, "ID argument {0} of type {1} is not a parseable long number: {2}", new Object[]{id.toString(), id.getClass(), e.toString()});
         return null;
       }
     } else if(id instanceof byte[]) {
       try {
         longId = ByteBuffer.wrap((byte[]) id).getLong();
       } catch(BufferUnderflowException e) {
-        logger.log(Level.WARNING, "ID argument " + id.toString() + " of type " + id.getClass() + " is not a parseable long number: " + e.toString());
+        logger.log(Level.WARNING, "ID argument {0} of type {1} is not a parseable long number: {2}", new Object[]{id.toString(), id.getClass(), e.toString()});
         return null;
       }
     } else {
-      logger.log(Level.WARNING, "ID argument " + id.toString() + " of type " + id.getClass() + " is not supported. Returning null.");
+      logger.log(Level.WARNING, "ID argument {0} of type {1} is not supported. Returning null.", new Object[]{id.toString(), id.getClass()});
       return null;
     }
     
@@ -307,7 +307,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
   
   @Override
   public Edge addEdge(Object id, Vertex outVertex, Vertex inVertex, String label) throws IllegalArgumentException {
-    logger.log(Level.FINE, "Adding edge: [id=" + id + ", outVertex=" + outVertex + ", inVertex=" + inVertex + ", label=" + label + "]");
+    logger.log(Level.FINE, "Adding edge: [id={0}, outVertex={1}, inVertex={2}, label={3}]", new Object[]{id, outVertex, inVertex, label});
     
     if(label == null) {
       throw ExceptionFactory.edgeLabelCanNotBeNull();
@@ -319,7 +319,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
       newEdge.create();
       return newEdge;
     } catch(IllegalArgumentException e) {
-      logger.log(Level.WARNING, "Tried to create edge " + newEdge.toString() + ": " + e.getMessage());
+      logger.log(Level.WARNING, "Tried to create edge {0}: {1}", new Object[]{newEdge.toString(), e.getMessage()});
       return null;
     }
   }
@@ -335,12 +335,12 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
     } else if(id instanceof String) {
       bytearrayId = Base64.decode(((String) id));
     } else {
-      logger.log(Level.WARNING, "ID argument " + id.toString() + " of type " + id.getClass() + " is not supported. Returning null.");
+      logger.log(Level.WARNING, "ID argument {0} of type {1} is not supported. Returning null.", new Object[]{id.toString(), id.getClass()});
       return null;
     }
     
     if(!RamCloudEdge.isValidEdgeId(bytearrayId)) {
-      logger.log(Level.WARNING, "ID argument " + id.toString() + " of type " + id.getClass() + " is malformed. Returning null.");
+      logger.log(Level.WARNING, "ID argument {0} of type {1} is malformed. Returning null.", new Object[]{id.toString(), id.getClass()});
       return null;
     }
     
@@ -354,7 +354,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 
   @Override
   public void removeEdge(Edge edge) {
-    logger.log(Level.FINE, "Removing edge: [edge=" + edge + "]");
+    logger.log(Level.FINE, "Removing edge: [edge={0}]", edge);
     
     edge.remove();
   }

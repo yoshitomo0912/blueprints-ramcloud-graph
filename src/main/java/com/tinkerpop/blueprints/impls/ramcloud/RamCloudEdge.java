@@ -129,7 +129,7 @@ public class RamCloudEdge extends RamCloudElement implements Edge {
     } else if(!edgePropTableEntryExists && !outVertexEntryExists && !inVertexEntryExists) {
       return false;
     } else {
-      logger.log(Level.WARNING, toString() + ": Detected RamCloudGraph inconsistency: inVertexEntryExists=" + inVertexEntryExists + ", outVertexEntryExists=" + outVertexEntryExists + ", inVertexEntryExists=" + inVertexEntryExists + ".");
+      logger.log(Level.WARNING, "{0}: Detected RamCloudGraph inconsistency: inVertexEntryExists={1}, outVertexEntryExists={2}, inVertexEntryExists={3}.", new Object[]{toString(), inVertexEntryExists, outVertexEntryExists, inVertexEntryExists});
       return true;
     }
   }

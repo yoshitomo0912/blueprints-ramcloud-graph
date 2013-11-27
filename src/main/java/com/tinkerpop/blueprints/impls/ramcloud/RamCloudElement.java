@@ -63,10 +63,10 @@ public class RamCloudElement implements Element, Serializable {
         Map<String, Object> map = (Map<String, Object>)ois.readObject();
         return map;
       } catch(IOException e) {
-        logger.log(Level.WARNING, "Got an exception while deserializing element's property map: " + e.toString());
+        logger.log(Level.WARNING, "Got an exception while deserializing element''s property map: {0}", e.toString());
         return null;
       } catch(ClassNotFoundException e) {
-        logger.log(Level.WARNING, "Got an exception while deserializing element's property map: " + e.toString());
+        logger.log(Level.WARNING, "Got an exception while deserializing element''s property map: {0}", e.toString());
         return null;
       }
     } else {
@@ -83,7 +83,7 @@ public class RamCloudElement implements Element, Serializable {
       oot.writeObject(map);
       rcValue = baos.toByteArray();
     } catch(IOException e) {
-      logger.log(Level.WARNING, "Got an exception while serializing element's property map: " + e.toString());
+      logger.log(Level.WARNING, "Got an exception while serializing element''s property map: {0}", e.toString());
       return;
     }
     
