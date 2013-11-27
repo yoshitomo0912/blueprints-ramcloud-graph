@@ -177,7 +177,7 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
   }
   
   public void addEdgesLocally(List<RamCloudEdge> edgesToAdd) {
-    logger.log(Level.FINER, "{0}: Adding edges: [edgesToAdd={1}]", new Object[]{this, edgesToAdd});
+    logger.log(Level.FINER, this + ": Adding edges: [edgesToAdd=" + edgesToAdd + "]");
     
     Set<RamCloudEdge> edges = getEdgeSet();
     
@@ -185,13 +185,13 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
       if(edges.addAll(edgesToAdd))
         setEdgeSet(edges);
       else
-        logger.log(Level.WARNING, "{0}: Failed to remove a set of edges ({1})", new Object[]{toString(), edgesToAdd.toString()});
+        logger.log(Level.WARNING, toString() + ": Failed to remove a set of edges (" + edgesToAdd.toString() + ")");
     } catch(UnsupportedOperationException e) {
-      logger.log(Level.WARNING, "{0}: Failed to remove a set of edges ({1}): {2}", new Object[]{toString(), edgesToAdd.toString(), e.getLocalizedMessage()});
+      logger.log(Level.WARNING, toString() + ": Failed to remove a set of edges (" + edgesToAdd.toString() + "): " + e.getLocalizedMessage());
     } catch(ClassCastException e) {
-      logger.log(Level.WARNING, "{0}: Failed to remove a set of edges ({1}): {2}", new Object[]{toString(), edgesToAdd.toString(), e.getLocalizedMessage()});
+      logger.log(Level.WARNING, toString() + ": Failed to remove a set of edges (" + edgesToAdd.toString() + "): " + e.getLocalizedMessage());
     } catch(NullPointerException e) {
-      logger.log(Level.WARNING, "{0}: Failed to remove a set of edges ({1}): {2}", new Object[]{toString(), edgesToAdd.toString(), e.getLocalizedMessage()});
+      logger.log(Level.WARNING, toString() + ": Failed to remove a set of edges (" + edgesToAdd.toString() + "): " + e.getLocalizedMessage());
     }
   }
   
@@ -202,7 +202,7 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
   }
    
    public void removeEdgesLocally(List<RamCloudEdge> edgesToRemove) {
-     logger.log(Level.FINER, "{0}: Removing edges: [edgesToRemove={1}]", new Object[]{this, edgesToRemove});
+     logger.log(Level.FINER, this + ": Removing edges: [edgesToRemove=" + edgesToRemove + "]");
      
      Set<RamCloudEdge> edges = getEdgeSet();
      
@@ -210,13 +210,13 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
        if(edges.removeAll(edgesToRemove))
          setEdgeSet(edges);
        else
-         logger.log(Level.WARNING, "{0}: Failed to remove a set of edges ({1})", new Object[]{toString(), edgesToRemove.toString()});
+         logger.log(Level.WARNING, toString() + ": Failed to remove a set of edges (" + edgesToRemove.toString() + ")");
      } catch(UnsupportedOperationException e) {
-       logger.log(Level.WARNING, "{0}: Failed to remove a set of edges ({1}): {2}", new Object[]{toString(), edgesToRemove.toString(), e.getLocalizedMessage()});
+       logger.log(Level.WARNING, toString() + ": Failed to remove a set of edges (" + edgesToRemove.toString() + "): " + e.getLocalizedMessage());
      } catch(ClassCastException e) {
-       logger.log(Level.WARNING, "{0}: Failed to remove a set of edges ({1}): {2}", new Object[]{toString(), edgesToRemove.toString(), e.getLocalizedMessage()});
+       logger.log(Level.WARNING, toString() + ": Failed to remove a set of edges (" + edgesToRemove.toString() + "): " + e.getLocalizedMessage());
      } catch(NullPointerException e) {
-       logger.log(Level.WARNING, "{0}: Failed to remove a set of edges ({1}): {2}", new Object[]{toString(), edgesToRemove.toString(), e.getLocalizedMessage()});
+       logger.log(Level.WARNING, toString() + ": Failed to remove a set of edges (" + edgesToRemove.toString() + "): " + e.getLocalizedMessage());
      }
    }
 
@@ -233,14 +233,14 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
     try {
       vertTableEntry = graph.rcClient.read(graph.vertTableId, rcKey);
     } catch(Exception e) {
-      logger.log(Level.WARNING, "{0}: Error reading vertex table entry: {1}", new Object[]{toString(), e.toString()});
+      logger.log(Level.WARNING, toString() + ": Error reading vertex table entry: " + e.toString());
       return null;
     }
     
     try {
       edgeList = EdgeListProtoBuf.parseFrom(vertTableEntry.value);
     } catch(InvalidProtocolBufferException e) {
-      logger.log(Level.WARNING, "{0}: Read malformed edge list: {1}", new Object[]{toString(), e.toString()});
+      logger.log(Level.WARNING, toString() + ": Read malformed edge list: " + e.toString());
       return null;
     }
     
@@ -287,7 +287,7 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
           }
         }
       } else {
-        logger.log(Level.WARNING, "{0}: Tried to add an edge unowned by this vertex ({1})", new Object[]{toString(), edge.toString()});
+        logger.log(Level.WARNING, toString() + ": Tried to add an edge unowned by this vertex (" + edge.toString() + ")");
       }
     }
     
@@ -307,14 +307,14 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
    try {
      vertTableEntry = graph.rcClient.read(graph.vertTableId, rcKey);
    } catch(Exception e) {
-     logger.log(Level.WARNING, "{0}: Error reading vertex table entry: {1}", new Object[]{toString(), e.getMessage()});
+     logger.log(Level.WARNING, toString() + ": Error reading vertex table entry: " + e.getMessage());
      return null;
    }
    
    try {
      edgeListPB = EdgeListProtoBuf.parseFrom(vertTableEntry.value);
    } catch(InvalidProtocolBufferException e) {
-     logger.log(Level.WARNING, "{0}: Read malformed edge list: {1}", new Object[]{toString(), e.getMessage()});
+     logger.log(Level.WARNING, toString() + ": Read malformed edge list: " + e.getMessage());
      return null;
    }
    
@@ -356,7 +356,7 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
     } else if(!vertTableEntryExists && !vertPropTableEntryExists) {
       return false;
     } else {
-      logger.log(Level.WARNING, "{0}: Detected RamCloudGraph inconsistency: vertTableEntryExists={1}, vertPropTableEntryExists={2}.", new Object[]{toString(), vertTableEntryExists, vertPropTableEntryExists});
+      logger.log(Level.WARNING, toString() + ": Detected RamCloudGraph inconsistency: vertTableEntryExists=" + vertTableEntryExists + ", vertPropTableEntryExists=" + vertPropTableEntryExists + ".");
       return true;
     }
   }

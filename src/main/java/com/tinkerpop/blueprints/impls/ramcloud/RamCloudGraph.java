@@ -133,34 +133,12 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 
   @Override
   public Vertex addVertex(Object id) {
-    logger.log(Level.FINE, "Adding vertex: [id=" + id + "]");
+    logger.log(Level.FINE, "Adding vertex: [id={0}]", id);
     System.out.println("Adding vertex: [id=" + id + "]");
 
-    Long longId;
-    
-    if(id == null) {
-      longId = nextVertexId++;
-    } else if(id instanceof Integer) {
-      longId = ((Integer) id).longValue();
-    } else if(id instanceof Long) {
-      longId = (Long) id;
-    } else if(id instanceof String) {
-      try {
-        longId = Long.parseLong((String) id, 10);
-      } catch(NumberFormatException e) {
-        logger.log(Level.WARNING, "ID argument {0} of type {1} is not a parseable long number: {2}", new Object[]{id.toString(), id.getClass(), e.toString()});
-        return null;
-          }
-    } else if(id instanceof byte[]) {
-      try {
-        longId = ByteBuffer.wrap((byte[]) id).getLong();
-      } catch(BufferUnderflowException e) {
-        logger.log(Level.WARNING, "ID argument {0} of type {1} is not a parseable long number: {2}", new Object[]{id.toString(), id.getClass(), e.toString()});
-        return null;
-      }
-    } else {
-      logger.log(Level.WARNING, "ID argument {0} of type {1} is not supported. Returning null.", new Object[]{id.toString(), id.getClass()});
-      return null;
+    Long longId = createVertId(id);
+    if (longId == null) {
+	return null;
     }
     
     System.out.println("Adding vertex: [longId=" + longId + "]");
@@ -176,6 +154,33 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
     }
   }
 
+  public synchronized Long createVertId(Object id) {
+    if(id == null) {
+      return nextVertexId++;
+    } else if(id instanceof Integer) {
+      return ((Integer) id).longValue();
+    } else if(id instanceof Long) {
+      return (Long) id;
+    } else if(id instanceof String) {
+      try {
+        return Long.parseLong((String) id, 10);
+      } catch(NumberFormatException e) {
+        logger.log(Level.WARNING, "ID argument {0} of type {1} is not a parseable long number: {2}", new Object[]{id.toString(), id.getClass(), e.toString()});
+        return null;
+          }
+    } else if(id instanceof byte[]) {
+      try {
+        return ByteBuffer.wrap((byte[]) id).getLong();
+      } catch(BufferUnderflowException e) {
+        logger.log(Level.WARNING, "ID argument {0} of type {1} is not a parseable long number: {2}", new Object[]{id.toString(), id.getClass(), e.toString()});
+        return null;
+      }
+    } else {
+      logger.log(Level.WARNING, "ID argument {0} of type {1} is not supported. Returning null.", new Object[]{id.toString(), id.getClass()});
+      return null;
+    }
+  }
+  
   @Override
   public Vertex getVertex(Object id) throws IllegalArgumentException {
     Long longId;
