@@ -27,8 +27,14 @@ import edu.stanford.ramcloud.JRamCloud;
 import java.io.Serializable;
 import java.nio.ByteOrder;
 import java.util.*;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, TransactionalGraph, Serializable {
+
+    private final ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
+    private final Lock read  = readWriteLock.readLock();
+    private final Lock write = readWriteLock.writeLock();
 
   private static final Logger logger = Logger.getLogger(RamCloudGraph.class.getName());
   
@@ -123,7 +129,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
     kidxVertTableId = rcClient.createTable(KIDX_VERT_TABLE_NAME);
     kidxEdgeTableId = rcClient.createTable(KIDX_EDGE_TABLE_NAME);
     
-    logger.log(Level.INFO, "Connected to coordinator at " + coordinatorLocation + " and created tables " + vertTableId + ", " + vertPropTableId + ", and " + edgePropTableId);
+    logger.log(Level.INFO, "Connected to coordinator at {0} and created tables {1}, {2}, and {3}", new Object[]{coordinatorLocation, vertTableId, vertPropTableId, edgePropTableId});
   }
 
   @Override
@@ -135,49 +141,46 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
   public Vertex addVertex(Object id) {
     logger.log(Level.FINE, "Adding vertex: [id={0}]", id);
     System.out.println("Adding vertex: [id=" + id + "]");
-
-    Long longId = createVertId(id);
-    if (longId == null) {
+    
+    Long longId;
+    if(id == null) {
+	write.lock();
+	try {
+	    longId = nextVertexId++;
+	} finally {
+	    write.unlock();
+	}
+    } else if(id instanceof Integer) {
+	longId = ((Integer) id).longValue();
+    } else if(id instanceof Long) {
+	longId = (Long) id;
+    } else if(id instanceof String) {
+    try {
+	longId = Long.parseLong((String) id, 10);
+    } catch(NumberFormatException e) {
+	logger.log(Level.WARNING, "ID argument {0} of type {1} is not a parseable long number: {2}", new Object[]{id.toString(), id.getClass(), e.toString()});
+	return null;
+    }
+    } else if(id instanceof byte[]) {
+    try {
+	longId = ByteBuffer.wrap((byte[]) id).getLong();
+    } catch(BufferUnderflowException e) {
+	logger.log(Level.WARNING, "ID argument {0} of type {1} is not a parseable long number: {2}", new Object[]{id.toString(), id.getClass(), e.toString()});
+	return null;
+    }
+    } else {
+	logger.log(Level.WARNING, "ID argument {0} of type {1} is not supported. Returning null.", new Object[]{id.toString(), id.getClass()});
 	return null;
     }
     
-    System.out.println("Adding vertex: [longId=" + longId + "]");
-    
     RamCloudVertex newVertex = new RamCloudVertex(longId, this);
-    
-    try {
-      newVertex.create();
-      return newVertex;
-    } catch(IllegalArgumentException e) {
-      logger.log(Level.WARNING, "Tried to create vertex {0}: {1}", new Object[]{newVertex.toString(), e.getMessage()});
-      return null;
-    }
-  }
 
-  public synchronized Long createVertId(Object id) {
-    if(id == null) {
-      return nextVertexId++;
-    } else if(id instanceof Integer) {
-      return ((Integer) id).longValue();
-    } else if(id instanceof Long) {
-      return (Long) id;
-    } else if(id instanceof String) {
-      try {
-        return Long.parseLong((String) id, 10);
-      } catch(NumberFormatException e) {
-        logger.log(Level.WARNING, "ID argument {0} of type {1} is not a parseable long number: {2}", new Object[]{id.toString(), id.getClass(), e.toString()});
-        return null;
-          }
-    } else if(id instanceof byte[]) {
-      try {
-        return ByteBuffer.wrap((byte[]) id).getLong();
-      } catch(BufferUnderflowException e) {
-        logger.log(Level.WARNING, "ID argument {0} of type {1} is not a parseable long number: {2}", new Object[]{id.toString(), id.getClass(), e.toString()});
-        return null;
-      }
-    } else {
-      logger.log(Level.WARNING, "ID argument {0} of type {1} is not supported. Returning null.", new Object[]{id.toString(), id.getClass()});
-      return null;
+    try {
+	newVertex.create();
+	return newVertex;
+    } catch(IllegalArgumentException e) {
+	logger.log(Level.WARNING, "Tried to create vertex " + newVertex.toString() + ": " + e.getMessage());
+	return null;
     }
   }
   
@@ -220,7 +223,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 
   @Override
   public void removeVertex(Vertex vertex) {
-    logger.log(Level.FINE, "Removing vertex: [vertex=" + vertex + "]");
+    logger.log(Level.FINE, "Removing vertex: [vertex={0}]", vertex);
         
     ((RamCloudVertex) vertex).remove();
   }
