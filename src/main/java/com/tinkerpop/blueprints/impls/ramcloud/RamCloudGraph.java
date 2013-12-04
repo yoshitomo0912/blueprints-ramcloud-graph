@@ -301,13 +301,18 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
         JRamCloud.TableEnumerator tableEnum = rcClient.new TableEnumerator(vertPropTableId);
         JRamCloud.Object tableEntry;
     
-        while(tableEnum.hasNext()) {
-            tableEntry = tableEnum.next();
-            Map<String, Object> propMap = RamCloudElement.getPropertyMap(tableEntry.value);
-            if(propMap.containsKey(key) && propMap.get(key).equals(value)) {
-                vertices.add(new RamCloudVertex(tableEntry.key, this));
-                logger.log(Level.FINE, "a vertice is added2");
-            }
+      while (tableEnum.hasNext()) {
+	  tableEntry = tableEnum.next();
+	  if (tableEntry != null) {
+	      Map<String, Object> propMap = RamCloudElement.getPropertyMap(tableEntry.value);
+	      if (propMap.containsKey(key) && propMap.get(key).equals(value)) {
+		  vertices.add(new RamCloudVertex(tableEntry.key, this));
+		  logger.log(Level.FINE, "a vertice is added2");
+	      }
+	  } else {
+	      System.out.println("table entry is null");
+	      break;
+	  }
         }
     //}
     
