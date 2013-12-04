@@ -250,7 +250,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
     List<Object> keyMap = null;
     
     System.out.println("getVertices key:" + key + ", " + "value:" + value);
-    
+/*    
     getIndexedKeys(key, Vertex.class);
     getIndex(key, Vertex.class);
     int mreadMax = 400;
@@ -296,7 +296,8 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
             vertices.add(getVertex(vert));
         }
         */
-    } else {        
+    //} else {
+    
         JRamCloud.TableEnumerator tableEnum = rcClient.new TableEnumerator(vertPropTableId);
         JRamCloud.Object tableEntry;
     
@@ -308,7 +309,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
                 logger.log(Level.FINE, "a vertice is added2");
             }
         }
-    }
+    //}
     
     return (Iterable<Vertex>)vertices;
   }
@@ -452,10 +453,24 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 
   @Override
   public <T extends Element> Set<String> getIndexedKeys(Class<T> elementClass) {
-          
-    return null;
+    Set<String> indexkey = null;
+    JRamCloud.Object tableEntry;
+    JRamCloud.TableEnumerator tableEnum;
+    
+    if (elementClass == Vertex.class) {
+	tableEnum = rcClient.new TableEnumerator(kidxVertTableId);
+    } else {
+	tableEnum = rcClient.new TableEnumerator(kidxEdgeTableId);
+    }
+	
+    while(tableEnum.hasNext()) {
+	tableEntry = tableEnum.next();
+	Map<String, Object> propMap = RamCloudElement.getPropertyMap(tableEntry.value);
+	indexkey.add(new String(tableEntry.key));
+	logger.log(Level.FINE, "a vertice is added2");
+    }
+    return indexkey;
   }
-
 
   public <T extends Element> RamCloudKeyIndex getIndexedKeys(String key, Class<T> elementClass) {
           
@@ -518,7 +533,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
   }
 
   @Override
-  public void dropIndex(String indexName) {        
+  public void dropIndex(String indexName) {
         // Remove ourselves entirely from the vertex table
   }
 
