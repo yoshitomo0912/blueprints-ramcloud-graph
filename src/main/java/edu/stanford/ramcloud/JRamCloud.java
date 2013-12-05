@@ -101,9 +101,9 @@ public class JRamCloud {
             tableEnumeratorObjectPointer = init(tableId);
         }
         
-        private synchronized native long init(long tableId);
-        public synchronized native boolean hasNext();
-        public synchronized native Object next();
+        private native long init(long tableId);
+        public native boolean hasNext();
+        public native Object next();
     }
 
     /**
@@ -147,7 +147,7 @@ public class JRamCloud {
     /**
      * Convenience read() wrapper that take a String key argument.
      */
-    public synchronized Object
+    public Object
     read(long tableId, String key)
     {
         return read(tableId, key.getBytes());
@@ -156,7 +156,7 @@ public class JRamCloud {
     /**
      * Convenience read() wrapper that take a String key argument.
      */
-    public synchronized Object
+    public Object
     read(long tableId, String key, RejectRules rules)
     {
         return read(tableId, key.getBytes(), rules);
@@ -165,7 +165,7 @@ public class JRamCloud {
     /**
      * Convenience remove() wrapper that take a String key argument.
      */
-    public synchronized long
+    public long
     remove(long tableId, String key)
     {
         return remove(tableId, key.getBytes());
@@ -174,7 +174,7 @@ public class JRamCloud {
     /**
      * Convenience remove() wrapper that take a String key argument.
      */
-    public synchronized long
+    public long
     remove(long tableId, String key, RejectRules rules)
     {
         return remove(tableId, key.getBytes(), rules);
@@ -183,7 +183,7 @@ public class JRamCloud {
     /**
      * Convenience write() wrapper that take String key and value arguments.
      */
-    public synchronized long
+    public long
     write(long tableId, String key, String value)
     {
         return write(tableId, key.getBytes(), value.getBytes());
@@ -192,7 +192,7 @@ public class JRamCloud {
     /**
      * Convenience write() wrapper that take String key and value arguments.
      */
-    public synchronized long
+    public long
     write(long tableId, String key, String value, RejectRules rules)
     {
         return write(tableId, key.getBytes(), value.getBytes(), rules);
@@ -202,7 +202,7 @@ public class JRamCloud {
      * Convenience write() wrapper that takes a String key and a byte[] value
      * argument.
      */
-    public synchronized long
+    public long
     write(long tableId, String key, byte[] value)
     {
         return write(tableId, key.getBytes(), value);
@@ -212,7 +212,7 @@ public class JRamCloud {
      * Convenience write() wrapper that takes a String key and a byte[] value
      * argument.
      */
-    public synchronized long
+    public long
     write(long tableId, String key, byte[] value, RejectRules rules)
     {
         return write(tableId, key.getBytes(), value, rules);
@@ -221,17 +221,17 @@ public class JRamCloud {
     private static native long connect(String coordinatorLocator);
     private static native void disconnect(long ramcloudObjectPointer);
 
-    public synchronized native long createTable(String name);
-    public synchronized native long createTable(String name, int serverSpan);
-    public synchronized native void dropTable(String name);
-    public synchronized native long getTableId(String name);
-    public synchronized native Object read(long tableId, byte[] key);
-    public synchronized native Object read(long tableId, byte[] key, RejectRules rules);
-    public synchronized native Object[] multiRead(multiReadObject[] mread);
-    public synchronized native long remove(long tableId, byte[] key);
-    public synchronized native long remove(long tableId, byte[] key, RejectRules rules);
-    public synchronized native long write(long tableId, byte[] key, byte[] value);
-    public synchronized native long write(long tableId, byte[] key, byte[] value, RejectRules rules);
+    public native long createTable(String name);
+    public native long createTable(String name, int serverSpan);
+    public native void dropTable(String name);
+    public native long getTableId(String name);
+    public native Object read(long tableId, byte[] key);
+    public native Object read(long tableId, byte[] key, RejectRules rules);
+    public native Object[] multiRead(multiReadObject[] mread);
+    public native long remove(long tableId, byte[] key);
+    public native long remove(long tableId, byte[] key, RejectRules rules);
+    public native long write(long tableId, byte[] key, byte[] value);
+    public native long write(long tableId, byte[] key, byte[] value, RejectRules rules);
 
     /*
      * The following exceptions may be thrown by the JNI functions:

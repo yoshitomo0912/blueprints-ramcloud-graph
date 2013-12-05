@@ -140,7 +140,6 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
   @Override
   public Vertex addVertex(Object id) {
     logger.log(Level.FINE, "Adding vertex: [id={0}]", id);
-    System.out.println("Adding vertex: [id=" + id + "]");
     
     Long longId;
     if(id == null) {
