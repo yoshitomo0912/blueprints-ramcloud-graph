@@ -233,17 +233,23 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
   public Iterable<Vertex> getVertices() {
     JRamCloud.TableEnumerator tableEnum = rcClient.new TableEnumerator(vertPropTableId);
     List<Vertex> vertices = new ArrayList<Vertex>();
-    
-    while(tableEnum.hasNext()) {
-        logger.log(Level.FINE, "a vertice is added");
-        vertices.add(new RamCloudVertex(tableEnum.next().key, this));          
+
+    write.lock();
+    try {    
+	while(tableEnum.hasNext()) {
+	    logger.log(Level.FINE, "a vertice is added");
+	    vertices.add(new RamCloudVertex(tableEnum.next().key, this));          
+	}
+    } finally {
+	write.unlock();
     }
     
     return (Iterable<Vertex>)vertices;
   }
 
   @Override
-  public Iterable<Vertex> getVertices(String key, Object value) { 
+  public Iterable<Vertex> getVertices(String key, Object value) {
+    
     List<Vertex> vertices = new ArrayList<Vertex>();
     boolean idx = false;
     List<Object> keyMap = null;
@@ -299,7 +305,9 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
     
         JRamCloud.TableEnumerator tableEnum = rcClient.new TableEnumerator(vertPropTableId);
         JRamCloud.Object tableEntry;
-    
+
+    write.lock();
+    try {
       while (tableEnum.hasNext()) {
 	  tableEntry = tableEnum.next();
 	  if (tableEntry != null) {
@@ -313,6 +321,9 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	      break;
 	  }
         }
+    } finally {
+	write.unlock();
+    }
     //}
     
     return (Iterable<Vertex>)vertices;
