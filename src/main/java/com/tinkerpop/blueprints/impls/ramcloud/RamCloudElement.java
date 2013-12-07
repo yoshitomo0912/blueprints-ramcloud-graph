@@ -22,154 +22,152 @@ import java.io.*;
 
 public class RamCloudElement implements Element, Serializable {
 
-  private static final Logger logger = Logger.getLogger(RamCloudGraph.class.getName());
-  
-  private byte[] rcPropTableKey;
-  private long rcPropTableId;
-  private RamCloudGraph graph;
-  
-  public RamCloudElement() {
-  }
-  
-  public RamCloudElement(byte[] rcPropTableKey, long rcPropTableId, JRamCloud rcClient, RamCloudGraph graph) {
-    this.rcPropTableKey = rcPropTableKey;
-    this.rcPropTableId = rcPropTableId;
-    this.graph = graph;
-  }
-  
-  public Map<String, Object> getPropertyMap() {
-    JRamCloud.Object propTableEntry;
-    
-    try {
-      propTableEntry = graph.getRcClient().read(rcPropTableId, rcPropTableKey);
-    } catch(Exception e) {
-      logger.log(Level.WARNING, "Element does not have a property table entry!");
-      return null;
+    private static final Logger logger = Logger.getLogger(RamCloudGraph.class.getName());
+    private byte[] rcPropTableKey;
+    private long rcPropTableId;
+    private RamCloudGraph graph;
+
+    public RamCloudElement() {
     }
-    
-    return getPropertyMap(propTableEntry.value);
-  }
 
-  public static Map<String, Object> getPropertyMap(byte[] byteArray) {
-    if(byteArray == null) {
-      logger.log(Level.WARNING, "Got a null byteArray argument");
-      return null;
-    } else if(byteArray.length != 0) {
-      try {
-        ByteArrayInputStream bais = new ByteArrayInputStream(byteArray);
-        ObjectInputStream ois = new ObjectInputStream(bais);
-        Map<String, Object> map = (Map<String, Object>)ois.readObject();
-        return map;
-      } catch(IOException e) {
-        logger.log(Level.WARNING, "Got an exception while deserializing element''s property map: {0}", e.toString());
-        return null;
-      } catch(ClassNotFoundException e) {
-        logger.log(Level.WARNING, "Got an exception while deserializing element''s property map: {0}", e.toString());
-        return null;
-      }
-    } else {
-      return new HashMap<String, Object>();
+    public RamCloudElement(byte[] rcPropTableKey, long rcPropTableId, JRamCloud rcClient, RamCloudGraph graph) {
+	this.rcPropTableKey = rcPropTableKey;
+	this.rcPropTableId = rcPropTableId;
+	this.graph = graph;
     }
-  }
-  
-  public void setPropertyMap(Map<String, Object> map) {
-    byte[] rcValue;
-    
-    try {
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      ObjectOutputStream oot = new ObjectOutputStream(baos);
-      oot.writeObject(map);
-      rcValue = baos.toByteArray();
-    } catch(IOException e) {
-      logger.log(Level.WARNING, "Got an exception while serializing element''s property map: {0}", e.toString());
-      return;
+
+    public Map<String, Object> getPropertyMap() {
+	JRamCloud.Object propTableEntry;
+
+	try {
+	    propTableEntry = graph.getRcClient().read(rcPropTableId, rcPropTableKey);
+	} catch (Exception e) {
+	    logger.log(Level.WARNING, "Element does not have a property table entry!");
+	    return null;
+	}
+
+	return getPropertyMap(propTableEntry.value);
     }
-    
-    graph.getRcClient().write(rcPropTableId, rcPropTableKey, rcValue);
-  }
-  
-  @Override
-  public <T> T getProperty(String key) {
-    Map<String, Object> map = getPropertyMap();
-    return (T)map.get(key);
-  }
 
-  @Override
-  public Set<String> getPropertyKeys() {
-    Map<String, Object> map = getPropertyMap();
-    return map.keySet();
-  }
-
-  @Override
-  public void setProperty(String key, Object value) {
-    Object oldValue;
-    if(value == null) {
-      throw ExceptionFactory.propertyValueCanNotBeNull();
+    public static Map<String, Object> getPropertyMap(byte[] byteArray) {
+	if (byteArray == null) {
+	    logger.log(Level.WARNING, "Got a null byteArray argument");
+	    return null;
+	} else if (byteArray.length != 0) {
+	    try {
+		ByteArrayInputStream bais = new ByteArrayInputStream(byteArray);
+		ObjectInputStream ois = new ObjectInputStream(bais);
+		Map<String, Object> map = (Map<String, Object>) ois.readObject();
+		return map;
+	    } catch (IOException e) {
+		logger.log(Level.WARNING, "Got an exception while deserializing element''s property map: {0}", e.toString());
+		return null;
+	    } catch (ClassNotFoundException e) {
+		logger.log(Level.WARNING, "Got an exception while deserializing element''s property map: {0}", e.toString());
+		return null;
+	    }
+	} else {
+	    return new HashMap<String, Object>();
+	}
     }
-    
-    if(key == null) {
-      throw ExceptionFactory.propertyKeyCanNotBeNull();
+
+    public void setPropertyMap(Map<String, Object> map) {
+	byte[] rcValue;
+
+	try {
+	    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+	    ObjectOutputStream oot = new ObjectOutputStream(baos);
+	    oot.writeObject(map);
+	    rcValue = baos.toByteArray();
+	} catch (IOException e) {
+	    logger.log(Level.WARNING, "Got an exception while serializing element''s property map: {0}", e.toString());
+	    return;
+	}
+
+	graph.getRcClient().write(rcPropTableId, rcPropTableKey, rcValue);
     }
-    
-    if(key.equals("")) {
-      throw ExceptionFactory.propertyKeyCanNotBeEmpty();
+
+    @Override
+    public <T> T getProperty(String key) {
+	Map<String, Object> map = getPropertyMap();
+	return (T) map.get(key);
     }
-    
-    if(key.equals("id")) {
-      throw ExceptionFactory.propertyKeyIdIsReserved();
+
+    @Override
+    public Set<String> getPropertyKeys() {
+	Map<String, Object> map = getPropertyMap();
+	return map.keySet();
     }
-    
-    if(this instanceof RamCloudEdge && key.equals("label")) {
-      throw ExceptionFactory.propertyKeyLabelIsReservedForEdges();
+
+    @Override
+    public void setProperty(String key, Object value) {
+	Object oldValue;
+	if (value == null) {
+	    throw ExceptionFactory.propertyValueCanNotBeNull();
+	}
+
+	if (key == null) {
+	    throw ExceptionFactory.propertyKeyCanNotBeNull();
+	}
+
+	if (key.equals("")) {
+	    throw ExceptionFactory.propertyKeyCanNotBeEmpty();
+	}
+
+	if (key.equals("id")) {
+	    throw ExceptionFactory.propertyKeyIdIsReserved();
+	}
+
+	if (this instanceof RamCloudEdge && key.equals("label")) {
+	    throw ExceptionFactory.propertyKeyLabelIsReservedForEdges();
+	}
+
+	System.out.println("setproperty key:" + key + ", " + "value:" + value);
+
+	Map<String, Object> map = getPropertyMap();
+	oldValue = map.put(key, value);
+	setPropertyMap(map);
+
+	if (this instanceof RamCloudVertex) {
+	    graph.getIndexedKeys(key, Vertex.class);
+	    RamCloudGraph.KeyIndex.autoUpdate(key, value, oldValue, this);
+	} else {
+	    graph.getIndexedKeys(key, Edge.class);
+	    RamCloudGraph.KeyIndex.autoUpdate(key, value, oldValue, this);
+	}
     }
-    
-    System.out.println("setproperty key:" + key + ", " + "value:" + value);
-    
-    Map<String, Object> map = getPropertyMap();
-    oldValue = map.put(key, value);
-    setPropertyMap(map);
-    
-    if (this instanceof RamCloudVertex){
-        graph.getIndexedKeys(key, Vertex.class);
-        RamCloudGraph.KeyIndex.autoUpdate(key, value, oldValue, this);
-    } else {
-        graph.getIndexedKeys(key, Edge.class);
-        RamCloudGraph.KeyIndex.autoUpdate(key, value, oldValue, this);
+
+    @Override
+    public <T> T removeProperty(String key) {
+	Map<String, Object> map = getPropertyMap();
+	T retVal = (T) map.remove(key);
+	setPropertyMap(map);
+
+	if (this instanceof RamCloudVertex) {
+	    graph.getIndexedKeys(key, Vertex.class);
+	    RamCloudGraph.KeyIndex.autoRemove(key, retVal.toString(), this);
+	} else {
+	    graph.getIndexedKeys(key, Edge.class);
+	    RamCloudGraph.KeyIndex.autoRemove(key, retVal.toString(), this);
+	}
+
+	return retVal;
     }
-  }
 
-  @Override
-  public <T> T removeProperty(String key) {
-    Map<String, Object> map = getPropertyMap();
-    T retVal = (T)map.remove(key);
-    setPropertyMap(map);
+    @Override
+    public void remove() {
+	graph.getRcClient().remove(rcPropTableId, rcPropTableKey);
+    }
 
-    if (this instanceof RamCloudVertex){
-        graph.getIndexedKeys(key, Vertex.class);
-        RamCloudGraph.KeyIndex.autoRemove(key, retVal.toString(), this);
-    } else {
-        graph.getIndexedKeys(key, Edge.class);
-        RamCloudGraph.KeyIndex.autoRemove(key, retVal.toString(), this);
-        }
+    @Override
+    public Object getId() {
+	// TODO Auto-generated method stub
+	return null;
+    }
 
-    return retVal;
-  }
-
-  @Override
-  public void remove() {
-    graph.getRcClient().remove(rcPropTableId, rcPropTableKey);
-  }
-
-  @Override
-  public Object getId() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public String toString() {
-    return "RamCloudElement [rcPropTableKey=" + Arrays.toString(rcPropTableKey)
-        + ", rcPropTableId=" + rcPropTableId + "]";
-  }
-
+    @Override
+    public String toString() {
+	return "RamCloudElement [rcPropTableKey=" + Arrays.toString(rcPropTableKey)
+		+ ", rcPropTableId=" + rcPropTableId + "]";
+    }
 }

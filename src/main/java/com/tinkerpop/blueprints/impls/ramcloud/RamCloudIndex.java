@@ -34,242 +34,239 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
     private long tableId;
     private String indexName;
     private Class<T> indexClass;
-    
+
     public RamCloudIndex(long tableId, String indexName, RamCloudGraph graph, Class<T> indexClass) {
-        this.tableId = tableId;
-        this.rcKey = indexToRcKey(indexName);
-        this.graph = graph;
-        this.indexName = indexName;
-        this.indexClass = indexClass;
+	this.tableId = tableId;
+	this.rcKey = indexToRcKey(indexName);
+	this.graph = graph;
+	this.indexName = indexName;
+	this.indexClass = indexClass;
     }
-    
+
     public RamCloudIndex(byte[] rcKey, long tableId, RamCloudGraph graph, Class<T> indexClass) {
-        this.tableId = tableId;
-        this.rcKey = rcKey;
-        this.graph = graph;
-        this.indexName = new String(rcKey);
-        this.indexClass = indexClass;
+	this.tableId = tableId;
+	this.rcKey = rcKey;
+	this.graph = graph;
+	this.indexName = new String(rcKey);
+	this.indexClass = indexClass;
     }
-    
+
     public boolean exists() {
 	System.out.println("exists tableId" + tableId + ", " + "rcKey:" + indexName);
-        try {
-            graph.getRcClient().read(tableId, rcKey);
-            return true;
-        } catch(Exception e) {
-            return false;
-        }
+	try {
+	    graph.getRcClient().read(tableId, rcKey);
+	    return true;
+	} catch (Exception e) {
+	    return false;
+	}
     }
-    
-    public void create() throws IllegalArgumentException{
-        if (!exists()){
-            graph.getRcClient().write(tableId, rcKey, ByteBuffer.allocate(0).array());
 
-        } else {
-            throw ExceptionFactory.vertexWithIdAlreadyExists(rcKey);
-        }
+    public void create() throws IllegalArgumentException {
+	if (!exists()) {
+	    graph.getRcClient().write(tableId, rcKey, ByteBuffer.allocate(0).array());
+
+	} else {
+	    throw ExceptionFactory.vertexWithIdAlreadyExists(rcKey);
+	}
     }
-    
+
     private static byte[] indexToRcKey(String indexName) {
-    return ByteBuffer.allocate(16 + indexName.length()).order(ByteOrder.LITTLE_ENDIAN)
-                      .put(indexName.getBytes())
-                      .array();
+	return ByteBuffer.allocate(16 + indexName.length()).order(ByteOrder.LITTLE_ENDIAN).put(indexName.getBytes()).array();
     }
-    
+
     @Override
     public String getIndexName() {
-        return this.indexName;
+	return this.indexName;
     }
 
     @Override
     public Class<T> getIndexClass() {
-        return this.indexClass;
+	return this.indexClass;
     }
 
     @Override
     public void put(String key, Object value, T element) {
-        getSetProperty(value.toString(), element.getId());
+	getSetProperty(value.toString(), element.getId());
     }
-    
-    public void getSetProperty(String key, Object value){
-        if(value == null) {
-            throw ExceptionFactory.propertyValueCanNotBeNull();
-        }
-    
-        if(key == null) {
-            throw ExceptionFactory.propertyKeyCanNotBeNull();
-        }
-    
-        if(key.equals("")) {
-            throw ExceptionFactory.propertyKeyCanNotBeEmpty();
-        }
-    
-        if(key.equals("id")) {
-            throw ExceptionFactory.propertyKeyIdIsReserved();
-        }
-       
-        Map<String, List<Object>> map = getIndexPropertyMap();
-        List<Object> values = new ArrayList<Object>();
-   
-        if (map.containsKey(key)){
-            for (Map.Entry<String, List<Object>> entry : map.entrySet()) {
-                if (!entry.getKey().equals(key)) {
-                    continue;
-                }
-                values = entry.getValue();
-                values.add(value);
-                break;
-            }
-        } else {
-            values.add(value);
-        }
-    
-        map.put(key, values);
-        setIndexPropertyMap(map);
+
+    public void getSetProperty(String key, Object value) {
+	if (value == null) {
+	    throw ExceptionFactory.propertyValueCanNotBeNull();
+	}
+
+	if (key == null) {
+	    throw ExceptionFactory.propertyKeyCanNotBeNull();
+	}
+
+	if (key.equals("")) {
+	    throw ExceptionFactory.propertyKeyCanNotBeEmpty();
+	}
+
+	if (key.equals("id")) {
+	    throw ExceptionFactory.propertyKeyIdIsReserved();
+	}
+
+	Map<String, List<Object>> map = getIndexPropertyMap();
+	List<Object> values = new ArrayList<Object>();
+
+	if (map.containsKey(key)) {
+	    for (Map.Entry<String, List<Object>> entry : map.entrySet()) {
+		if (!entry.getKey().equals(key)) {
+		    continue;
+		}
+		values = entry.getValue();
+		values.add(value);
+		break;
+	    }
+	} else {
+	    values.add(value);
+	}
+
+	map.put(key, values);
+	setIndexPropertyMap(map);
     }
 
     @Override
     public CloseableIterable<T> get(String string, Object value) {
-        return getIndexProperty(value.toString());
+	return getIndexProperty(value.toString());
     }
 
     @Override
     public CloseableIterable<T> query(String string, Object o) {
-        throw new UnsupportedOperationException("Not supported yet.");
+	throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public long count(String key, Object value) {
-        Map<String, List<Object>> map = getIndexPropertyMap();
-        List<Object> values = map.get(value);
-        if (null == values) {
-            return 0;
-        } else {
-            return values.size();
-        }
+	Map<String, List<Object>> map = getIndexPropertyMap();
+	List<Object> values = map.get(value);
+	if (null == values) {
+	    return 0;
+	} else {
+	    return values.size();
+	}
     }
 
     @Override
     public void remove(String key, Object value, T element) {
-        if(value == null) {
-            throw ExceptionFactory.propertyValueCanNotBeNull();
-        }
-            
-        if(key == null) {
-            throw ExceptionFactory.propertyKeyCanNotBeNull();
-        }
-    
-        if(key.equals("")) {
-            throw ExceptionFactory.propertyKeyCanNotBeEmpty();
-        }
-    
-        if(key.equals("id")) {
-            throw ExceptionFactory.propertyKeyIdIsReserved();
-        }
-    
-        Map<String, List<Object>> map = getIndexPropertyMap();
+	if (value == null) {
+	    throw ExceptionFactory.propertyValueCanNotBeNull();
+	}
 
-        if (map.isEmpty()) {
-            return;
-        } else if (map.containsKey(value)){
-            List<Object> objects = map.get(value);
-            if (null != objects){
-                objects.remove(element.getId());
-                if (objects.isEmpty()){
-                    map.remove(value);
-                }
-            }
-        }
-        setIndexPropertyMap(map);
-      
-    } 
-    
-    public void removeElement(Object element) {
-        JRamCloud.TableEnumerator tableEnum = graph.getRcClient().new TableEnumerator(tableId);
-        
-        JRamCloud.Object tableEntry;
-        List<Object> values = new ArrayList<Object>(); 
-    
-        while(tableEnum.hasNext()) {
-            tableEntry = tableEnum.next();
-            Map<String, List<Object>> propMap = getIndexPropertyMap(tableEntry.value);
-            for (Map.Entry<String, List<Object>> map : propMap.entrySet()) {
-                values = map.getValue();
-                values.remove(element);
-                propMap.put(map.getKey(), values);
-            }
-        }
+	if (key == null) {
+	    throw ExceptionFactory.propertyKeyCanNotBeNull();
+	}
+
+	if (key.equals("")) {
+	    throw ExceptionFactory.propertyKeyCanNotBeEmpty();
+	}
+
+	if (key.equals("id")) {
+	    throw ExceptionFactory.propertyKeyIdIsReserved();
+	}
+
+	Map<String, List<Object>> map = getIndexPropertyMap();
+
+	if (map.isEmpty()) {
+	    return;
+	} else if (map.containsKey(value)) {
+	    List<Object> objects = map.get(value);
+	    if (null != objects) {
+		objects.remove(element.getId());
+		if (objects.isEmpty()) {
+		    map.remove(value);
+		}
+	    }
+	}
+	setIndexPropertyMap(map);
+
     }
-    
+
+    public void removeElement(Object element) {
+	JRamCloud.TableEnumerator tableEnum = graph.getRcClient().new TableEnumerator(tableId);
+
+	JRamCloud.Object tableEntry;
+	List<Object> values = new ArrayList<Object>();
+
+	while (tableEnum.hasNext()) {
+	    tableEntry = tableEnum.next();
+	    Map<String, List<Object>> propMap = getIndexPropertyMap(tableEntry.value);
+	    for (Map.Entry<String, List<Object>> map : propMap.entrySet()) {
+		values = map.getValue();
+		values.remove(element);
+		propMap.put(map.getKey(), values);
+	    }
+	}
+    }
+
     public Map<String, List<Object>> getIndexPropertyMap() {
-        JRamCloud.Object propTableEntry;
-    
-        try {
-            propTableEntry = graph.getRcClient().read(tableId, rcKey);
-        } catch(Exception e) {
-            logger.log(Level.WARNING, "Element does not have a property table entry!");
-            return null;
-        }
-    
-        return getIndexPropertyMap(propTableEntry.value);
+	JRamCloud.Object propTableEntry;
+
+	try {
+	    propTableEntry = graph.getRcClient().read(tableId, rcKey);
+	} catch (Exception e) {
+	    logger.log(Level.WARNING, "Element does not have a property table entry!");
+	    return null;
+	}
+
+	return getIndexPropertyMap(propTableEntry.value);
     }
 
     public static Map<String, List<Object>> getIndexPropertyMap(byte[] byteArray) {
-        if(byteArray == null) {
-            logger.log(Level.WARNING, "Got a null byteArray argument");
-            return null;
-        } else if(byteArray.length != 0) {
-            try {
-                ByteArrayInputStream bais = new ByteArrayInputStream(byteArray);
-                ObjectInputStream ois = new ObjectInputStream(bais);
-                Map<String, List<Object>> map = (Map<String, List<Object>>)ois.readObject();
-                return map;
-            } catch(IOException e) {
-                logger.log(Level.WARNING, "Got an exception while deserializing element's property map: " + e.toString());
-                return null;
-            } catch(ClassNotFoundException e) {
-                logger.log(Level.WARNING, "Got an exception while deserializing element's property map: " + e.toString());
-                return null;
-            }
-        } else {
-            return new ConcurrentHashMap<String, List<Object>>();
-        }
+	if (byteArray == null) {
+	    logger.log(Level.WARNING, "Got a null byteArray argument");
+	    return null;
+	} else if (byteArray.length != 0) {
+	    try {
+		ByteArrayInputStream bais = new ByteArrayInputStream(byteArray);
+		ObjectInputStream ois = new ObjectInputStream(bais);
+		Map<String, List<Object>> map = (Map<String, List<Object>>) ois.readObject();
+		return map;
+	    } catch (IOException e) {
+		logger.log(Level.WARNING, "Got an exception while deserializing element's property map: " + e.toString());
+		return null;
+	    } catch (ClassNotFoundException e) {
+		logger.log(Level.WARNING, "Got an exception while deserializing element's property map: " + e.toString());
+		return null;
+	    }
+	} else {
+	    return new ConcurrentHashMap<String, List<Object>>();
+	}
     }
-  
-  public void setIndexPropertyMap(Map<String, List<Object>> map) {
-    byte[] rcValue;
-    
-    try {
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      ObjectOutputStream oot = new ObjectOutputStream(baos);
-      oot.writeObject(map);
-      rcValue = baos.toByteArray();
-    } catch(IOException e) {
-      logger.log(Level.WARNING, "Got an exception while serializing element's property map: " + e.toString());
-      return;
+
+    public void setIndexPropertyMap(Map<String, List<Object>> map) {
+	byte[] rcValue;
+
+	try {
+	    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+	    ObjectOutputStream oot = new ObjectOutputStream(baos);
+	    oot.writeObject(map);
+	    rcValue = baos.toByteArray();
+	} catch (IOException e) {
+	    logger.log(Level.WARNING, "Got an exception while serializing element's property map: " + e.toString());
+	    return;
+	}
+	graph.getRcClient().write(tableId, rcKey, rcValue);
     }
-    graph.getRcClient().write(tableId, rcKey, rcValue);
-  } 
-  
-  public <T> T getIndexProperty(String key) {
-    Map<String, List<Object>> map = getIndexPropertyMap();
-    return (T)map.get(key);
-  }
 
-  public Set<String> getIndexPropertyKeys() {
-    Map<String, List<Object>> map = getIndexPropertyMap();
-    return map.keySet();
-  }    
+    public <T> T getIndexProperty(String key) {
+	Map<String, List<Object>> map = getIndexPropertyMap();
+	return (T) map.get(key);
+    }
 
-  public <T> T removeIndexProperty(String key) {
-    Map<String, List<Object>> map = getIndexPropertyMap();
-    T retVal = (T)map.remove(key);
-    setIndexPropertyMap(map);
-    return retVal;
-  }
+    public Set<String> getIndexPropertyKeys() {
+	Map<String, List<Object>> map = getIndexPropertyMap();
+	return map.keySet();
+    }
 
-  public void removeIndex() {
-    graph.getRcClient().remove(tableId, rcKey);
-  }
+    public <T> T removeIndexProperty(String key) {
+	Map<String, List<Object>> map = getIndexPropertyMap();
+	T retVal = (T) map.remove(key);
+	setIndexPropertyMap(map);
+	return retVal;
+    }
+
+    public void removeIndex() {
+	graph.getRcClient().remove(tableId, rcKey);
+    }
 }
-
