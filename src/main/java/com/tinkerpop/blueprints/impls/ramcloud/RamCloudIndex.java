@@ -54,7 +54,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
     public boolean exists() {
 	System.out.println("exists tableId" + tableId + ", " + "rcKey:" + indexName);
         try {
-            graph.rcClient.read(tableId, rcKey);
+            graph.getRcClient().read(tableId, rcKey);
             return true;
         } catch(Exception e) {
             return false;
@@ -63,7 +63,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
     
     public void create() throws IllegalArgumentException{
         if (!exists()){
-            graph.rcClient.write(tableId, rcKey, ByteBuffer.allocate(0).array());
+            graph.getRcClient().write(tableId, rcKey, ByteBuffer.allocate(0).array());
 
         } else {
             throw ExceptionFactory.vertexWithIdAlreadyExists(rcKey);
@@ -185,7 +185,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
     } 
     
     public void removeElement(Object element) {
-        JRamCloud.TableEnumerator tableEnum = graph.rcClient.new TableEnumerator(tableId);
+        JRamCloud.TableEnumerator tableEnum = graph.getRcClient().new TableEnumerator(tableId);
         
         JRamCloud.Object tableEntry;
         List<Object> values = new ArrayList<Object>(); 
@@ -205,7 +205,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
         JRamCloud.Object propTableEntry;
     
         try {
-            propTableEntry = graph.rcClient.read(tableId, rcKey);
+            propTableEntry = graph.getRcClient().read(tableId, rcKey);
         } catch(Exception e) {
             logger.log(Level.WARNING, "Element does not have a property table entry!");
             return null;
@@ -248,7 +248,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
       logger.log(Level.WARNING, "Got an exception while serializing element's property map: " + e.toString());
       return;
     }
-    graph.rcClient.write(tableId, rcKey, rcValue);
+    graph.getRcClient().write(tableId, rcKey, rcValue);
   } 
   
   public <T> T getIndexProperty(String key) {
@@ -269,7 +269,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
   }
 
   public void removeIndex() {
-    graph.rcClient.remove(tableId, rcKey);
+    graph.getRcClient().remove(tableId, rcKey);
   }
 }
 

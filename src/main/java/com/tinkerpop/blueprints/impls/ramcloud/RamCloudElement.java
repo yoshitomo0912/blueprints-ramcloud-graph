@@ -26,7 +26,6 @@ public class RamCloudElement implements Element, Serializable {
   
   private byte[] rcPropTableKey;
   private long rcPropTableId;
-  private JRamCloud rcClient;
   private RamCloudGraph graph;
   
   public RamCloudElement() {
@@ -35,7 +34,6 @@ public class RamCloudElement implements Element, Serializable {
   public RamCloudElement(byte[] rcPropTableKey, long rcPropTableId, JRamCloud rcClient, RamCloudGraph graph) {
     this.rcPropTableKey = rcPropTableKey;
     this.rcPropTableId = rcPropTableId;
-    this.rcClient = rcClient;
     this.graph = graph;
   }
   
@@ -43,7 +41,7 @@ public class RamCloudElement implements Element, Serializable {
     JRamCloud.Object propTableEntry;
     
     try {
-      propTableEntry = rcClient.read(rcPropTableId, rcPropTableKey);
+      propTableEntry = graph.getRcClient().read(rcPropTableId, rcPropTableKey);
     } catch(Exception e) {
       logger.log(Level.WARNING, "Element does not have a property table entry!");
       return null;
@@ -87,7 +85,7 @@ public class RamCloudElement implements Element, Serializable {
       return;
     }
     
-    rcClient.write(rcPropTableId, rcPropTableKey, rcValue);
+    graph.getRcClient().write(rcPropTableId, rcPropTableKey, rcValue);
   }
   
   @Override
@@ -159,7 +157,7 @@ public class RamCloudElement implements Element, Serializable {
 
   @Override
   public void remove() {
-    rcClient.remove(rcPropTableId, rcPropTableKey);
+    graph.getRcClient().remove(rcPropTableId, rcPropTableKey);
   }
 
   @Override

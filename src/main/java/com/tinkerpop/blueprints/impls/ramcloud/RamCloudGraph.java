@@ -38,7 +38,10 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 
   private static final Logger logger = Logger.getLogger(RamCloudGraph.class.getName());
   
+  private static final ThreadLocal<JRamCloud> RamCloudThreadLocal = new ThreadLocal<JRamCloud>();
+
   protected JRamCloud rcClient;
+  private String coordinatorLocation;
     
   protected long vertTableId; //(vertex_id) --> ( (n,d,ll,l), (n,d,ll,l), ... )
   protected long vertPropTableId; //(vertex_id) -> ( (kl,k,vl,v), (kl,k,vl,v), ... )
@@ -118,8 +121,9 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
     consoleHandler.setLevel(logLevel);
     logger.addHandler(consoleHandler);
     logger.setUseParentHandlers(false);
+    this.coordinatorLocation = coordinatorLocation;
     
-    rcClient = new JRamCloud(coordinatorLocation);
+    rcClient = getRcClient();
     
     vertTableId = rcClient.createTable(VERT_TABLE_NAME);
     vertPropTableId = rcClient.createTable(VERT_PROP_TABLE_NAME);
@@ -132,6 +136,15 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
     logger.log(Level.INFO, "Connected to coordinator at {0} and created tables {1}, {2}, and {3}", new Object[]{coordinatorLocation, vertTableId, vertPropTableId, edgePropTableId});
   }
 
+  public synchronized JRamCloud getRcClient(){
+      rcClient = RamCloudThreadLocal.get();
+      if (rcClient == null) {
+	    rcClient = new JRamCloud(coordinatorLocation);
+	    RamCloudThreadLocal.set(rcClient);
+	}
+      return rcClient;
+  }
+  
   @Override
   public Features getFeatures() {
     return FEATURES;
@@ -231,18 +244,13 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
   
   @Override
   public Iterable<Vertex> getVertices() {
-    JRamCloud.TableEnumerator tableEnum = rcClient.new TableEnumerator(vertPropTableId);
+    JRamCloud.TableEnumerator tableEnum = getRcClient().new TableEnumerator(vertPropTableId);
     List<Vertex> vertices = new ArrayList<Vertex>();
 
-    write.lock();
-    try {    
 	while(tableEnum.hasNext()) {
 	    logger.log(Level.FINE, "a vertice is added");
 	    vertices.add(new RamCloudVertex(tableEnum.next().key, this));          
 	}
-    } finally {
-	write.unlock();
-    }
     
     return (Iterable<Vertex>)vertices;
   }
@@ -279,7 +287,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
             vertTableMread[vertexNum] = new JRamCloud.multiReadObject(vertTableId, rckey);
             vertPropTableMread[vertexNum] = new JRamCloud.multiReadObject(vertPropTableId, rckey);
             if (vertexNum >= (mreadMax - 1)) {
-                JRamCloud.Object outvertPropTable[] = rcClient.multiRead(vertPropTableMread);
+                JRamCloud.Object outvertPropTable[] = getRcClient().multiRead(vertPropTableMread);
                 for (int i = 0; i < vertexNum ; i++){
                     vertices.add(new RamCloudVertex(outvertPropTable[i].key, this));
                 }
@@ -290,7 +298,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
         
         if (vertexNum != 0) {
             if ((vertexNum-1) > 0){
-                JRamCloud.Object outvertPropTable[] = rcClient.multiRead(vertPropTableMread);
+                JRamCloud.Object outvertPropTable[] = getRcClient().multiRead(vertPropTableMread);
                     for (int i = 0; i < vertexNum ; i++){
                         vertices.add(new RamCloudVertex(outvertPropTable[i].key, this));
                 }
@@ -303,11 +311,9 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
         */
     //} else {
     
-        JRamCloud.TableEnumerator tableEnum = rcClient.new TableEnumerator(vertPropTableId);
-        JRamCloud.Object tableEntry;
+      JRamCloud.TableEnumerator tableEnum = getRcClient().new TableEnumerator(vertPropTableId);
+      JRamCloud.Object tableEntry;
 
-    write.lock();
-    try {
       while (tableEnum.hasNext()) {
 	  tableEntry = tableEnum.next();
 	  if (tableEntry != null) {
@@ -320,10 +326,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	      System.out.println("table entry is null");
 	      break;
 	  }
-        }
-    } finally {
-	write.unlock();
-    }
+      }
     //}
     
     return (Iterable<Vertex>)vertices;
@@ -385,7 +388,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 
   @Override
   public Iterable<Edge> getEdges() {
-    JRamCloud.TableEnumerator tableEnum = rcClient.new TableEnumerator(edgePropTableId);
+    JRamCloud.TableEnumerator tableEnum = getRcClient().new TableEnumerator(edgePropTableId);
     List<Edge> edges = new ArrayList<Edge>();
     
     while(tableEnum.hasNext()) 
@@ -396,7 +399,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 
   @Override
   public Iterable<Edge> getEdges(String key, Object value) {
-    JRamCloud.TableEnumerator tableEnum = rcClient.new TableEnumerator(edgePropTableId);
+    JRamCloud.TableEnumerator tableEnum = getRcClient().new TableEnumerator(edgePropTableId);
     List<Edge> edges = new ArrayList<Edge>();
     JRamCloud.Object tableEntry;
     
@@ -417,14 +420,14 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 
   @Override
   public void shutdown() {
-    rcClient.dropTable(VERT_TABLE_NAME);
-    rcClient.dropTable(VERT_PROP_TABLE_NAME);
-    rcClient.dropTable(EDGE_PROP_TABLE_NAME);
-    rcClient.dropTable(IDX_VERT_TABLE_NAME);
-    rcClient.dropTable(IDX_EDGE_TABLE_NAME);
-    rcClient.dropTable(KIDX_VERT_TABLE_NAME);
-    rcClient.dropTable(KIDX_EDGE_TABLE_NAME);
-    rcClient.disconnect();
+    getRcClient().dropTable(VERT_TABLE_NAME);
+    getRcClient().dropTable(VERT_PROP_TABLE_NAME);
+    getRcClient().dropTable(EDGE_PROP_TABLE_NAME);
+    getRcClient().dropTable(IDX_VERT_TABLE_NAME);
+    getRcClient().dropTable(IDX_EDGE_TABLE_NAME);
+    getRcClient().dropTable(KIDX_VERT_TABLE_NAME);
+    getRcClient().dropTable(KIDX_EDGE_TABLE_NAME);
+    getRcClient().disconnect();
   }
 
   @Override
@@ -473,9 +476,9 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
     JRamCloud.TableEnumerator tableEnum;
     
     if (elementClass == Vertex.class) {
-	tableEnum = rcClient.new TableEnumerator(kidxVertTableId);
+	tableEnum = getRcClient().new TableEnumerator(kidxVertTableId);
     } else {
-	tableEnum = rcClient.new TableEnumerator(kidxEdgeTableId);
+	tableEnum = getRcClient().new TableEnumerator(kidxEdgeTableId);
     }
 	
     while(tableEnum.hasNext()) {
@@ -529,7 +532,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
   @Override
   public Iterable<Index<? extends Element>> getIndices() {
     final List<Index<? extends Element>> list = new ArrayList<Index<? extends Element>>();
-    JRamCloud.TableEnumerator verttableEnum = rcClient.new TableEnumerator(idxVertTableId);
+    JRamCloud.TableEnumerator verttableEnum = getRcClient().new TableEnumerator(idxVertTableId);
     JRamCloud.Object verttableEntry;
     
     while(verttableEnum.hasNext()) {
@@ -537,7 +540,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
       list.add(new RamCloudIndex(verttableEntry.key, idxVertTableId, this, Vertex.class));
     }
     
-    JRamCloud.TableEnumerator edgetableEnum = rcClient.new TableEnumerator(idxEdgeTableId);
+    JRamCloud.TableEnumerator edgetableEnum = getRcClient().new TableEnumerator(idxEdgeTableId);
     JRamCloud.Object edgetableEntry;
     
     while(edgetableEnum.hasNext()) {

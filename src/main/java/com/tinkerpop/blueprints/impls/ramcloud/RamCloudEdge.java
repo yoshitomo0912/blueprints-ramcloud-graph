@@ -26,7 +26,7 @@ public class RamCloudEdge extends RamCloudElement implements Edge {
   private RamCloudGraph graph;
   
   public RamCloudEdge(RamCloudVertex outVertex, RamCloudVertex inVertex, String label, RamCloudGraph graph) {
-    super(edgeToRcKey(outVertex, inVertex, label), graph.edgePropTableId, graph.rcClient, graph);
+    super(edgeToRcKey(outVertex, inVertex, label), graph.edgePropTableId, graph.getRcClient(), graph);
     
     this.outVertex = outVertex;
     this.inVertex = inVertex;
@@ -36,7 +36,7 @@ public class RamCloudEdge extends RamCloudElement implements Edge {
   }
   
   public RamCloudEdge(byte[] rcKey, RamCloudGraph graph) {
-    super(rcKey, graph.edgePropTableId, graph.rcClient, graph);
+    super(rcKey, graph.edgePropTableId, graph.getRcClient(), graph);
     
     ByteBuffer edgeId = ByteBuffer.wrap(rcKey).order(ByteOrder.LITTLE_ENDIAN);
     outVertex = new RamCloudVertex(edgeId.getLong(), graph);
@@ -110,7 +110,7 @@ public class RamCloudEdge extends RamCloudElement implements Edge {
     boolean inVertexEntryExists;
     
     try {
-      graph.rcClient.read(graph.edgePropTableId, rcKey);
+      graph.getRcClient().read(graph.edgePropTableId, rcKey);
       edgePropTableEntryExists = true;
     } catch(Exception e) {
       // Edge property table entry does not exist
@@ -141,7 +141,7 @@ public class RamCloudEdge extends RamCloudElement implements Edge {
       if(!isLoop())
         inVertex.addEdgeLocally(this);
       
-      graph.rcClient.write(graph.edgePropTableId, rcKey, ByteBuffer.allocate(0).array());
+      graph.getRcClient().write(graph.edgePropTableId, rcKey, ByteBuffer.allocate(0).array());
     } else
       throw ExceptionFactory.edgeWithIdAlreadyExist(rcKey);
   }

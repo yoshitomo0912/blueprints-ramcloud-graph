@@ -42,7 +42,7 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
   }
   
   public RamCloudVertex(long id, RamCloudGraph graph) {
-    super(idToRcKey(id), graph.vertPropTableId, graph.rcClient, graph);
+    super(idToRcKey(id), graph.vertPropTableId, graph.getRcClient(), graph);
     
     this.id = id;
     this.rcKey = idToRcKey(id);
@@ -50,7 +50,7 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
   }
 
   public RamCloudVertex(byte[] rcKey, RamCloudGraph graph) {
-    super(rcKey, graph.vertPropTableId, graph.rcClient, graph);
+    super(rcKey, graph.vertPropTableId, graph.getRcClient(), graph);
     
     this.id = rcKeyToId(rcKey);
     this.rcKey = rcKey;
@@ -123,7 +123,7 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
     }
     
     // Remove ourselves entirely from the vertex table
-    graph.rcClient.remove(graph.vertTableId, rcKey);
+    graph.getRcClient().remove(graph.vertTableId, rcKey);
     
     // Remove ourselves from our property table
     super.remove();
@@ -231,7 +231,7 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
     RamCloudVertex neighbor;
     
     try {
-      vertTableEntry = graph.rcClient.read(graph.vertTableId, rcKey);
+      vertTableEntry = graph.getRcClient().read(graph.vertTableId, rcKey);
     } catch(Exception e) {
       logger.log(Level.WARNING, toString() + ": Error reading vertex table entry: " + e.toString());
       return null;
@@ -291,7 +291,7 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
       }
     }
     
-    graph.rcClient.write(graph.vertTableId, rcKey, edgeListBuilder.build().toByteArray());
+    graph.getRcClient().write(graph.vertTableId, rcKey, edgeListBuilder.build().toByteArray());
   }
   
  public List<RamCloudEdge> getEdgeList() {
@@ -305,7 +305,7 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
    RamCloudVertex neighbor;
    
    try {
-     vertTableEntry = graph.rcClient.read(graph.vertTableId, rcKey);
+     vertTableEntry = graph.getRcClient().read(graph.vertTableId, rcKey);
    } catch(Exception e) {
      logger.log(Level.WARNING, toString() + ": Error reading vertex table entry: " + e.getMessage());
      return null;
@@ -338,14 +338,14 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
     boolean vertPropTableEntryExists = false;
     
     try {
-      graph.rcClient.read(graph.vertTableId, rcKey);
+      graph.getRcClient().read(graph.vertTableId, rcKey);
       vertTableEntryExists = true;
     } catch(Exception e) {
       // Vertex table entry does not exist
     }
     
     try {
-      graph.rcClient.read(graph.vertPropTableId, rcKey);
+      graph.getRcClient().read(graph.vertPropTableId, rcKey);
       vertPropTableEntryExists = true;
     } catch(Exception e) {
       // Vertex property table entry does not exist
@@ -364,8 +364,8 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
   protected void create() throws IllegalArgumentException {
     // TODO: Existence check costs extra (presently 2 reads), could use option to turn on/off
     if(!exists()) {
-      graph.rcClient.write(graph.vertTableId, rcKey, ByteBuffer.allocate(0).array());
-      graph.rcClient.write(graph.vertPropTableId, rcKey, ByteBuffer.allocate(0).array());
+      graph.getRcClient().write(graph.vertTableId, rcKey, ByteBuffer.allocate(0).array());
+      graph.getRcClient().write(graph.vertPropTableId, rcKey, ByteBuffer.allocate(0).array());
     } else {
       throw ExceptionFactory.vertexWithIdAlreadyExists(id);
     }
