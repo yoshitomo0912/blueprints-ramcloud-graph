@@ -242,7 +242,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
     }
 
     @Override
-    public Iterable<Vertex> getVertices(String key, Object value) {
+    public synchronized Iterable<Vertex> getVertices(String key, Object value) {
 
 	List<Vertex> vertices = new ArrayList<Vertex>();
 	boolean idx = false;
@@ -269,7 +269,6 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	    }
 	}
 
-	System.out.println("getvertices1 " + vertices);
 	if (idx) {
 	    final int size = Math.min(mreadMax, keyMap.size());
 	    JRamCloud.multiReadObject vertTableMread[] = new JRamCloud.multiReadObject[size];
@@ -291,7 +290,6 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 		}
 		vertexNum++;
 	    }
-	    	System.out.println("getvertices2 " + vertices);
 
 	    if (vertexNum != 0) {
 		if ((vertexNum - 1) > 0) {
@@ -304,7 +302,6 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	    for (Object vert : keyMap) {
 		vertices.add(getVertex(vert));
 	    }
-	    	System.out.println("getvertices3 " + vertices);
 	} else {
 
 	    JRamCloud.TableEnumerator tableEnum = getRcClient().new TableEnumerator(vertPropTableId);

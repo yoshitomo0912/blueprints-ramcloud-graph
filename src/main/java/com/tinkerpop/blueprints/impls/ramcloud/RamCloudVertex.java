@@ -314,14 +314,14 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 	try {
 	    vertTableEntry = graph.getRcClient().read(graph.vertTableId, rcKey);
 	} catch (Exception e) {
-	    logger.log(Level.WARNING, toString() + ": Error reading vertex table entry: " + e.getMessage());
+	    logger.log(Level.WARNING, "{0}: Error reading vertex table entry: {1}", new Object[]{toString(), e.getMessage()});
 	    return null;
 	}
 
 	try {
 	    edgeListPB = EdgeListProtoBuf.parseFrom(vertTableEntry.value);
 	} catch (InvalidProtocolBufferException e) {
-	    logger.log(Level.WARNING, toString() + ": Read malformed edge list: " + e.getMessage());
+	    logger.log(Level.WARNING, "{0}: Read malformed edge list: {1}", new Object[]{toString(), e.getMessage()});
 	    return null;
 	}
 
@@ -363,7 +363,7 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 	} else if (!vertTableEntryExists && !vertPropTableEntryExists) {
 	    return false;
 	} else {
-	    logger.log(Level.WARNING, toString() + ": Detected RamCloudGraph inconsistency: vertTableEntryExists=" + vertTableEntryExists + ", vertPropTableEntryExists=" + vertPropTableEntryExists + ".");
+	    logger.log(Level.WARNING, "{0}: Detected RamCloudGraph inconsistency: vertTableEntryExists={1}, vertPropTableEntryExists={2}.", new Object[]{toString(), vertTableEntryExists, vertPropTableEntryExists});
 	    return true;
 	}
     }

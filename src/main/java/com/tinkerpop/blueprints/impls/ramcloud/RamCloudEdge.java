@@ -13,8 +13,6 @@ import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 
-import edu.stanford.ramcloud.JRamCloud;
-
 public class RamCloudEdge extends RamCloudElement implements Edge {
 
     private static final Logger logger = Logger.getLogger(RamCloudGraph.class.getName());
