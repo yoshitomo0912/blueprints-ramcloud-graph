@@ -479,7 +479,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	    //Map<String, Object> propMap = RamCloudElement.getPropertyMap(tableEntry.value);
 	    String key = new String(tableEntry.key);
 	    indexkey.add(key);
-	    System.out.println(key);
+	    System.out.println("key =" + key + "length : " + key.length());
 	    /*
 	    Iterator it = propMap.keySet().iterator();
 	    if (it.hasNext()) {
