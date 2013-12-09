@@ -477,8 +477,12 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	while (tableEnum.hasNext()) {
 	    tableEntry = tableEnum.next();
 	    Map<String, Object> propMap = RamCloudElement.getPropertyMap(tableEntry.value);
-	    indexkey.add(new String(tableEntry.key));
-	    logger.log(Level.FINE, "a vertice is added2");
+	    Iterator it = propMap.keySet().iterator();
+	    if (it.hasNext()) {
+		String key = (String) it.next();
+		indexkey.add(key);
+		System.out.println("indexkey.add " + key);
+	    }
 	}
 	return indexkey;
     }
