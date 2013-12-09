@@ -476,13 +476,19 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 
 	while (tableEnum.hasNext()) {
 	    tableEntry = tableEnum.next();
-	    Map<String, Object> propMap = RamCloudElement.getPropertyMap(tableEntry.value);
+	    //Map<String, Object> propMap = RamCloudElement.getPropertyMap(tableEntry.value);
+	    String key = new String(tableEntry.key);
+	    indexkey.add(key);
+	    System.out.println(key);
+	    /*
 	    Iterator it = propMap.keySet().iterator();
 	    if (it.hasNext()) {
 		String key = (String) it.next();
 		indexkey.add(key);
 		System.out.println("indexkey.add " + key);
 	    }
+	    * 
+	    */
 	}
 	return indexkey;
     }
