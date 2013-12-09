@@ -65,7 +65,8 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    graph.getRcClient().write(tableId, rcKey, ByteBuffer.allocate(0).array());
 
 	} else {
-	    throw ExceptionFactory.vertexWithIdAlreadyExists(rcKey);
+	    
+	    //throw ExceptionFactory.vertexWithIdAlreadyExists(rcKey);
 	}
     }
 
