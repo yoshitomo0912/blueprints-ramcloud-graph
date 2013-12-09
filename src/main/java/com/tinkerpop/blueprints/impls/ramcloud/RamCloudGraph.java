@@ -610,9 +610,11 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 
 	public void autoUpdate(final String key, final Object newValue, final Object oldValue, final T element) {
 	    if (this.exists()) {
+		/*
 		if (oldValue != null) {
 		    this.remove(key, oldValue, element);
 		}
+		*/ 
 		this.put(key, newValue, element);
 	    }
 	}
