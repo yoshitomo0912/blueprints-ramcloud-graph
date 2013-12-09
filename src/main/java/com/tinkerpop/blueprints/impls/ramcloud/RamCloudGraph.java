@@ -441,9 +441,11 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
     public <T extends Element> void createKeyIndex(String key,
 	    Class<T> elementClass, Parameter... indexParameters) {
 	if (key == null) {
+	    System.out.println("key is null");
 	    return;
 	}
 	if (elementClass == Vertex.class) {
+	    System.out.println("");
 	    KeyIndex = new RamCloudKeyIndex(kidxVertTableId, key, this, elementClass);
 	} else if (elementClass == Edge.class) {
 	    KeyIndex = new RamCloudKeyIndex(kidxEdgeTableId, key, this, elementClass);
@@ -454,7 +456,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 
     @Override
     public <T extends Element> Set< String> getIndexedKeys(Class< T> elementClass) {
-	Set<String> indexkey = null;
+	Set<String> indexkey = new HashSet<String>();
 	JRamCloud.Object tableEntry;
 	JRamCloud.TableEnumerator tableEnum;
 
