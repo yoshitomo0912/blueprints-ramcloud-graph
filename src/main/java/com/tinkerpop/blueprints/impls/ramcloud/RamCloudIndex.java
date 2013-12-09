@@ -71,7 +71,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
     }
 
     private static byte[] indexToRcKey(String indexName) {
-	return ByteBuffer.allocate(16 + indexName.length()).order(ByteOrder.LITTLE_ENDIAN).put(indexName.getBytes()).array();
+	return ByteBuffer.allocate(indexName.length()).order(ByteOrder.LITTLE_ENDIAN).put(indexName.getBytes()).array();
     }
 
     @Override
