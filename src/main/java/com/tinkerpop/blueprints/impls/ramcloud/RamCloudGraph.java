@@ -246,7 +246,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 
 	List<Vertex> vertices = new ArrayList<Vertex>();
 	boolean idx = false;
-	List<Object> keyMap = null;
+	List<Object> keyMap = new ArrayList<Object>();
 
 	System.out.println("getVertices key:" + key + ", " + "value:" + value);
 	getIndexedKeys(key, Vertex.class);
@@ -258,9 +258,11 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	    idx = true;
 	} else if (KeyIndex.exists()) {
 	    keyMap = (List<Object>) KeyIndex.getIndexProperty(value.toString());
+	    System.out.println("keyindex : " + keyMap);
 	    idx = true;
 	}
 
+	System.out.println("getvertices1 " + vertices);
 	if (idx) {
 	    final int size = Math.min(mreadMax, keyMap.size());
 	    JRamCloud.multiReadObject vertTableMread[] = new JRamCloud.multiReadObject[size];
@@ -282,6 +284,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 		}
 		vertexNum++;
 	    }
+	    	System.out.println("getvertices2 " + vertices);
 
 	    if (vertexNum != 0) {
 		if ((vertexNum - 1) > 0) {
@@ -294,7 +297,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	    for (Object vert : keyMap) {
 		vertices.add(getVertex(vert));
 	    }
-
+	    	System.out.println("getvertices3 " + vertices);
 	} else {
 
 	    JRamCloud.TableEnumerator tableEnum = getRcClient().new TableEnumerator(vertPropTableId);
@@ -312,6 +315,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	    }
 	}
 
+	System.out.println("getvertices4 " + vertices);
 	return (Iterable<Vertex>) vertices;
     }
 
