@@ -255,13 +255,16 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 
 	if (index.exists()) {
 	    keyMap = (List<Object>) index.getIndexProperty(value.toString());
-	    idx = true;
+	    if (keyMap == null) {
+		return (Iterable<Vertex>) vertices;
+	    } else {
+		idx = true;
+	    }
 	} else if (KeyIndex.exists()) {
 	    keyMap = (List<Object>) KeyIndex.getIndexProperty(value.toString());
 	    if (keyMap == null) {
-		idx = false;
+		return (Iterable<Vertex>) vertices;
 	    } else {
-		System.out.println("keyindex : " + keyMap);
 		idx = true;
 	    }
 	}
