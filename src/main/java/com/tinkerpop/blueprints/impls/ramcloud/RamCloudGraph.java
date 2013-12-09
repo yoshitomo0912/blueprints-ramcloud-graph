@@ -299,9 +299,6 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 		    }
 		}
 	    }
-	    for (Object vert : keyMap) {
-		vertices.add(getVertex(vert));
-	    }
 	} else {
 
 	    JRamCloud.TableEnumerator tableEnum = getRcClient().new TableEnumerator(vertPropTableId);
