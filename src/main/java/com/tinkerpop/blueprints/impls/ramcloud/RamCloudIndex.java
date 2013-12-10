@@ -103,7 +103,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	}
 
 	Map<String, List<Object>> map = getIndexPropertyMap();
-	System.out.println(map.values());
+	System.out.println(map);
 	List<Object> values = new ArrayList<Object>();
 
 	if (map.containsKey(key)) {
