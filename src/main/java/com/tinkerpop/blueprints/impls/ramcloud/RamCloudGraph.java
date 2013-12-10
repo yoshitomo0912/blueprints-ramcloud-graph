@@ -276,8 +276,9 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 
 	    int vertexNum = 0;
 	    for (Object vert : keyMap) {
-		byte[] rckey =
+		byte[] rckey = 
 			ByteBuffer.allocate(8).order(ByteOrder.LITTLE_ENDIAN).putLong((Long) vert).array();
+		System.out.println("vert : " + vert);
 		vertTableMread[vertexNum] = new JRamCloud.multiReadObject(vertTableId, rckey);
 		vertPropTableMread[vertexNum] = new JRamCloud.multiReadObject(vertPropTableId, rckey);
 		if (vertexNum >= (mreadMax - 1)) {
