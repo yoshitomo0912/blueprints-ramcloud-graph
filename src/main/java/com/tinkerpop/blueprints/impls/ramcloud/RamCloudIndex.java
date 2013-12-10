@@ -116,7 +116,9 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 		}
 	    }
 	    if (found) {
-		values.add(value);
+		if (!values.contains(value)){
+		    values.add(value);
+		}
 	    }
 	} else {
 	    values.add(value);
