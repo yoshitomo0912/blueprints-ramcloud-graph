@@ -285,7 +285,9 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 		    JRamCloud.Object outvertPropTable[] =
 			    getRcClient().multiRead(vertPropTableMread);
 		    for (int i = 0; i < vertexNum; i++) {
-			vertices.add(new RamCloudVertex(outvertPropTable[i].key, this));
+			if (outvertPropTable[i] != null) {
+			    vertices.add(new RamCloudVertex(outvertPropTable[i].key, this));
+			}
 		    }
 		    vertexNum = 0;
 		}
@@ -293,12 +295,16 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	    }
 
 	    if (vertexNum != 0) {
-		if ((vertexNum - 1) > 0) {
+		//if ((vertexNum - 1) > 0) {
 		    JRamCloud.Object outvertPropTable[] = getRcClient().multiRead(vertPropTableMread);
 		    for (int i = 0; i < vertexNum; i++) {
-			vertices.add(new RamCloudVertex(outvertPropTable[i].key, this));
+			if (outvertPropTable[i] != null) {
+			    vertices.add(new RamCloudVertex(outvertPropTable[i].key, this));
+			} else {
+			    System.out.println("outvertPropTable is null");
+			}
 		    }
-		}
+		//}
 	    }
 	} else {
 
