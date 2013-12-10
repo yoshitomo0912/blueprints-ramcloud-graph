@@ -60,14 +60,10 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	}
     }
 
-    public void create() throws IllegalArgumentException {
+    public void create() {
 	if (!exists()) {
 	    graph.getRcClient().write(tableId, rcKey, ByteBuffer.allocate(0).array());
-
-	} else {
-	    
-	    //throw ExceptionFactory.vertexWithIdAlreadyExists(rcKey);
-	}
+	} 
     }
 
     private static byte[] indexToRcKey(String indexName) {

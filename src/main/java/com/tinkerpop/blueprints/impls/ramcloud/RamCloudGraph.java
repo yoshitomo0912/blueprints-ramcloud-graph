@@ -49,8 +49,8 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
     private String coordinatorLocation;
     private static long nextVertexId = 1;
     private static final Features FEATURES = new Features();
-    private static RamCloudIndex index = null;
-    public static RamCloudKeyIndex KeyIndex = null;
+    private RamCloudIndex index = null;
+    public RamCloudKeyIndex KeyIndex = null;
 
     static {
 	FEATURES.supportsSerializableObjectProperty = true;
@@ -270,6 +270,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	}
 
 	if (idx) {
+	    System.out.println("keyMap size : " + keyMap.size());
 	    final int size = Math.min(mreadMax, keyMap.size());
 	    JRamCloud.multiReadObject vertTableMread[] = new JRamCloud.multiReadObject[size];
 	    JRamCloud.multiReadObject vertPropTableMread[] = new JRamCloud.multiReadObject[size];
@@ -494,6 +495,8 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	    index = new RamCloudIndex(idxVertTableId, indexName, this, indexClass);
 	} else if (indexClass == Edge.class) {
 	    index = new RamCloudIndex(idxEdgeTableId, indexName, this, indexClass);
+	} else {
+	    return null;
 	}
 	index.create();
 
@@ -519,27 +522,26 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
     @Override
     public Iterable<Index<? extends Element>> getIndices() {
 	final List<Index<? extends Element>> list = new ArrayList<Index<? extends Element>>();
-	JRamCloud.TableEnumerator verttableEnum = getRcClient().new TableEnumerator(idxVertTableId);
-	JRamCloud.Object verttableEntry;
+	JRamCloud.TableEnumerator tableEnum = getRcClient().new TableEnumerator(idxVertTableId);
+	JRamCloud.Object tableEntry;
 
-	while (verttableEnum.hasNext()) {
-	    verttableEntry = verttableEnum.next();
-	    list.add(new RamCloudIndex(verttableEntry.key, idxVertTableId, this, Vertex.class));
+	while (tableEnum.hasNext()) {
+	    tableEntry = tableEnum.next();
+	    list.add(new RamCloudIndex(tableEntry.key, idxVertTableId, this, Vertex.class));
 	}
 
-	JRamCloud.TableEnumerator edgetableEnum = getRcClient().new TableEnumerator(idxEdgeTableId);
-	JRamCloud.Object edgetableEntry;
+	tableEnum = getRcClient().new TableEnumerator(idxEdgeTableId);
 
-	while (edgetableEnum.hasNext()) {
-	    edgetableEntry = edgetableEnum.next();
-	    list.add(new RamCloudIndex(edgetableEntry.key, idxEdgeTableId, this, Edge.class));
+	while (tableEnum.hasNext()) {
+	    tableEntry = tableEnum.next();
+	    list.add(new RamCloudIndex(tableEntry.key, idxEdgeTableId, this, Edge.class));
 	}
 	return list;
     }
 
     @Override
     public void dropIndex(String indexName) {
-	// Remove ourselves entirely from the vertex table
+	// TODO: Remove ourselves entirely from the vertex table
     }
 
     //@Override

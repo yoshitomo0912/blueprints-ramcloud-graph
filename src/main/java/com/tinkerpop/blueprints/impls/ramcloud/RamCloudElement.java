@@ -130,10 +130,10 @@ public class RamCloudElement implements Element, Serializable {
 
 	if (this instanceof RamCloudVertex) {
 	    graph.getIndexedKeys(key, Vertex.class);
-	    RamCloudGraph.KeyIndex.autoUpdate(key, value, oldValue, this);
+	    graph.KeyIndex.autoUpdate(key, value, oldValue, this);
 	} else {
 	    graph.getIndexedKeys(key, Edge.class);
-	    RamCloudGraph.KeyIndex.autoUpdate(key, value, oldValue, this);
+	    graph.KeyIndex.autoUpdate(key, value, oldValue, this);
 	}
     }
 
@@ -145,10 +145,10 @@ public class RamCloudElement implements Element, Serializable {
 
 	if (this instanceof RamCloudVertex) {
 	    graph.getIndexedKeys(key, Vertex.class);
-	    RamCloudGraph.KeyIndex.autoRemove(key, retVal.toString(), this);
+	    graph.KeyIndex.autoRemove(key, retVal.toString(), this);
 	} else {
 	    graph.getIndexedKeys(key, Edge.class);
-	    RamCloudGraph.KeyIndex.autoRemove(key, retVal.toString(), this);
+	    graph.KeyIndex.autoRemove(key, retVal.toString(), this);
 	}
 
 	return retVal;
