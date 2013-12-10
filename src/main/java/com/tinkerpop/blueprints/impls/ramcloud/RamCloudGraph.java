@@ -71,14 +71,14 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	FEATURES.isWrapper = false;
 	FEATURES.supportsVertexIteration = true;
 	FEATURES.supportsEdgeIteration = true;
-	FEATURES.supportsVertexIndex = false;
+	FEATURES.supportsVertexIndex = true;
 	FEATURES.supportsEdgeIndex = false;
 	FEATURES.ignoresSuppliedIds = true;
 	FEATURES.supportsTransactions = false;
 	FEATURES.supportsIndices = false;
 	FEATURES.supportsKeyIndices = false;
 	FEATURES.supportsVertexKeyIndex = true;
-	FEATURES.supportsEdgeKeyIndex = true;
+	FEATURES.supportsEdgeKeyIndex = false;
 	FEATURES.supportsEdgeRetrieval = true;
 	FEATURES.supportsVertexProperties = true;
 	FEATURES.supportsEdgeProperties = true;
@@ -270,7 +270,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	}
 
 	if (idx) {
-	    System.out.println("keyMap size : " + keyMap.size());
+	    //System.out.println("keyMap size : " + keyMap.size());
 	    final int size = Math.min(mreadMax, keyMap.size());
 	    JRamCloud.multiReadObject vertTableMread[] = new JRamCloud.multiReadObject[size];
 	    JRamCloud.multiReadObject vertPropTableMread[] = new JRamCloud.multiReadObject[size];
@@ -541,7 +541,13 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 
     @Override
     public void dropIndex(String indexName) {
-	// TODO: Remove ourselves entirely from the vertex table
+	final Iterator<RamCloudIndex> list = (Iterator<RamCloudIndex>) getIndices();
+	while (list.hasNext()) {
+	    index = list.next();
+	    if (new String(index.rcKey).equals(indexName)) {
+		index.removeIndex();
+	    }
+	}
     }
 
     //@Override
