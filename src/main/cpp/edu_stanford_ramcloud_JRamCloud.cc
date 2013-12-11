@@ -376,7 +376,7 @@ JNICALL Java_edu_stanford_ramcloud_JRamCloud_multiRead(JNIEnv *env,
     try {
         ramcloud->multiRead(requests, requestNum);
     } EXCEPTION_CATCHER(NULL);
-
+    
     jclass cls = env->FindClass(PACKAGE_PATH "JRamCloud$Object");
     check_null(cls, "FindClass failed");
     jmethodID methodId = env->GetMethodID(cls,
@@ -387,14 +387,16 @@ JNICALL Java_edu_stanford_ramcloud_JRamCloud_multiRead(JNIEnv *env,
     check_null(outJNIArray, "NewObjectArray failed");
     
     for (int i = 0 ; i < requestNum ; i++) {
-        jbyteArray jValue = env->NewByteArray(values[i].get()->getTotalLength());
-        check_null(jValue, "NewByteArray failed");
-        JByteArrayGetter value(env, jValue);
-        values[i].get()->copy(0, values[i].get()->getTotalLength(), value.pointer);
-        jobject obj = env->NewObject(cls, methodId, jRamCloud, jKey[i], jValue);
-        check_null(obj, "NewObject failed");
-        env->SetObjectArrayElement(outJNIArray, i, obj);
-        env->ReleaseByteArrayElements(jKey[i], (jbyte *)objects[i].key, 0);
+	if (object[i].status != 0) {
+	    jbyteArray jValue = env->NewByteArray(values[i].get()->getTotalLength());
+	    check_null(jValue, "NewByteArray failed");
+	    JByteArrayGetter value(env, jValue);
+	    values[i].get()->copy(0, values[i].get()->getTotalLength(), value.pointer);
+	    jobject obj = env->NewObject(cls, methodId, jRamCloud, jKey[i], jValue);
+	    check_null(obj, "NewObject failed");
+	    env->SetObjectArrayElement(outJNIArray, i, obj);
+	    env->ReleaseByteArrayElements(jKey[i], (jbyte *) objects[i].key, 0);
+	}
     }
     return outJNIArray;
 }
