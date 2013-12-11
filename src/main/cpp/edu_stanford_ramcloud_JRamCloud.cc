@@ -387,7 +387,7 @@ JNICALL Java_edu_stanford_ramcloud_JRamCloud_multiRead(JNIEnv *env,
     check_null(outJNIArray, "NewObjectArray failed");
     
     for (int i = 0 ; i < requestNum ; i++) {
-	if (object[i].status != 0) {
+	if (objects[i].status == 0) {
 	    jbyteArray jValue = env->NewByteArray(values[i].get()->getTotalLength());
 	    check_null(jValue, "NewByteArray failed");
 	    JByteArrayGetter value(env, jValue);
