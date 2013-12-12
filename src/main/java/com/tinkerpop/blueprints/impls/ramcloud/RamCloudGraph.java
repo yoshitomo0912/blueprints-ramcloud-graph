@@ -7,10 +7,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Handler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import com.sun.jersey.core.util.Base64;
 import com.tinkerpop.blueprints.*;
@@ -21,16 +17,18 @@ import edu.stanford.ramcloud.JRamCloud;
 import java.io.Serializable;
 import java.nio.ByteOrder;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, TransactionalGraph, Serializable {
 
     private final ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
     private final Lock write = readWriteLock.writeLock();
-    private static final Logger logger = Logger.getLogger(RamCloudGraph.class.getName());
+    private final static Logger log = LoggerFactory.getLogger(RamCloudGraph.class);
+
     private static final ThreadLocal<JRamCloud> RamCloudThreadLocal = new ThreadLocal<JRamCloud>();
     
     protected JRamCloud rcClient;
@@ -51,7 +49,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
     private String coordinatorLocation;
     private static AtomicLong nextVertexId = new AtomicLong(Long.valueOf(System.getProperty("blueprint.initial")));
     private static final Features FEATURES = new Features();
-    private RamCloudIndex index = null;
+    public RamCloudIndex index = null;
     public RamCloudKeyIndex KeyIndex = null;
 
     static {
@@ -95,20 +93,8 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	this("fast+udp:host=127.0.0.1,port=12246");
     }
 
+
     public RamCloudGraph(String coordinatorLocation) {
-	this(coordinatorLocation, Level.INFO);
-    }
-
-    public RamCloudGraph(Level logLevel) {
-	this("fast+udp:host=127.0.0.1,port=12246", logLevel);
-    }
-
-    public RamCloudGraph(String coordinatorLocation, Level logLevel) {
-	logger.setLevel(logLevel);
-	Handler consoleHandler = new ConsoleHandler();
-	consoleHandler.setLevel(logLevel);
-	logger.addHandler(consoleHandler);
-	logger.setUseParentHandlers(false);
 	this.coordinatorLocation = coordinatorLocation;
 
 	rcClient = getRcClient();
@@ -121,7 +107,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	kidxVertTableId = rcClient.createTable(KIDX_VERT_TABLE_NAME);
 	kidxEdgeTableId = rcClient.createTable(KIDX_EDGE_TABLE_NAME);
 
-	logger.log(Level.INFO, "Connected to coordinator at {0} and created tables {1}, {2}, and {3}", new Object[]{coordinatorLocation, vertTableId, vertPropTableId, edgePropTableId});
+	log.info( "Connected to coordinator at {0} and created tables {1}, {2}, and {3}", new Object[]{coordinatorLocation, vertTableId, vertPropTableId, edgePropTableId});
     }
 
     public synchronized JRamCloud getRcClient() {
@@ -140,7 +126,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 
     @Override
     public Vertex addVertex(Object id) {
-	logger.log(Level.FINE, "Adding vertex: [id={0}]", id);
+	log.info("Adding vertex: [id={0}]", id);
 
 	Long longId;
 	if (id == null) {
@@ -158,18 +144,18 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	    try {
 		longId = Long.parseLong((String) id, 10);
 	    } catch (NumberFormatException e) {
-		logger.log(Level.WARNING, "ID argument {0} of type {1} is not a parseable long number: {2}", new Object[]{id.toString(), id.getClass(), e.toString()});
+		log.warn("ID argument {0} of type {1} is not a parseable long number: {2}", new Object[]{id.toString(), id.getClass(), e.toString()});
 		return null;
 	    }
 	} else if (id instanceof byte[]) {
 	    try {
 		longId = ByteBuffer.wrap((byte[]) id).getLong();
 	    } catch (BufferUnderflowException e) {
-		logger.log(Level.WARNING, "ID argument {0} of type {1} is not a parseable long number: {2}", new Object[]{id.toString(), id.getClass(), e.toString()});
+		log.warn("ID argument {0} of type {1} is not a parseable long number: {2}", new Object[]{id.toString(), id.getClass(), e.toString()});
 		return null;
 	    }
 	} else {
-	    logger.log(Level.WARNING, "ID argument {0} of type {1} is not supported. Returning null.", new Object[]{id.toString(), id.getClass()});
+	    log.warn("ID argument {0} of type {1} is not supported. Returning null.", new Object[]{id.toString(), id.getClass()});
 	    return null;
 	}
 
@@ -177,9 +163,10 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 
 	try {
 	    newVertex.create();
+	    log.warn("add Vertex success");
 	    return newVertex;
 	} catch (IllegalArgumentException e) {
-	    logger.log(Level.WARNING, "Tried to create vertex " + newVertex.toString() + ": " + e.getMessage());
+	    log.warn("Tried to create vertex {0}: {1}", new Object[]{newVertex.toString(), e.getMessage()});
 	    return null;
 	}
     }
@@ -198,18 +185,18 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	    try {
 		longId = Long.parseLong((String) id, 10);
 	    } catch (NumberFormatException e) {
-		logger.log(Level.WARNING, "ID argument {0} of type {1} is not a parseable long number: {2}", new Object[]{id.toString(), id.getClass(), e.toString()});
+		log.warn("ID argument {0} of type {1} is not a parseable long number: {2}", new Object[]{id.toString(), id.getClass(), e.toString()});
 		return null;
 	    }
 	} else if (id instanceof byte[]) {
 	    try {
 		longId = ByteBuffer.wrap((byte[]) id).getLong();
 	    } catch (BufferUnderflowException e) {
-		logger.log(Level.WARNING, "ID argument {0} of type {1} is not a parseable long number: {2}", new Object[]{id.toString(), id.getClass(), e.toString()});
+		log.warn("ID argument {0} of type {1} is not a parseable long number: {2}", new Object[]{id.toString(), id.getClass(), e.toString()});
 		return null;
 	    }
 	} else {
-	    logger.log(Level.WARNING, "ID argument {0} of type {1} is not supported. Returning null.", new Object[]{id.toString(), id.getClass()});
+	    log.warn("ID argument {0} of type {1} is not supported. Returning null.", new Object[]{id.toString(), id.getClass()});
 	    return null;
 	}
 
@@ -224,19 +211,17 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 
     @Override
     public void removeVertex(Vertex vertex) {
-	logger.log(Level.FINE, "Removing vertex: [vertex={0}]", vertex);
+	log.info("Removing vertex: [vertex={0}]", vertex);
 
 	((RamCloudVertex) vertex).remove();
     }
 
-    // TODO: Code review stopped here
     @Override
     public Iterable<Vertex> getVertices() {
 	JRamCloud.TableEnumerator tableEnum = getRcClient().new TableEnumerator(vertPropTableId);
 	List<Vertex> vertices = new ArrayList<Vertex>();
 
 	while (tableEnum.hasNext()) {
-	    logger.log(Level.FINE, "a vertice is added");
 	    vertices.add(new RamCloudVertex(tableEnum.next().key, this));
 	}
 
@@ -250,7 +235,6 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	boolean idx = false;
 	List<Object> keyMap = new ArrayList<Object>();
 
-	//System.out.println("getVertices key:" + key + ", " + "value:" + value);
 	getIndexedKeys(key, Vertex.class);
 	getIndex(key, Vertex.class);
 	int mreadMax = 400;
@@ -313,7 +297,6 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 		    Map<String, Object> propMap = RamCloudElement.getPropertyMap(tableEntry.value);
 		    if (propMap.containsKey(key) && propMap.get(key).equals(value)) {
 			vertices.add(new RamCloudVertex(tableEntry.key, this));
-			logger.log(Level.FINE, "a vertice is added2");
 		    }
 		} 
 	    }
@@ -324,7 +307,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 
     @Override
     public Edge addEdge(Object id, Vertex outVertex, Vertex inVertex, String label) throws IllegalArgumentException {
-	logger.log(Level.FINE, "Adding edge: [id={0}, outVertex={1}, inVertex={2}, label={3}]", new Object[]{id, outVertex, inVertex, label});
+	log.info("Adding edge: [id={0}, outVertex={1}, inVertex={2}, label={3}]", new Object[]{id, outVertex, inVertex, label});
 
 	if (label == null) {
 	    throw ExceptionFactory.edgeLabelCanNotBeNull();
@@ -336,7 +319,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	    newEdge.create();
 	    return newEdge;
 	} catch (IllegalArgumentException e) {
-	    logger.log(Level.WARNING, "Tried to create edge {0}: {1}", new Object[]{newEdge.toString(), e.getMessage()});
+	    log.warn("Tried to create edge {0}: {1}", new Object[]{newEdge.toString(), e.getMessage()});
 	    return null;
 	}
     }
@@ -352,12 +335,12 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	} else if (id instanceof String) {
 	    bytearrayId = Base64.decode(((String) id));
 	} else {
-	    logger.log(Level.WARNING, "ID argument {0} of type {1} is not supported. Returning null.", new Object[]{id.toString(), id.getClass()});
+	    log.warn("ID argument {0} of type {1} is not supported. Returning null.", new Object[]{id.toString(), id.getClass()});
 	    return null;
 	}
 
 	if (!RamCloudEdge.isValidEdgeId(bytearrayId)) {
-	    logger.log(Level.WARNING, "ID argument {0} of type {1} is malformed. Returning null.", new Object[]{id.toString(), id.getClass()});
+	    log.warn("ID argument {0} of type {1} is malformed. Returning null.", new Object[]{id.toString(), id.getClass()});
 	    return null;
 	}
 
@@ -372,7 +355,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 
     @Override
     public void removeEdge(Edge edge) {
-	logger.log(Level.FINE, "Removing edge: [edge={0}]", edge);
+	log.info("Removing edge: [edge={0}]", edge);
 
 	edge.remove();
     }
@@ -572,7 +555,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
     }
 
     public static void main(String[] args) {
-	RamCloudGraph graph = new RamCloudGraph(Level.FINER);
+	RamCloudGraph graph = new RamCloudGraph();
 
 	Vertex a = graph.addVertex(null);
 	Vertex b = graph.addVertex(null);

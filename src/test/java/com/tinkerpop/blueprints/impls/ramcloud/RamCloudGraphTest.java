@@ -99,7 +99,7 @@ public class RamCloudGraphTest extends GraphTest {
 
   @Override
   public Graph generateGraph(String graphDirectoryName) {
-    return new RamCloudGraph("infrc:host=192.168.1.101,port=12246", Level.FINE);
+    return new RamCloudGraph("fast+udp:host=127.0.0.1,12246");
   }
 
 }

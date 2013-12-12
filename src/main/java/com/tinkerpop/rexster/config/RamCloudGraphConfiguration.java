@@ -5,12 +5,11 @@ import com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraph;
 import com.tinkerpop.rexster.config.GraphConfiguration;
 import org.apache.commons.configuration.Configuration;
 
-import java.util.logging.Level;
 
 public class RamCloudGraphConfiguration implements GraphConfiguration {
 
     public Graph configureGraphInstance(final Configuration properties) throws GraphConfigurationException {
-        return new RamCloudGraph("fast+udp:host=127.0.0.1,port=12246", Level.FINE);
+        return new RamCloudGraph("fast+udp:host=127.0.0.1,port=12246");
     }
 
 }
