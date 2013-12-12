@@ -21,6 +21,8 @@ import edu.stanford.ramcloud.JRamCloud;
 import java.io.Serializable;
 import java.nio.ByteOrder;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -47,7 +49,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
     private String KIDX_VERT_TABLE_NAME = "kidx_vert";
     private String KIDX_EDGE_TABLE_NAME = "kidx_edge";
     private String coordinatorLocation;
-    private static long nextVertexId = 1;
+    private static AtomicLong nextVertexId = new AtomicLong(Long.valueOf(System.getProperty("blueprint.initial")));
     private static final Features FEATURES = new Features();
     private RamCloudIndex index = null;
     public RamCloudKeyIndex KeyIndex = null;
@@ -75,7 +77,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	FEATURES.supportsEdgeIndex = false;
 	FEATURES.ignoresSuppliedIds = true;
 	FEATURES.supportsTransactions = false;
-	FEATURES.supportsIndices = false;
+	FEATURES.supportsIndices = true;
 	FEATURES.supportsKeyIndices = false;
 	FEATURES.supportsVertexKeyIndex = true;
 	FEATURES.supportsEdgeKeyIndex = false;
@@ -144,7 +146,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	if (id == null) {
 	    write.lock();
 	    try {
-		longId = nextVertexId++;
+		longId = nextVertexId.getAndIncrement();
 	    } finally {
 		write.unlock();
 	    }
@@ -242,7 +244,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
     }
 
     @Override
-    public synchronized Iterable<Vertex> getVertices(String key, Object value) {
+    public Iterable<Vertex> getVertices(String key, Object value) {
 
 	List<Vertex> vertices = new ArrayList<Vertex>();
 	boolean idx = false;
@@ -272,14 +274,12 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	if (idx) {
 	    //System.out.println("keyMap size : " + keyMap.size());
 	    final int size = Math.min(mreadMax, keyMap.size());
-	    JRamCloud.multiReadObject vertTableMread[] = new JRamCloud.multiReadObject[size];
 	    JRamCloud.multiReadObject vertPropTableMread[] = new JRamCloud.multiReadObject[size];
 
 	    int vertexNum = 0;
 	    for (Object vert : keyMap) {
 		byte[] rckey = 
 			ByteBuffer.allocate(8).order(ByteOrder.LITTLE_ENDIAN).putLong((Long) vert).array();
-		vertTableMread[vertexNum] = new JRamCloud.multiReadObject(vertTableId, rckey);
 		vertPropTableMread[vertexNum] = new JRamCloud.multiReadObject(vertPropTableId, rckey);
 		if (vertexNum >= (mreadMax - 1)) {
 		    JRamCloud.Object outvertPropTable[] =
@@ -603,11 +603,9 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 
 	public void autoUpdate(final String key, final Object newValue, final Object oldValue, final T element) {
 	    if (this.exists()) {
-		/*
 		if (oldValue != null) {
 		    this.remove(key, oldValue, element);
 		}
-		*/ 
 		this.put(key, newValue, element);
 	    }
 	}
