@@ -168,6 +168,12 @@ createException(JNIEnv* env, jobject jRamCloud, const char* name)
     } catch (WrongVersionException& e) {                                       \
         createException(env, jRamCloud, "WrongVersionException");              \
         return _returnValue;                                                   \
+    } catch (RejectRulesException& e) {                                        \
+        createException(env, jRamCloud, "RejectRulesException");               \
+        return _returnValue;                                                   \
+    } catch (InvalidObjectException& e) {                                      \
+        createException(env, jRamCloud, "InvalidObjectException");             \
+        return _returnValue;                                                   \
     }
 
 /*
@@ -483,19 +489,87 @@ JNICALL Java_edu_stanford_ramcloud_JRamCloud_write__J_3B_3BLJRamCloud_RejectRule
                                                            jbyteArray jValue,
                                                            jobject jRejectRules)
 {
-    // XXX- handle RejectRules
+    // XXX- handle RejectRules    
+    RamCloud* ramcloud = getRamCloud(env, jRamCloud);
+    JByteArrayGetter key(env, jKey);
+    JByteArrayGetter value(env, jValue);
+    RejectRules rules;
+    jclass ruleClass = env->GetObjectClass(jRejectRules);
+    jfieldID fid = env->GetFieldID(ruleClass, "doesntExist", "Z");
+    rules.doesntExist = (uint8_t) env->GetBooleanField(jRejectRules, fid);
+
+    fid = env->GetFieldID(ruleClass, "exists", "Z");
+    rules.exists = (uint8_t) env->GetBooleanField(jRejectRules, fid);
+
+    fid = env->GetFieldID(ruleClass, "givenVersion", "J");
+    rules.givenVersion = env->GetLongField(jRejectRules, fid);
+
+    fid = env->GetFieldID(ruleClass, "versionLeGiven", "Z");
+    rules.versionLeGiven = (uint8_t) env->GetBooleanField(jRejectRules, fid);
+
+    fid = env->GetFieldID(ruleClass, "versionNeGiven", "Z");
+    rules.versionNeGiven = (uint8_t) env->GetBooleanField(jRejectRules, fid);
+
+    uint64_t version;
+    try {
+        ramcloud->write(jTableId,
+                key.pointer, key.length,
+                value.pointer, value.length,
+                &rules,
+                &version);
+    }
+    EXCEPTION_CATCHER(-1);
+    return static_cast<jlong> (version);
+}
+
+JNIEXPORT jlong
+JNICALL Java_edu_stanford_ramcloud_JRamCloud_writeRule(JNIEnv *env,
+        jobject jRamCloud,
+        jlong jTableId,
+        jbyteArray jKey,
+        jbyteArray jValue,
+        jobject jRejectRules) {
     RamCloud* ramcloud = getRamCloud(env, jRamCloud);
     JByteArrayGetter key(env, jKey);
     JByteArrayGetter value(env, jValue);
     uint64_t version;
+    RejectRules rules;
+    memset(&rules, 0, sizeof(rules));
+    jclass ruleClass = env->GetObjectClass(jRejectRules);
+
+    jfieldID fid = env->GetFieldID(ruleClass, "doesntExist", "Z");
+    check_null(fid, "doesentExist field id is null");
+    jboolean ruleBool;
+    ruleBool = env->GetBooleanField(jRejectRules, fid);
+    rules.doesntExist = ruleBool ? 1 : 0;
+
+    fid = env->GetFieldID(ruleClass, "exists", "Z");
+    check_null(fid, "exists field id is null");
+    ruleBool = env->GetBooleanField(jRejectRules, fid);
+    rules.exists = ruleBool ? 1 : 0;
+
+    fid = env->GetFieldID(ruleClass, "givenVersion", "J");
+    check_null(fid, "givenVersion field id is null");
+    rules.givenVersion = env->GetLongField(jRejectRules, fid);
+
+    fid = env->GetFieldID(ruleClass, "versionLeGiven", "Z");
+    check_null(fid, "versionLeGiven field id is null");
+    ruleBool = env->GetBooleanField(jRejectRules, fid);
+    rules.versionLeGiven = ruleBool ? 1 : 0;
+
+    fid = env->GetFieldID(ruleClass, "versionNeGiven", "Z");
+    check_null(fid, "versionNeGiven field id is null");
+    ruleBool = env->GetBooleanField(jRejectRules, fid);
+    rules.versionNeGiven = ruleBool ? 1 : 0;
     try {
         ramcloud->write(jTableId,
-                        key.pointer, key.length,
-                        value.pointer, value.length,
-                        NULL,
-                        &version);
-    } EXCEPTION_CATCHER(-1);
-    return static_cast<jlong>(version);
+                key.pointer, key.length,
+                value.pointer, value.length,
+                &rules,
+                &version);
+    }
+    EXCEPTION_CATCHER(-1);
+    return static_cast<jlong> (version);
 }
 
 /*

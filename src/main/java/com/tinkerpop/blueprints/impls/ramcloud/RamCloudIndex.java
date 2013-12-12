@@ -11,7 +11,6 @@ import com.tinkerpop.blueprints.util.WrappingCloseableIterable;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -34,6 +33,8 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
     private long tableId;
     private String indexName;
     private Class<T> indexClass;
+    
+    private long indexVersion;
 
     public RamCloudIndex(long tableId, String indexName, RamCloudGraph graph, Class<T> indexClass) {
 	this.tableId = tableId;
@@ -51,19 +52,28 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	this.indexClass = indexClass;
     }
 
-    public boolean exists() {
+    public boolean exists() {	
 	try {
-	    graph.getRcClient().read(tableId, rcKey);
+	    JRamCloud.Object vertTableEntry;
+	    vertTableEntry = graph.getRcClient().read(tableId, rcKey);
+	    indexVersion = vertTableEntry.version;
 	    return true;
 	} catch (Exception e) {
+	    logger.log(Level.WARNING, toString() + ": Error reading vertex table entry: " + e.toString());
 	    return false;
 	}
     }
 
     public void create() {
 	if (!exists()) {
-	    graph.getRcClient().write(tableId, rcKey, ByteBuffer.allocate(0).array());
-	} 
+	    JRamCloud.RejectRules rules = graph.rcClient.new RejectRules();
+	    rules.setNeVersion(indexVersion);
+	    try {
+		graph.getRcClient().writeRule(tableId, rcKey, ByteBuffer.allocate(0).array(), rules);
+	    } catch (Exception e) {
+		logger.log(Level.WARNING, toString() + ": Write create index list: " + e.toString());
+	    }
+	}
     }
 
     private static byte[] indexToRcKey(String indexName) {
@@ -207,6 +217,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 
 	try {
 	    propTableEntry = graph.getRcClient().read(tableId, rcKey);
+	    indexVersion = propTableEntry.version;
 	} catch (Exception e) {
 	    logger.log(Level.WARNING, "Element does not have a property table entry!");
 	    return null;
@@ -233,7 +244,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 		return null;
 	    }
 	} else {
-	    return new ConcurrentHashMap<String, List<Object>>();
+	    return new HashMap<String, List<Object>>();
 	}
     }
 
@@ -249,7 +260,14 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    logger.log(Level.WARNING, "Got an exception while serializing element''s property map: {0}", e.toString());
 	    return;
 	}
-	graph.getRcClient().write(tableId, rcKey, rcValue);
+	
+	JRamCloud.RejectRules rules = graph.rcClient.new RejectRules();
+	rules.setNeVersion(indexVersion);
+	try {
+	    graph.getRcClient().writeRule(tableId, rcKey, rcValue, rules);
+	} catch (Exception e) {
+	    logger.log(Level.WARNING, toString() + ": Write index property: " + e.toString());
+	}
     }
 
     public <T> T getIndexProperty(String key) {

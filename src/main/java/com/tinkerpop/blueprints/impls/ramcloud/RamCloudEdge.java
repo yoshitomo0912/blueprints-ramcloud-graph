@@ -4,18 +4,18 @@ import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import com.sun.jersey.core.util.Base64;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RamCloudEdge extends RamCloudElement implements Edge {
 
-    private static final Logger logger = Logger.getLogger(RamCloudGraph.class.getName());
+    private final static Logger log = LoggerFactory.getLogger(RamCloudGraph.class);
     private RamCloudVertex outVertex;
     private RamCloudVertex inVertex;
     private String label;
@@ -125,7 +125,7 @@ public class RamCloudEdge extends RamCloudElement implements Edge {
 	} else if (!edgePropTableEntryExists && !outVertexEntryExists && !inVertexEntryExists) {
 	    return false;
 	} else {
-	    logger.log(Level.WARNING, "{0}: Detected RamCloudGraph inconsistency: inVertexEntryExists={1}, outVertexEntryExists={2}, inVertexEntryExists={3}.", new Object[]{toString(), inVertexEntryExists, outVertexEntryExists, inVertexEntryExists});
+	    log.info("{0}: Detected RamCloudGraph inconsistency: inVertexEntryExists={1}, outVertexEntryExists={2}, inVertexEntryExists={3}.", new Object[]{toString(), inVertexEntryExists, outVertexEntryExists, inVertexEntryExists});
 	    return true;
 	}
     }
