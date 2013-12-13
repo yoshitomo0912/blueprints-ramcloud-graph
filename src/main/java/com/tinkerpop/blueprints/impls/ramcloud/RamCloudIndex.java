@@ -112,36 +112,45 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    throw ExceptionFactory.propertyKeyIdIsReserved();
 	}
 
-	Map<String, List<Object>> map = getIndexPropertyMap();
-	List<Object> values = new ArrayList<Object>();
 	List<Object> verify_values = new ArrayList<Object>();
-
-	if (map.containsKey(key)) {
-	    boolean found = false;
-	    for (Map.Entry<String, List<Object>> entry : map.entrySet()) {
-		if (entry.getKey().equals(key)) {
-		    values = entry.getValue();
-		    found = true;
-		    break;
-		}
-	    }
-	    if (found) {
-		if (!values.contains(value)){
-		    values.add(value);
-		}
-	    }
-	} else {
-	    values.add(value);
-	}
+        List<Object> values = new ArrayList<Object>();
+	Map<String, List<Object>> map = null;
 	
-	map.put(key, values);
+	for (int i = 0 ; i < 5 ; i++) {
+	    map = getIndexPropertyMap();
 
-	setIndexPropertyMap(map);
+	    if (map.containsKey(key)) {
+		boolean found = false;
+		for (Map.Entry<String, List<Object>> entry : map.entrySet()) {
+		    if (entry.getKey().equals(key)) {
+			values = entry.getValue();
+			found = true;
+			break;
+		    }
+		}
+		if (found) {
+		    if (!values.contains(value)) {
+			values.add(value);
+		    }
+		}
+	    } else {
+		values.add(value);
+	    }
+
+	    map.put(key, values);
+
+	    byte[] rcValue = setIndexPropertyMap(map);
+	    if (rcValue.length != 0) {
+		if (writeWithRules(rcValue)) {
+		    break;
+		} 
+	    }
+	}
 	
 	if (key.equals("switch")) {
 	    Map<String, List<Object>> verify_map = getIndexPropertyMap();
 	    boolean check = false;
-	    if (verify_map.get(key).contains(value)){
+	    if (verify_map.get(key).contains(value)) {
 		check = true;
 	    }
 	    for (Map.Entry<String, List<Object>> entry : map.entrySet()) {
@@ -264,8 +273,8 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	}
     }
 
-    public void setIndexPropertyMap(Map<String, List<Object>> map) {
-	byte[] rcValue;
+    public byte[] setIndexPropertyMap(Map<String, List<Object>> map) {
+	byte[] rcValue = null;
 
 	try {
 	    ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -274,32 +283,28 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    rcValue = baos.toByteArray();
 	} catch (IOException e) {
 	    log.info("Got an exception while serializing element''s property map: {"+ e.toString() + "}");
-	    return;
 	}
-	writeWithRules(rcValue);
+	
+	return rcValue;
+
     }
 
-    private void writeWithRules(byte[] rcValue) {
-	boolean success = false;
-	JRamCloud.Object propTableEntry;
+    private boolean writeWithRules(byte[] rcValue) {
 	JRamCloud.RejectRules rules = graph.getRcClient().new RejectRules();
-	
-	for(int i = 0; i < 10 && !success; i++) {
-	    if (indexVersion == 0) {
-		rules.setExists();
-	    } else {
-		rules.setNeVersion(indexVersion);
-	    }
-	    
-	    try {
-		graph.getRcClient().writeRule(tableId, rcKey, rcValue, rules);
-		success = true;
-	    } catch (Exception e) {
-		log.info(toString() + ": Write index property: " + e.toString() + " version " + indexVersion + " retry# " + i);
-		propTableEntry = graph.getRcClient().read(tableId, rcKey);
-	        indexVersion = propTableEntry.version;
-	    }
+
+	if (indexVersion == 0) {
+	    rules.setExists();
+	} else {
+	    rules.setNeVersion(indexVersion);
 	}
+
+	try {
+	    graph.getRcClient().writeRule(tableId, rcKey, rcValue, rules);
+	} catch (Exception e) {
+	    log.info(toString() + ": Write index property: " + e.toString() + " version " + indexVersion);
+	    return false;
+	}
+    	return true;
     }
  
     public <T> T getIndexProperty(String key) {
