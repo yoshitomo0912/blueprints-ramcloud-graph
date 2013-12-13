@@ -120,6 +120,11 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 	    }
 	}
 	
+	for (String keyindex : graph.getIndexedKeys(Vertex.class)) {
+	    graph.getIndexedKeys(keyindex, Vertex.class);
+	    graph.KeyIndex.removeElement(this.getId());
+	}
+	
 	// Remove ourselves entirely from the vertex table
 	graph.getRcClient().remove(graph.vertTableId, rcKey);
 
