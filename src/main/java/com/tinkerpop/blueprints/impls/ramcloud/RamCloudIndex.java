@@ -66,7 +66,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 
     public void create() {
 	if (!exists()) {
-	    JRamCloud.RejectRules rules = graph.rcClient.new RejectRules();
+	    JRamCloud.RejectRules rules = graph.getRcClient().new RejectRules();
 	    rules.setExists();
 	    try {
 		graph.getRcClient().writeRule(tableId, rcKey, ByteBuffer.allocate(0).array(), rules);
@@ -262,6 +262,21 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    return;
 	}
 	
+	JRamCloud.RejectRules rules = graph.getRcClient().new RejectRules();
+	if (indexVersion == 0) {
+	    rules.setExists();
+	} else {
+	    rules.setNeVersion(indexVersion);
+	}
+
+	try {
+	    graph.getRcClient().writeRule(tableId, rcKey, rcValue, rules);
+	} catch (Exception e) {
+	    log.info(toString() + ": Write index property: " + e.toString() + " version " + indexVersion);
+	}
+    }
+/*
+    private writeWithRules(byte[] rcValue) {
 	JRamCloud.RejectRules rules = graph.rcClient.new RejectRules();
 	if (indexVersion == 0) {
 	    rules.setExists();
@@ -272,10 +287,10 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	try {
 	    graph.getRcClient().writeRule(tableId, rcKey, rcValue, rules);
 	} catch (Exception e) {
-	    log.info(toString() + ": Write index property: " + e.toString());
+	    log.info(toString() + ": Write index property: " + e.toString() + " version " + indexVersion);
 	}
     }
-
+    * */
     public <T> T getIndexProperty(String key) {
 	Map<String, List<Object>> map = getIndexPropertyMap();
 	return (T) map.get(key);
