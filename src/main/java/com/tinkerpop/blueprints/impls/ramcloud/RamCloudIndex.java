@@ -143,7 +143,9 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    if (rcValue.length != 0) {
 		if (writeWithRules(rcValue)) {
 		    break;
-		} 
+		} else {
+		    log.info("write failure " + (i+1));
+		}
 	    }
 	}
 	
