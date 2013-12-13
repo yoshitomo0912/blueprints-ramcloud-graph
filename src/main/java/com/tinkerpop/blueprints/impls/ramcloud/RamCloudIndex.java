@@ -211,14 +211,17 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    tableEntry = tableEnum.next();
 	    for (int i = 0 ; i < 5 ; i++) {
 		Map<String, List<Object>> propMap = getIndexPropertyMap(tableEntry.value);
+		Map<String, List<Object>> trimMap = new HashMap<String, List<Object>>(propMap);
+
 		for (Map.Entry<String, List<Object>> map : propMap.entrySet()) {
 		    values = map.getValue();
 		    values.remove(element);
 		    if (values.isEmpty()) {
-			propMap.remove(map.getKey());
+			trimMap.remove(map.getKey());
 		    }
 		}
-		byte[] rcValue = setIndexPropertyMap(propMap);
+
+                byte[] rcValue = setIndexPropertyMap(trimMap);
 		if (rcValue.length != 0) {
 		    if (writeWithRules(rcValue)) {
 			break;
