@@ -218,7 +218,6 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    }
 	}
 	setIndexPropertyMap(map);
-
     }
 
     public void removeElement(Object element) {
@@ -229,13 +228,25 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 
 	while (tableEnum.hasNext()) {
 	    tableEntry = tableEnum.next();
-	    Map<String, List<Object>> propMap = getIndexPropertyMap(tableEntry.value);
-	    for (Map.Entry<String, List<Object>> map : propMap.entrySet()) {
-		values = map.getValue();
-		values.remove(element);
-		propMap.put(map.getKey(), values);
+	    for (int i = 0 ; i < 5 ; i++) {
+		Map<String, List<Object>> propMap = getIndexPropertyMap(tableEntry.value);
+		for (Map.Entry<String, List<Object>> map : propMap.entrySet()) {
+		    values = map.getValue();
+		    values.remove(element);
+		    if (values.isEmpty()) {
+			propMap.remove(map.getKey());
+		    }
+		}
+		byte[] rcValue = setIndexPropertyMap(propMap);
+		if (rcValue.length != 0) {
+		    if (writeWithRules(rcValue)) {
+			break;
+		    } else {
+			log.info("write failure " + (i + 1));
+		    }
+		}
 	    }
-	}
+	}	
     }
 
     public Map<String, List<Object>> getIndexPropertyMap() {
