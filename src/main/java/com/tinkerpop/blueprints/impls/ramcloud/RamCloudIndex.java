@@ -59,7 +59,6 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    indexVersion = vertTableEntry.version;
 	    return true;
 	} catch (Exception e) {
-	    log.info(toString() + ": Already vertex table entry: " + e.toString());
 	    return false;
 	}
     }
@@ -111,13 +110,10 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	if (key.equals("id")) {
 	    throw ExceptionFactory.propertyKeyIdIsReserved();
 	}
-
-	List<Object> verify_values = new ArrayList<Object>();
-        List<Object> values = new ArrayList<Object>();
-	Map<String, List<Object>> map = null;
 	
 	for (int i = 0 ; i < 5 ; i++) {
-	    map = getIndexPropertyMap();
+	    Map<String, List<Object>> map = getIndexPropertyMap();
+	    List<Object> values = new ArrayList<Object>();
 
 	    if (map.containsKey(key)) {
 		boolean found = false;
@@ -147,21 +143,6 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 		    log.info("write failure " + (i+1));
 		}
 	    }
-	}
-	
-	if (key.equals("switch")) {
-	    Map<String, List<Object>> verify_map = getIndexPropertyMap();
-	    boolean check = false;
-	    if (verify_map.get(key).contains(value)) {
-		check = true;
-	    }
-	    for (Map.Entry<String, List<Object>> entry : map.entrySet()) {
-		if (entry.getKey().equals(key)) {
-		    verify_values = entry.getValue();
-		    break;
-		}
-	    }
-	    log.info("check :" + check + " switch list " + verify_values);
 	}
     }
 
