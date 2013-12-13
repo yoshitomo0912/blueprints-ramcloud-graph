@@ -47,7 +47,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
     private String KIDX_VERT_TABLE_NAME = "kidx_vert";
     private String KIDX_EDGE_TABLE_NAME = "kidx_edge";
     private String coordinatorLocation;
-    private static AtomicLong nextVertexId = new AtomicLong(Long.valueOf(System.getProperty("blueprint.initial")));
+    private static AtomicLong nextVertexId = new AtomicLong(Long.valueOf(System.getProperty("blueprint.initial", "1")));
     private static final Features FEATURES = new Features();
     public RamCloudIndex index = null;
     public RamCloudKeyIndex KeyIndex = null;
