@@ -266,6 +266,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 
     private void writeWithRules(byte[] rcValue) {
 	boolean success = false;
+	JRamCloud.Object propTableEntry;
 	JRamCloud.RejectRules rules = graph.getRcClient().new RejectRules();
 	
 	for(int i = 0; i < 3 && !success; i++) {
@@ -280,6 +281,8 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 		success = true;
 	    } catch (Exception e) {
 		log.info(toString() + ": Write index property: " + e.toString() + " version " + indexVersion + " retry# " + i);
+		propTableEntry = graph.getRcClient().read(tableId, rcKey);
+	        indexVersion = propTableEntry.version;
 	    }
 	}
     }
