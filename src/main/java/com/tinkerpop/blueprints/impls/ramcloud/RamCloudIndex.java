@@ -22,19 +22,19 @@ import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RamCloudIndex<T extends Element> implements Index<T>, Serializable {
 
-    private static final Logger logger = Logger.getLogger(RamCloudGraph.class.getName());
+    private final static Logger log = LoggerFactory.getLogger(RamCloudGraph.class);
     protected byte[] rcKey;
     private RamCloudGraph graph;
     private long tableId;
     private String indexName;
     private Class<T> indexClass;
     
-    private long indexVersion;
+    private long indexVersion ;
 
     public RamCloudIndex(long tableId, String indexName, RamCloudGraph graph, Class<T> indexClass) {
 	this.tableId = tableId;
@@ -59,7 +59,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    indexVersion = vertTableEntry.version;
 	    return true;
 	} catch (Exception e) {
-	    logger.log(Level.WARNING, toString() + ": Error reading vertex table entry: " + e.toString());
+	    log.info(toString() + ": Error reading vertex table entry: " + e.toString());
 	    return false;
 	}
     }
@@ -67,11 +67,11 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
     public void create() {
 	if (!exists()) {
 	    JRamCloud.RejectRules rules = graph.rcClient.new RejectRules();
-	    rules.setNeVersion(indexVersion);
+	    rules.setExists();
 	    try {
 		graph.getRcClient().writeRule(tableId, rcKey, ByteBuffer.allocate(0).array(), rules);
 	    } catch (Exception e) {
-		logger.log(Level.WARNING, toString() + ": Write create index list: " + e.toString());
+		log.info(toString() + ": Write create index list: " + e.toString());
 	    }
 	}
     }
@@ -219,7 +219,8 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    propTableEntry = graph.getRcClient().read(tableId, rcKey);
 	    indexVersion = propTableEntry.version;
 	} catch (Exception e) {
-	    logger.log(Level.WARNING, "Element does not have a property table entry!");
+	    indexVersion = 0;
+	    log.info("Element does not have a index property table entry! tableId :"+ tableId + " indexName : " + indexName);
 	    return null;
 	}
 
@@ -228,7 +229,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 
     public static Map<String, List<Object>> getIndexPropertyMap(byte[] byteArray) {
 	if (byteArray == null) {
-	    logger.log(Level.WARNING, "Got a null byteArray argument");
+	    log.info("Got a null byteArray argument");
 	    return null;
 	} else if (byteArray.length != 0) {
 	    try {
@@ -237,10 +238,10 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 		Map<String, List<Object>> map = (Map<String, List<Object>>) ois.readObject();
 		return map;
 	    } catch (IOException e) {
-		logger.log(Level.WARNING, "Got an exception while deserializing element''s property map: {0}", e.toString());
+		log.info("Got an exception while deserializing element''s property map: {"+ e.toString() + "}");
 		return null;
 	    } catch (ClassNotFoundException e) {
-		logger.log(Level.WARNING, "Got an exception while deserializing element''s property map: {0}", e.toString());
+		log.info("Got an exception while deserializing element''s property map: {"+ e.toString() + "}");
 		return null;
 	    }
 	} else {
@@ -257,16 +258,21 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    oot.writeObject(map);
 	    rcValue = baos.toByteArray();
 	} catch (IOException e) {
-	    logger.log(Level.WARNING, "Got an exception while serializing element''s property map: {0}", e.toString());
+	    log.info("Got an exception while serializing element''s property map: {"+ e.toString() + "}");
 	    return;
 	}
 	
 	JRamCloud.RejectRules rules = graph.rcClient.new RejectRules();
-	rules.setNeVersion(indexVersion);
+	if (indexVersion == 0) {
+	    rules.setExists();
+	} else {
+	    rules.setNeVersion(indexVersion);
+	}
+
 	try {
 	    graph.getRcClient().writeRule(tableId, rcKey, rcValue, rules);
 	} catch (Exception e) {
-	    logger.log(Level.WARNING, toString() + ": Write index property: " + e.toString());
+	    log.info(toString() + ": Write index property: " + e.toString());
 	}
     }
 
