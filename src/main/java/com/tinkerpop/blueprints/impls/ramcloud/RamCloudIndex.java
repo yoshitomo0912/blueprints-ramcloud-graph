@@ -113,7 +113,6 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	}
 
 	Map<String, List<Object>> map = getIndexPropertyMap();
-	//System.out.println(map);
 	List<Object> values = new ArrayList<Object>();
 
 	if (map.containsKey(key)) {
@@ -137,6 +136,15 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	map.put(key, values);
 
 	setIndexPropertyMap(map);
+	
+	if (key.equals("switch")) {
+	    Map<String, List<Object>> verify_map = getIndexPropertyMap();
+	    boolean check = false;
+	    if (verify_map.get(key).contains(value)){
+		check = true;
+	    }
+	    log.info("check :" + check + " switch list " + verify_map.get(key).toArray().toString());
+	}
     }
 
     @Override
