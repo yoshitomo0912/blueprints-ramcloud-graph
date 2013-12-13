@@ -269,7 +269,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	JRamCloud.Object propTableEntry;
 	JRamCloud.RejectRules rules = graph.getRcClient().new RejectRules();
 	
-	for(int i = 0; i < 3 && !success; i++) {
+	for(int i = 0; i < 10 && !success; i++) {
 	    if (indexVersion == 0) {
 		rules.setExists();
 	    } else {
