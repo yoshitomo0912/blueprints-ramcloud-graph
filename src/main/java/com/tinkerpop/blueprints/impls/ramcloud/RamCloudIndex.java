@@ -59,7 +59,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    indexVersion = vertTableEntry.version;
 	    return true;
 	} catch (Exception e) {
-	    log.info(toString() + ": Error reading vertex table entry: " + e.toString());
+	    log.info(toString() + ": Already vertex table entry: " + e.toString());
 	    return false;
 	}
     }
@@ -261,36 +261,29 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    log.info("Got an exception while serializing element''s property map: {"+ e.toString() + "}");
 	    return;
 	}
-	
+	writeWithRules(rcValue);
+    }
+
+    private void writeWithRules(byte[] rcValue) {
+	boolean success = false;
 	JRamCloud.RejectRules rules = graph.getRcClient().new RejectRules();
-	if (indexVersion == 0) {
-	    rules.setExists();
-	} else {
-	    rules.setNeVersion(indexVersion);
-	}
-
-	try {
-	    graph.getRcClient().writeRule(tableId, rcKey, rcValue, rules);
-	} catch (Exception e) {
-	    log.info(toString() + ": Write index property: " + e.toString() + " version " + indexVersion);
-	}
-    }
-/*
-    private writeWithRules(byte[] rcValue) {
-	JRamCloud.RejectRules rules = graph.rcClient.new RejectRules();
-	if (indexVersion == 0) {
-	    rules.setExists();
-	} else {
-	    rules.setNeVersion(indexVersion);
-	}
-
-	try {
-	    graph.getRcClient().writeRule(tableId, rcKey, rcValue, rules);
-	} catch (Exception e) {
-	    log.info(toString() + ": Write index property: " + e.toString() + " version " + indexVersion);
+	
+	for(int i = 0; i < 3 && !success; i++) {
+	    if (indexVersion == 0) {
+		rules.setExists();
+	    } else {
+		rules.setNeVersion(indexVersion);
+	    }
+	    
+	    try {
+		graph.getRcClient().writeRule(tableId, rcKey, rcValue, rules);
+		success = true;
+	    } catch (Exception e) {
+		log.info(toString() + ": Write index property: " + e.toString() + " version " + indexVersion + " retry# " + i);
+	    }
 	}
     }
-    * */
+ 
     public <T> T getIndexProperty(String key) {
 	Map<String, List<Object>> map = getIndexPropertyMap();
 	return (T) map.get(key);
