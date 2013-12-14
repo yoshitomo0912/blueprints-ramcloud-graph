@@ -325,6 +325,10 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 
     public <T> T getIndexProperty(String key) {
 	Map<String, List<Object>> map = getIndexPropertyMap();
+	if ( map == null ) {
+		log.error("IndexPropertyMap was null");
+		return null;
+	}
 	return (T) map.get(key);
     }
 
