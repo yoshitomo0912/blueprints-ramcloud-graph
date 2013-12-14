@@ -50,11 +50,11 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	try {
 	    JRamCloud.Object vertTableEntry;
 	    vertTableEntry = graph.getRcClient().read(tableId, rcKey);
-		log.info(toString() + ": exists() Update version " + indexVersion + " -> " + vertTableEntry.version );
+		log.debug("exists() Update version " + indexVersion + " -> " + vertTableEntry.version + "["+this.toString()+"]");
 	    indexVersion = vertTableEntry.version;
 	    return true;
 	} catch (Exception e) {
-		log.info(e.toString() + ": exists() Exception thrown ");
+		//log.info(e.toString() + ": exists() Exception thrown ");
 	    return false;
 	}
     }
@@ -107,10 +107,9 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    throw ExceptionFactory.propertyKeyIdIsReserved();
 	}
 
+	// FIXME give more meaningful loop variable
 	for (int i = 0 ; i < 5 ; i++) {
-	    log.info("Before getIndexPropertyMap()");
 	    Map<String, List<Object>> map = getIndexPropertyMap();
-	    log.info("After getIndexPropertyMap()");
 	    List<Object> values = new ArrayList<Object>();
 
 	    if (map.containsKey(key)) {
@@ -138,7 +137,10 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 		if (writeWithRules(rcValue)) {
 		    break;
 		} else {
-		    log.info("getSetProperty(String key, Object value) cond. write  failure RETRYING " + (i+1));
+		    log.debug("getSetProperty(String key, Object value) cond. write failure RETRYING " + (i+1));
+		    if ( i == 4 ) {
+		    	log.error("getSetProperty(String key, Object value) cond. write failure Gaveup RETRYING");
+		    }
 		}
 	    }
 	}
@@ -183,6 +185,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    throw ExceptionFactory.propertyKeyIdIsReserved();
 	}
 
+	// FIXME better loop variable name
        	for (int i = 0; i < 5; ++i) {
 		Map<String, List<Object>> map = getIndexPropertyMap();
 
@@ -202,8 +205,11 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 			if (writeWithRules(rcValue)) {
 				break;
 			} else {
-				log.info("remove(String key, Object value, T element) write failure RETRYING" + (i + 1));
+				log.debug("remove(String key, Object value, T element) write failure RETRYING" + (i + 1));
 				// TODO ERROR message
+				if (i == 4 ) {
+					log.error("remove(String key, Object value, T element) write failure gave up RETRYING");
+				}
 			}
 		}
 	}
@@ -213,50 +219,67 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
     public void removeElement(T element) {
 	JRamCloud.TableEnumerator tableEnum = graph.getRcClient().new TableEnumerator(tableId);
 
-	JRamCloud.Object tableEntry;
-	List<Object> values = new ArrayList<Object>();
-
 	while (tableEnum.hasNext()) {
-	    tableEntry = tableEnum.next();
-	    // FIXME remove loop
-	    for (int i = 0 ; i < 5 ; i++) {
+		JRamCloud.Object tableEntry = tableEnum.next();
 		Map<String, List<Object>> propMap = getIndexPropertyMap(tableEntry.value);
-		List<Map.Entry<String, List<Object>>> toRemove = new LinkedList<Map.Entry<String, List<Object>>>();
+		List<Map.Entry<String, List<Object>>> toRemove = new ArrayList<Map.Entry<String, List<Object>>>();
 
 		for (Map.Entry<String, List<Object>> map : propMap.entrySet()) {
-		    values = map.getValue();
-		    values.remove(element.getId());
-		    if (values.isEmpty()) {
-			toRemove.add(map);
-		    }
+			List<Object> idList = map.getValue();
+			idList.remove(element.getId());
+			if (idList.isEmpty()) {
+				toRemove.add(map);
+			}
 		}
 		for (Map.Entry<String, List<Object>> map : toRemove ) {
 		    propMap.remove(map.getKey());
 		}
 
-                byte[] rcValue = setIndexPropertyMap(propMap);
-		if (rcValue.length != 0) {
-		    if (writeWithRules(rcValue)) {
-			break;
-		    } else {
-			log.info("write failure " + (i + 1));
-			for (Map.Entry<String, List<Object>> map : toRemove ) {
-				this.remove(indexName, map.getKey(), element);
-			}
-			return;
-		    }
+		byte[] rcValue = setIndexPropertyMap(propMap);
+		if (rcValue.length == 0) {
+			// nothing to write
+			continue;
 		}
-	    }
+		if (writeWithRules(rcValue)) {
+			// cond. write success
+			continue;
+		} else {
+			// cond. write failure
+			// FIXME code clone!!	
+			for ( int retry = 5 ; retry >= 0 ; --retry ) {
+				log.info("removeElement(T element) cond. write failure RETRYING " + retry );
+				Map<String, List<Object>> rereadMap = getIndexPropertyMap();
+				toRemove.clear();
+				for (Map.Entry<String, List<Object>> e : rereadMap.entrySet() ) {
+					List<Object> idList = e.getValue();
+					idList.remove(element.getId());
+					if (idList.isEmpty()) {
+						toRemove.add(e);
+					}
+				}
+				for (Map.Entry<String, List<Object>> e : toRemove ) {
+				    rereadMap.remove(e.getKey());
+				}
+				if ( writeWithRules(setIndexPropertyMap(rereadMap)) ) {
+					// cond. re-write success
+					break;
+				}
+				if ( retry == 0 ) {
+					log.error("removeElement(T element) cond. write failure Gave up RETRYING");
+					// XXX may be we should throw some king of exception here?
+				}
+			}
+		}
 	}
     }
 
     public Map<String, List<Object>> getIndexPropertyMap() {
-	log.info("getIndexPropertyMap() ");
+	//log.debug("getIndexPropertyMap() ");
 	JRamCloud.Object propTableEntry;
 
 	try {
 	    propTableEntry = graph.getRcClient().read(tableId, rcKey);
-		log.info(toString() + ": getIndexPropertyMap() " + indexName + "Update version " + indexVersion + " -> " + propTableEntry.version );
+		log.debug("getIndexPropertyMap() " + indexName + " Update version " + indexVersion + " -> " + propTableEntry.version + " ["+this.toString()+"]");
 	    indexVersion = propTableEntry.version;
 	} catch (Exception e) {
 	    indexVersion = 0;
@@ -317,7 +340,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	try {
 	    graph.getRcClient().writeRule(tableId, rcKey, rcValue, rules);
 	} catch (Exception e) {
-	    log.info(toString() + ": Write index property: " + indexName + " " + e.toString() + " version " + indexVersion);
+	    log.debug("Cond. Write index property: " + indexName + " failed " + e.toString() + " version: " + indexVersion + " ["+this.toString()+"]");
 	    return false;
 	}
     	return true;
@@ -326,7 +349,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
     public <T> T getIndexProperty(String key) {
 	Map<String, List<Object>> map = getIndexPropertyMap();
 	if ( map == null ) {
-		log.error("IndexPropertyMap was null");
+		log.error("IndexPropertyMap was null. " + this.indexName +" : " + key);
 		return null;
 	}
 	return (T) map.get(key);

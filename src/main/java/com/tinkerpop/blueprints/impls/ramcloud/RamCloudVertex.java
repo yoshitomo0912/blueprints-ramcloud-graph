@@ -184,7 +184,7 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
     }
 
     public void addEdgesLocally(List<RamCloudEdge> edgesToAdd) {
-	log.info("{"+ this + "}: Adding edges: [edgesToAdd={" + edgesToAdd + "}]");
+	log.debug("Adding edges: {"+ this + "} [edgesToAdd={" + edgesToAdd + "}]");
 
 	Set<RamCloudEdge> edges = getEdgeSet();
 	
@@ -211,7 +211,7 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
     }
 
     public void removeEdgesLocally(List<RamCloudEdge> edgesToRemove) {
-	log.info("{"+ this + "}: Removing edges: [edgesToRemove={" + edgesToRemove + "}]");
+	log.debug("Removein edges: {"+ this + "} [edgesToRemove={" + edgesToRemove + "}]");
 
 	Set<RamCloudEdge> edges = getEdgeSet();
 
