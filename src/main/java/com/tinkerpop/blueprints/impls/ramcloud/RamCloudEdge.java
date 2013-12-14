@@ -135,13 +135,9 @@ public class RamCloudEdge extends RamCloudElement implements Edge {
     public void create() throws Exception {
 	// TODO: Existence check costs extra (presently 3 reads), could use option to turn on/off
 	if (!exists()) {
-	    if (!outVertex.addEdgeLocally(this)) {
-		throw new NoSuchElementException("outVertex create failed");
-	    }
+	    outVertex.addEdgeLocally(this);
 	    if (!isLoop()) {
-		if (!inVertex.addEdgeLocally(this)) {
-		    throw new NoSuchElementException("inVertex create failed");
-		}
+		inVertex.addEdgeLocally(this);
 	    }
 
 	    graph.getRcClient().write(graph.edgePropTableId, rcKey, ByteBuffer.allocate(0).array());
