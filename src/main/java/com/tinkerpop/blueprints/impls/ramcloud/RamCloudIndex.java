@@ -56,9 +56,11 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	try {
 	    JRamCloud.Object vertTableEntry;
 	    vertTableEntry = graph.getRcClient().read(tableId, rcKey);
+		log.info(toString() + ": exists() Update version " + indexVersion + " -> " + vertTableEntry.version ); 
 	    indexVersion = vertTableEntry.version;
 	    return true;
 	} catch (Exception e) {
+		log.info(e.toString() + ": exists() Exception thrown ");
 	    return false;
 	}
     }
@@ -211,17 +213,20 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    tableEntry = tableEnum.next();
 	    for (int i = 0 ; i < 5 ; i++) {
 		Map<String, List<Object>> propMap = getIndexPropertyMap(tableEntry.value);
-		Map<String, List<Object>> trimMap = new HashMap<String, List<Object>>(propMap);
+		List<Map.Entry<String, List<Object>>> toRemove = new LinkedList<Map.Entry<String, List<Object>>>();
 
 		for (Map.Entry<String, List<Object>> map : propMap.entrySet()) {
 		    values = map.getValue();
 		    values.remove(element);
 		    if (values.isEmpty()) {
-			trimMap.remove(map.getKey());
+			toRemove.add(map);
 		    }
 		}
+		for (Map.Entry<String, List<Object>> map : toRemove ) {
+		    propMap.remove(map.getKey());
+		}
 
-                byte[] rcValue = setIndexPropertyMap(trimMap);
+                byte[] rcValue = setIndexPropertyMap(propMap);
 		if (rcValue.length != 0) {
 		    if (writeWithRules(rcValue)) {
 			break;
@@ -234,14 +239,16 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
     }
 
     public Map<String, List<Object>> getIndexPropertyMap() {
+	log.info("getIndexPropertyMap() ");
 	JRamCloud.Object propTableEntry;
 
 	try {
 	    propTableEntry = graph.getRcClient().read(tableId, rcKey);
+		log.info(toString() + ": getIndexPropertyMap() " + indexName + "Update version " + indexVersion + " -> " + propTableEntry.version ); 
 	    indexVersion = propTableEntry.version;
 	} catch (Exception e) {
 	    indexVersion = 0;
-	    log.info("Element does not have a index property table entry! tableId :"+ tableId + " indexName : " + indexName);
+	    log.info(e.toString() + " Element does not have a index property table entry! tableId :"+ tableId + " indexName : " + indexName );
 	    return null;
 	}
 
@@ -298,7 +305,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	try {
 	    graph.getRcClient().writeRule(tableId, rcKey, rcValue, rules);
 	} catch (Exception e) {
-	    log.info(toString() + ": Write index property: " + e.toString() + " version " + indexVersion);
+	    log.info(toString() + ": Write index property: " + indexName + " " + e.toString() + " version " + indexVersion);
 	    return false;
 	}
     	return true;
@@ -317,11 +324,13 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
     public <T> T removeIndexProperty(String key) {
 	Map<String, List<Object>> map = getIndexPropertyMap();
 	T retVal = (T) map.remove(key);
+        // FIXME
 	setIndexPropertyMap(map);
 	return retVal;
     }
 
     public void removeIndex() {
+	    log.info(toString() + ": Removing Index: " + indexName + " was version " + indexVersion);
 	graph.getRcClient().remove(tableId, rcKey);
     }
 }
