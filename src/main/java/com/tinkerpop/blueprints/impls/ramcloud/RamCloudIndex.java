@@ -108,7 +108,9 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	}
 
 	for (int i = 0 ; i < 5 ; i++) {
+	    log.info("Before getIndexPropertyMap()");
 	    Map<String, List<Object>> map = getIndexPropertyMap();
+	    log.info("After getIndexPropertyMap()");
 	    List<Object> values = new ArrayList<Object>();
 
 	    if (map.containsKey(key)) {
@@ -181,21 +183,31 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    throw ExceptionFactory.propertyKeyIdIsReserved();
 	}
 
-	Map<String, List<Object>> map = getIndexPropertyMap();
+       	for (int i = 0; i < 5; ++i) {
+		Map<String, List<Object>> map = getIndexPropertyMap();
 
-	if (map.isEmpty()) {
-	    return;
-	} else if (map.containsKey(value)) {
-	    List<Object> objects = map.get(value);
-	    if (null != objects) {
-		objects.remove(element.getId());
-		if (objects.isEmpty()) {
-		    map.remove(value);
+		if (map.isEmpty()) {
+		    return;
+		} else if (map.containsKey(value)) {
+			List<Object> objects = map.get(value);
+	    		if (null != objects) {
+				objects.remove(element.getId());
+				if (objects.isEmpty()) {
+				    map.remove(value);
+				}
+			}
 		}
-	    }
+		byte[] rcValue = setIndexPropertyMap(map);
+		if (rcValue.length != 0) {
+			if (writeWithRules(rcValue)) {
+				break;
+			} else {
+				log.info("remove(String key, Object value, T element) write failure " + (i + 1));
+				// TODO ERROR message
+			}
+		}
 	}
-	//FIXME
-	setIndexPropertyMap(map);
+
     }
 
     public void removeElement(T element) {
@@ -227,10 +239,11 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 		    if (writeWithRules(rcValue)) {
 			break;
 		    } else {
+			log.info("write failure " + (i + 1));
 			for (Map.Entry<String, List<Object>> map : toRemove ) {
 				this.remove(indexName, map.getKey(), element);
 			}
-			log.info("write failure " + (i + 1));
+			return;
 		    }
 		}
 	    }
@@ -321,20 +334,21 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
     }
 
 	public <T> T removeIndexProperty(String key) {
-		Map<String, List<Object>> map = getIndexPropertyMap();
-		T retVal = (T) map.remove(key);
 		for (int i = 0; i < 5; ++i) {
+			Map<String, List<Object>> map = getIndexPropertyMap();
+			T retVal = (T) map.remove(key);
 			byte[] rcValue = setIndexPropertyMap(map);
 			if (rcValue.length != 0) {
 				if (writeWithRules(rcValue)) {
-					break;
+					return retVal;
 				} else {
 					log.info("write failure " + (i + 1));
 					// TODO ERROR message
 				}
 			}
 		}
-		return retVal;
+		// XXX ?Is this correct
+		return null;
 	}
 
     public void removeIndex() {
