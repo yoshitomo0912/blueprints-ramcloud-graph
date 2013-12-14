@@ -120,17 +120,17 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 		edge.removeProperties();
 	    }
 	}
-	
+
 	for (String keyindex : graph.getIndexedKeys(Vertex.class)) {
 	    graph.getIndexedKeys(keyindex, Vertex.class);
-	    graph.KeyIndex.removeElement(this.getId());
+	    graph.KeyIndex.removeElement(this);
 	}
-	
+
 	// Remove ourselves entirely from the vertex table
 	graph.getRcClient().remove(graph.vertTableId, rcKey);
 
 	// Remove ourselves from our property table
-	super.remove();	
+	super.remove();
     }
 
     /*
@@ -189,7 +189,7 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 
 	Set<RamCloudEdge> edges = getEdgeSet();
 	boolean ret = false;
-	
+
 	try {
 	    if (edges.addAll(edgesToAdd)) {
 		ret = setEdgeSet(edges);
@@ -203,7 +203,7 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 	} catch (NullPointerException e) {
 	    log.warn("{" + toString() + "}: Failed to remove a set of edges ({" + edgesToAdd.toString() + "}): {" + e.getLocalizedMessage() + "}");
 	}
-	
+
 	return ret;
     }
 
