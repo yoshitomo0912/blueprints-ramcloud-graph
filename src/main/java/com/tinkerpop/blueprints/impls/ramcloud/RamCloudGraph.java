@@ -313,13 +313,19 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 
 	RamCloudEdge newEdge = new RamCloudEdge((RamCloudVertex) outVertex, (RamCloudVertex) inVertex, label, this);
 
-	try {
-	    newEdge.create();
-	    return newEdge;
-	} catch (IllegalArgumentException e) {
-	    log.warn("Tried to create edge {" + newEdge.toString() + "}: {" + e.getMessage() + "}");
-	    return null;
+	for (int i = 0; i < 5 ;i++) {
+	    try {
+		newEdge.create();
+		return newEdge;
+	    } catch (Exception e) {
+		log.warn("Tried to create edge {" + newEdge.toString() + "}: {" + e.getMessage() + "}");
+		if (e instanceof NoSuchElementException) {
+		    log.warn("addEdge retry " + i);
+		    continue;
+		}
+	    }
 	}
+	return null;
     }
 
     @Override

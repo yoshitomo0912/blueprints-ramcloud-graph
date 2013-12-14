@@ -10,6 +10,8 @@ import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
+import edu.stanford.ramcloud.JRamCloud;
+import java.util.NoSuchElementException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -130,12 +132,16 @@ public class RamCloudEdge extends RamCloudElement implements Edge {
 	}
     }
 
-    public void create() throws IllegalArgumentException {
+    public void create() throws Exception {
 	// TODO: Existence check costs extra (presently 3 reads), could use option to turn on/off
 	if (!exists()) {
-	    outVertex.addEdgeLocally(this);
+	    if (!outVertex.addEdgeLocally(this)) {
+		throw new NoSuchElementException("outVertex create failed");
+	    }
 	    if (!isLoop()) {
-		inVertex.addEdgeLocally(this);
+		if (!inVertex.addEdgeLocally(this)) {
+		    throw new NoSuchElementException("inVertex create failed");
+		}
 	    }
 
 	    graph.getRcClient().write(graph.edgePropTableId, rcKey, ByteBuffer.allocate(0).array());

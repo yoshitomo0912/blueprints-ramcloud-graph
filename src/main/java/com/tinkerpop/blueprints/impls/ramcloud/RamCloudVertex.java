@@ -30,6 +30,7 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
     protected long id;
     protected byte[] rcKey;
     private RamCloudGraph graph;
+    private long vertexVersion;
 
     /*
      * Constructors
@@ -177,20 +178,21 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 	return ByteBuffer.wrap(rcKey).order(ByteOrder.LITTLE_ENDIAN).getLong();
     }
 
-    public void addEdgeLocally(RamCloudEdge edge) {
+    public boolean addEdgeLocally(RamCloudEdge edge) {
 	List<RamCloudEdge> edgesToAdd = new ArrayList<RamCloudEdge>();
 	edgesToAdd.add(edge);
-	addEdgesLocally(edgesToAdd);
+	return addEdgesLocally(edgesToAdd);
     }
 
-    public void addEdgesLocally(List<RamCloudEdge> edgesToAdd) {
+    public boolean addEdgesLocally(List<RamCloudEdge> edgesToAdd) {
 	log.info("{"+ this + "}: Adding edges: [edgesToAdd={" + edgesToAdd + "}]");
 
 	Set<RamCloudEdge> edges = getEdgeSet();
-
+	boolean ret = false;
+	
 	try {
 	    if (edges.addAll(edgesToAdd)) {
-		setEdgeSet(edges);
+		ret = setEdgeSet(edges);
 	    } else {
 		log.info("{" + toString() + "}: Failed to remove a set of edges ({" + edgesToAdd.toString() + "})");
 	    }
@@ -201,6 +203,8 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 	} catch (NullPointerException e) {
 	    log.warn("{" + toString() + "}: Failed to remove a set of edges ({" + edgesToAdd.toString() + "}): {" + e.getLocalizedMessage() + "}");
 	}
+	
+	return ret;
     }
 
     public void removeEdgeLocally(RamCloudEdge edge) {
@@ -238,9 +242,11 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 	EdgeListProtoBuf edgeList;
 	Set<RamCloudEdge> edgeSet = new HashSet<RamCloudEdge>();
 	RamCloudVertex neighbor;
+	vertexVersion = 0;
 
 	try {
 	    vertTableEntry = graph.getRcClient().read(graph.vertTableId, rcKey);
+	    vertexVersion = vertTableEntry.version;
 	} catch (Exception e) {
 	    log.warn("{" + toString() + "}: Error reading vertex table entry: {" + e.toString() + "}");
 	    return null;
@@ -268,7 +274,7 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 	return edgeSet;
     }
 
-    public void setEdgeSet(Set<RamCloudEdge> edgeSet) {
+    public boolean setEdgeSet(Set<RamCloudEdge> edgeSet) {
 	EdgeListProtoBuf.Builder edgeListBuilder = EdgeListProtoBuf.newBuilder();
 	EdgeProtoBuf.Builder edgeBuilder = EdgeProtoBuf.newBuilder();
 
@@ -296,11 +302,25 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 		    }
 		}
 	    } else {
-		log.warn("{" + toString() + "}: Tried to add an edge unowned by this vertex ({1})", new Object[]{toString(), edge.toString()});
+		log.warn("{" + toString() + "}: Tried to add an edge unowned by this vertex ({" + edge.toString() + "})");
+		return true;
 	    }
 	}
 
-	graph.getRcClient().write(graph.vertTableId, rcKey, edgeListBuilder.build().toByteArray());
+	JRamCloud.RejectRules rules = graph.getRcClient().new RejectRules();
+
+	if (vertexVersion == 0) {
+	    rules.setExists();
+	} else {
+	    rules.setNeVersion(vertexVersion);
+	}
+	try {
+	    graph.getRcClient().writeRule(graph.vertTableId, rcKey, edgeListBuilder.build().toByteArray(), rules);
+	    return true;
+	} catch (Exception e) {
+	    log.warn("in/out vertex write failure" + e.toString());
+	    return false;
+	}
     }
 
     public List<RamCloudEdge> getEdgeList() {
