@@ -164,7 +164,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	    log.info("Adding vertex: [id={" + longId + "}]");
 	    return newVertex;
 	} catch (IllegalArgumentException e) {
-	    log.warn("Tried to create vertex {" + newVertex.toString() + "}: {" + e.getMessage() + "}");
+	    log.error("Tried to create vertex failed {" + newVertex.toString() + "}: {" + e.getMessage() + "}");
 	    return null;
 	}
     }
