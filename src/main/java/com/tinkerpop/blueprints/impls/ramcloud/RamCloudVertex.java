@@ -201,6 +201,7 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 	} catch (NullPointerException e) {
 	    log.warn("{" + toString() + "}: Failed to remove a set of edges ({" + edgesToAdd.toString() + "}): {" + e.getLocalizedMessage() + "}");
 	}
+
     }
 
     public void removeEdgeLocally(RamCloudEdge edge) {
