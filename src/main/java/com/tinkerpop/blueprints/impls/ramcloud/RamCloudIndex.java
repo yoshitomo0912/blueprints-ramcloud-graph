@@ -138,7 +138,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 		if (writeWithRules(rcValue)) {
 		    break;
 		} else {
-		    log.info("write failure " + (i+1));
+		    log.info("getSetProperty(String key, Object value) cond. write  failure RETRYING " + (i+1));
 		}
 	    }
 	}
@@ -202,7 +202,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 			if (writeWithRules(rcValue)) {
 				break;
 			} else {
-				log.info("remove(String key, Object value, T element) write failure " + (i + 1));
+				log.info("remove(String key, Object value, T element) write failure RETRYING" + (i + 1));
 				// TODO ERROR message
 			}
 		}
@@ -269,7 +269,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 
     public static Map<String, List<Object>> getIndexPropertyMap(byte[] byteArray) {
 	if (byteArray == null) {
-	    log.info("Got a null byteArray argument");
+	    log.error("Got a null byteArray argument");
 	    return null;
 	} else if (byteArray.length != 0) {
 	    try {
@@ -278,10 +278,10 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 		Map<String, List<Object>> map = (Map<String, List<Object>>) ois.readObject();
 		return map;
 	    } catch (IOException e) {
-		log.info("Got an exception while deserializing element''s property map: {"+ e.toString() + "}");
+		log.error("Got an IOException while deserializing element''s property map: {"+ e.toString() + "}");
 		return null;
 	    } catch (ClassNotFoundException e) {
-		log.info("Got an exception while deserializing element''s property map: {"+ e.toString() + "}");
+		log.error("Got a ClassNotFoundException while deserializing element''s property map: {"+ e.toString() + "}");
 		return null;
 	    }
 	} else {
