@@ -107,7 +107,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    throw ExceptionFactory.propertyKeyIdIsReserved();
 	}
 
-	for (int i = 0 ; i < 5 ; i++) {
+	for (int i = 0 ; i < 100 ; i++) {
 	    log.info("Before getIndexPropertyMap()");
 	    Map<String, List<Object>> map = getIndexPropertyMap();
 	    log.info("After getIndexPropertyMap()");
@@ -183,7 +183,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    throw ExceptionFactory.propertyKeyIdIsReserved();
 	}
 
-       	for (int i = 0; i < 5; ++i) {
+       	for (int i = 0; i < 100; ++i) {
 		Map<String, List<Object>> map = getIndexPropertyMap();
 
 		if (map.isEmpty()) {
@@ -211,7 +211,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
     }
 
     public void removeElement(T element) {
-	JRamCloud.TableEnumerator tableEnum = graph.getRcClient().new TableEnumerator(tableId);
+	JRamCloud.TableEnumerator tableEnum = graph.getRcClient().new TableEnumerator(graph.kidxVertTableId);
 
 	JRamCloud.Object tableEntry;
 	List<Object> values = new ArrayList<Object>();
@@ -219,7 +219,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	while (tableEnum.hasNext()) {
 	    tableEntry = tableEnum.next();
 	    // FIXME remove loop
-	    for (int i = 0 ; i < 5 ; i++) {
+	    for (int i = 0 ; i < 100 ; i++) {
 		Map<String, List<Object>> propMap = getIndexPropertyMap(tableEntry.value);
 		List<Map.Entry<String, List<Object>>> toRemove = new LinkedList<Map.Entry<String, List<Object>>>();
 
@@ -334,7 +334,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
     }
 
 	public <T> T removeIndexProperty(String key) {
-		for (int i = 0; i < 5; ++i) {
+		for (int i = 0; i < 100; ++i) {
 			Map<String, List<Object>> map = getIndexPropertyMap();
 			T retVal = (T) map.remove(key);
 			byte[] rcValue = setIndexPropertyMap(map);

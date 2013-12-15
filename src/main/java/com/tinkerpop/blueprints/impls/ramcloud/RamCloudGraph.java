@@ -47,10 +47,8 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
     private String KIDX_VERT_TABLE_NAME = "kidx_vert";
     private String KIDX_EDGE_TABLE_NAME = "kidx_edge";
     private String coordinatorLocation;
-    private static AtomicLong nextVertexId = new AtomicLong(Long.valueOf(System.getProperty("blueprint.initial", "1")));
+    private static final AtomicLong nextVertexId = new AtomicLong(Long.valueOf(System.getProperty("blueprint.initial", "1")));
     private static final Features FEATURES = new Features();
-    public RamCloudIndex index = null;
-    public RamCloudKeyIndex KeyIndex = null;
 
     static {
 	FEATURES.supportsSerializableObjectProperty = true;
@@ -230,31 +228,33 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
     public Iterable<Vertex> getVertices(String key, Object value) {
 
 	List<Vertex> vertices = new ArrayList<Vertex>();
-	boolean idx = false;
-	List<Object> keyMap = new ArrayList<Object>();
+	boolean isIndexed = false;
+	List<Object> keyMap = null;;
 
-	getIndexedKeys(key, Vertex.class);
-	getIndex(key, Vertex.class);
+	RamCloudIndex<Vertex> KeyIndex = getIndexedKeys(key, Vertex.class);
+	RamCloudIndex<Vertex> index = (RamCloudIndex<Vertex>)getIndex(key, Vertex.class);
 	int mreadMax = 400;
+	
+	log.debug("getVertices key : " + key + " value " + value);
 
 	if (index.exists()) {
 	    keyMap = (List<Object>) index.getIndexProperty(value.toString());
 	    if (keyMap == null) {
-		return (Iterable<Vertex>) vertices;
+		return vertices;
 	    } else {
-		idx = true;
+		isIndexed = true;
 	    }
 	} else if (KeyIndex.exists()) {
 	    keyMap = (List<Object>) KeyIndex.getIndexProperty(value.toString());
 	    if (keyMap == null) {
-		return (Iterable<Vertex>) vertices;
+		return vertices;
 	    } else {
-		idx = true;
+		log.debug("keyMap size " + keyMap.size() + " keyMap " + keyMap);
+		isIndexed = true;
 	    }
 	}
 
-	if (idx) {
-	    //System.out.println("keyMap size : " + keyMap.size());
+	if (isIndexed) {
 	    final int size = Math.min(mreadMax, keyMap.size());
 	    JRamCloud.multiReadObject vertPropTableMread[] = new JRamCloud.multiReadObject[size];
 
@@ -427,8 +427,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 
     @Override
     public <T extends Element> void dropKeyIndex(String key, Class<T> elementClass) {
-	KeyIndex = (RamCloudKeyIndex) getIndexedKeys(key, elementClass);
-	KeyIndex.removeIndex();
+	getIndexedKeys(key, elementClass).removeIndex();
     }
 
     @Override
@@ -437,6 +436,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	if (key == null) {
 	    return;
 	}
+	RamCloudKeyIndex KeyIndex = null;
 	if (elementClass == Vertex.class) {
 	    KeyIndex = new RamCloudKeyIndex(kidxVertTableId, key, this, elementClass);
 	} else if (elementClass == Edge.class) {
@@ -467,9 +467,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
     }
 
     public <T extends Element> RamCloudKeyIndex getIndexedKeys(String key, Class<T> elementClass) {
-
-	return KeyIndex = new RamCloudKeyIndex(kidxVertTableId, key, this, elementClass);
-
+	return new RamCloudKeyIndex(kidxVertTableId, key, this, elementClass);
     }
 
     @Override
@@ -478,6 +476,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	if (indexName == null) {
 	    return null;
 	}
+	RamCloudIndex<T> index = null;
 	if (indexClass == Vertex.class) {
 	    index = new RamCloudIndex(idxVertTableId, indexName, this, indexClass);
 	} else if (indexClass == Edge.class) {
@@ -495,7 +494,8 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	if (indexName == null) {
 	    return null;
 	}
-
+	
+	RamCloudIndex index = null;
 	if (indexClass.equals(Vertex.class)) {
 	    index = new RamCloudIndex(idxVertTableId, indexName, this, indexClass);
 	} else if (indexClass.equals(Edge.class)) {
@@ -530,7 +530,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
     public void dropIndex(String indexName) {
 	final Iterator<RamCloudIndex> list = (Iterator<RamCloudIndex>) getIndices();
 	while (list.hasNext()) {
-	    index = list.next();
+	    RamCloudIndex index = list.next();
 	    if (new String(index.rcKey).equals(indexName)) {
 		index.removeIndex();
 	    }
@@ -540,7 +540,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
     //@Override
     public void dropIndex(String indexName, Class indexClass) {
 	// Remove ourselves entirely from the vertex table
-	index = (RamCloudIndex) getIndex(indexName, indexClass);
+	RamCloudIndex index = (RamCloudIndex) getIndex(indexName, indexClass);
 	index.removeIndex();
     }
 

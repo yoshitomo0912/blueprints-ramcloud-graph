@@ -13,6 +13,7 @@ import java.util.Set;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.tinkerpop.blueprints.*;
+import com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraph.RamCloudKeyIndex;
 import com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeListProtoBuf;
 import com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf;
 import com.tinkerpop.blueprints.util.DefaultVertexQuery;
@@ -120,10 +121,8 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 	    }
 	}
 
-	for (String keyindex : graph.getIndexedKeys(Vertex.class)) {
-	    graph.getIndexedKeys(keyindex, Vertex.class);
-	    graph.KeyIndex.removeElement(this);
-	}
+	RamCloudKeyIndex keyIndex = graph.getIndexedKeys("dummy", Vertex.class);
+	keyIndex.removeElement(this);
 
 	// Remove ourselves entirely from the vertex table
 	graph.getRcClient().remove(graph.vertTableId, rcKey);
