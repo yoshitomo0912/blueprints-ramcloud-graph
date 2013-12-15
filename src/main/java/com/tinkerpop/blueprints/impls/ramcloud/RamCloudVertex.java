@@ -20,7 +20,9 @@ import com.tinkerpop.blueprints.util.DefaultVertexQuery;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 
 import edu.stanford.ramcloud.JRamCloud;
+
 import java.io.Serializable;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,9 +94,11 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 
     @Override
     public void remove() {
+	log.debug("RamCloudVertex.remove() begin");
 	Set<RamCloudEdge> edges = getEdgeSet();
 	Map<RamCloudVertex, List<RamCloudEdge>> vertexToEdgesMap = new HashMap<RamCloudVertex, List<RamCloudEdge>>();
 
+	log.debug("RamCloudVertex.remove() - removing Edges");
 	// Batch edges together by neighbor vertex
 	for (RamCloudEdge edge : edges) {
 	    RamCloudVertex neighbor = (RamCloudVertex) edge.getNeighbor(this);
@@ -121,14 +125,29 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 	    }
 	}
 
-	RamCloudKeyIndex keyIndex = graph.getIndexedKeys("dummy", Vertex.class);
-	keyIndex.removeElement(this);
+	log.debug("RamCloudVertex.remove() - removing IndexedKeys");
+	Map<String,Object> props = this.getPropertyMap();
+	for( Map.Entry<String,Object> entry : props.entrySet() ) {
+		RamCloudKeyIndex keyIndex = graph.getIndexedKeys(entry.getKey(), Vertex.class);
+		if ( !keyIndex.exists() ) continue;
+		keyIndex.remove(entry.getKey(), entry.getValue(), this);
+	}
 
+//	Map<String,Object> props = this.getPropertyMap();
+//	for (String keyindex : graph.getIndexedKeys(Vertex.class)) {
+//		if ( !props.containsKey(keyindex) ) continue;
+//		RamCloudKeyIndex keyIndex = graph.getIndexedKeys(keyindex, Vertex.class);
+//		keyIndex.remove(keyindex, props.get(keyindex), this);
+//	}
+
+	log.debug("RamCloudVertex.remove() - removing Vertex Table Key");
 	// Remove ourselves entirely from the vertex table
 	graph.getRcClient().remove(graph.vertTableId, rcKey);
 
+	log.debug("RamCloudVertex.remove() - removing Vertex Property Table Key");
 	// Remove ourselves from our property table
 	super.remove();
+	log.debug("RamCloudVertex.remove() end");
     }
 
     /*
@@ -183,22 +202,22 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
     }
 
     public void addEdgesLocally(List<RamCloudEdge> edgesToAdd) {
-	log.info("{"+ this + "}: Adding edges: [edgesToAdd={" + edgesToAdd + "}]");
+	log.debug("Adding edges: {"+ this + "} [edgesToAdd={" + edgesToAdd + "}]");
 
 	Set<RamCloudEdge> edges = getEdgeSet();
-	
+
 	try {
 	    if (edges.addAll(edgesToAdd)) {
 		setEdgeSet(edges);
 	    } else {
-		log.info("{" + toString() + "}: Failed to remove a set of edges ({" + edgesToAdd.toString() + "})");
+		log.warn("{" + toString() + "}: Failed to add a set of edges ({" + edgesToAdd.toString() + "})");
 	    }
 	} catch (UnsupportedOperationException e) {
-	    log.warn("{" + toString() + "}: Failed to remove a set of edges ({" + edgesToAdd.toString() + "}): {" + e.getLocalizedMessage() + "}");
+	    log.error("{" + toString() + "}: Failed to add a set of edges ({" + edgesToAdd.toString() + "}): {" + e.getLocalizedMessage() + "}");
 	} catch (ClassCastException e) {
-	    log.warn("{" + toString() + "}: Failed to remove a set of edges ({" + edgesToAdd.toString() + "}): {" + e.getLocalizedMessage() + "}");
+	    log.error("{" + toString() + "}: Failed to add a set of edges ({" + edgesToAdd.toString() + "}): {" + e.getLocalizedMessage() + "}");
 	} catch (NullPointerException e) {
-	    log.warn("{" + toString() + "}: Failed to remove a set of edges ({" + edgesToAdd.toString() + "}): {" + e.getLocalizedMessage() + "}");
+	    log.error("{" + toString() + "}: Failed to add a set of edges ({" + edgesToAdd.toString() + "}): {" + e.getLocalizedMessage() + "}");
 	}
 
     }
@@ -210,7 +229,7 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
     }
 
     public void removeEdgesLocally(List<RamCloudEdge> edgesToRemove) {
-	log.info("{"+ this + "}: Removing edges: [edgesToRemove={" + edgesToRemove + "}]");
+	log.debug("Removein edges: {"+ this + "} [edgesToRemove={" + edgesToRemove + "}]");
 
 	Set<RamCloudEdge> edges = getEdgeSet();
 
@@ -221,11 +240,11 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 		log.warn("{" + toString() + "}: Failed to remove a set of edges ({" + edgesToRemove.toString() + "})");
 	    }
 	} catch (UnsupportedOperationException e) {
-	    log.warn("{" + toString() + "}: Failed to remove a set of edges ({" + edgesToRemove.toString() + "}): {" + e.getLocalizedMessage() + "}");
+	    log.error("{" + toString() + "}: Failed to remove a set of edges ({" + edgesToRemove.toString() + "}): {" + e.getLocalizedMessage() + "}");
 	} catch (ClassCastException e) {
-	    log.warn("{" + toString() + "}: Failed to remove a set of edges ({" + edgesToRemove.toString() + "}): {" + e.getLocalizedMessage() + "}");
+	    log.error("{" + toString() + "}: Failed to remove a set of edges ({" + edgesToRemove.toString() + "}): {" + e.getLocalizedMessage() + "}");
 	} catch (NullPointerException e) {
-	    log.warn("{" + toString() + "}: Failed to remove a set of edges ({" + edgesToRemove.toString() + "}): {" + e.getLocalizedMessage() + "}");
+	    log.error("{" + toString() + "}: Failed to remove a set of edges ({" + edgesToRemove.toString() + "}): {" + e.getLocalizedMessage() + "}");
 	}
     }
 
