@@ -187,7 +187,7 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 	log.debug("Adding edges: {"+ this + "} [edgesToAdd={" + edgesToAdd + "}]");
 
 	Set<RamCloudEdge> edges = getEdgeSet();
-	
+
 	try {
 	    if (edges.addAll(edgesToAdd)) {
 		setEdgeSet(edges);
