@@ -111,7 +111,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	}
 
 	// FIXME give more meaningful loop variable
-	for (int i = 0 ; i < 5 ; i++) {
+	for (int i = 0 ; i < 100 ; i++) {
 	    Map<Object, List<Object>> map = readIndexPropertyMapFromDB();
 	    List<Object> values = new ArrayList<Object>();
 
@@ -196,7 +196,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	}
 
 	// FIXME better loop variable name
-	for (int i = 0; i < 5; ++i) {
+	for (int i = 0; i < 100; ++i) {
 		Map<Object, List<Object>> map = readIndexPropertyMapFromDB();
 
 		if (map.containsKey(propValue)) {
@@ -220,7 +220,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 			break;
 		} else {
 			log.debug("remove({}, {}, T element) write failure RETRYING {}", propName, propValue, (i + 1));
-			if ( i+1 == 5 ) {
+			if ( i+1 == 100 ) {
 				log.error("remove({}, {}, T element) write failed completely. gave up RETRYING", propName, propValue);
 			}
 		}
@@ -266,7 +266,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 		} else {
 			// cond. write failure
 			// FIXME Dirty hack
-			for ( int retry = 5 ; retry >= 0 ; --retry ) {
+			for ( int retry = 100 ; retry >= 0 ; --retry ) {
 				log.debug("removeElement({}, {}, ...) cond. write failure RETRYING {}", tableId, element, retry );
 				RamCloudIndex<T> idx = new RamCloudIndex<T>(tableId, tableEntry.key, graph, (Class<T>)element.getClass() );
 				Map<Object, List<Object>> rereadMap = idx.readIndexPropertyMapFromDB();
