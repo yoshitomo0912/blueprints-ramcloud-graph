@@ -164,7 +164,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 
 	try {
 	    newVertex.create();
-	    log.info("Adding vertex: [id={" + longId + "}]");
+	    log.info("Added vertex: [id={" + longId + "}]");
 	    return newVertex;
 	} catch (IllegalArgumentException e) {
 	    log.error("Tried to create vertex failed {" + newVertex.toString() + "}: {" + e.getMessage() + "}");
@@ -212,9 +212,10 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 
     @Override
     public void removeVertex(Vertex vertex) {
-	log.info("Removing vertex: [vertex={" + vertex + "}]");
+	log.info("Removing vertex begin: [vertex={" + vertex + "}]");
 
 	((RamCloudVertex) vertex).remove();
+	log.info("Removing vertex end: [vertex={" + vertex + "}]");
     }
 
     @Override
@@ -362,9 +363,10 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 
     @Override
     public void removeEdge(Edge edge) {
-	log.info("Removing edge: [edge={" + edge + "}]");
+	log.info("Removing edge begin: [edge={" + edge + "}]");
 
 	edge.remove();
+	log.info("Removing edge end: [edge={" + edge + "}]");
     }
 
     @Override
