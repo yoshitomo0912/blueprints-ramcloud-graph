@@ -1,6 +1,7 @@
 package com.tinkerpop.blueprints.impls.ramcloud;
 
 import com.tinkerpop.blueprints.Edge;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -13,10 +14,13 @@ import java.util.Set;
 
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraph.RamCloudKeyIndex;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 
 import edu.stanford.ramcloud.JRamCloud;
+
 import java.io.*;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -129,11 +133,11 @@ public class RamCloudElement implements Element, Serializable {
 	setPropertyMap(map);
 
 	if (this instanceof RamCloudVertex) {
-	    graph.getIndexedKeys(key, Vertex.class);
-	    graph.KeyIndex.autoUpdate(key, value, oldValue, this);
+		RamCloudKeyIndex keyIndex = graph.getIndexedKeys(key, Vertex.class);
+		keyIndex.autoUpdate(key, value, oldValue, this);
 	} else {
-	    graph.getIndexedKeys(key, Edge.class);
-	    graph.KeyIndex.autoUpdate(key, value, oldValue, this);
+		RamCloudKeyIndex keyIndex =graph.getIndexedKeys(key, Edge.class);
+		keyIndex.autoUpdate(key, value, oldValue, this);
 	}
     }
 
@@ -144,11 +148,11 @@ public class RamCloudElement implements Element, Serializable {
 	setPropertyMap(map);
 
 	if (this instanceof RamCloudVertex) {
-	    graph.getIndexedKeys(key, Vertex.class);
-	    graph.KeyIndex.autoRemove(key, retVal.toString(), this);
+		RamCloudKeyIndex keyIndex = graph.getIndexedKeys(key, Vertex.class);
+		keyIndex.autoRemove(key, retVal.toString(), this);
 	} else {
-	    graph.getIndexedKeys(key, Edge.class);
-	    graph.KeyIndex.autoRemove(key, retVal.toString(), this);
+		RamCloudKeyIndex keyIndex = graph.getIndexedKeys(key, Edge.class);
+		keyIndex.autoRemove(key, retVal.toString(), this);
 	}
 
 	return retVal;

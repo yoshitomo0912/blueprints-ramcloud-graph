@@ -14,12 +14,14 @@ import com.tinkerpop.blueprints.util.DefaultGraphQuery;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 
 import edu.stanford.ramcloud.JRamCloud;
+
 import java.io.Serializable;
 import java.nio.ByteOrder;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,8 +52,8 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
     private static AtomicLong nextVertexId = new AtomicLong(Long.valueOf(System.getProperty("blueprint.initial", "1")));
     private static final Features FEATURES = new Features();
     // FIXME Index for Vertex only
-    public RamCloudIndex index = null;
-    public RamCloudKeyIndex KeyIndex = null;
+    //public RamCloudIndex index = null;
+    //public RamCloudKeyIndex KeyIndex = null;
 
     static {
 	FEATURES.supportsSerializableObjectProperty = true;
@@ -234,8 +236,8 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	boolean isIndexed = false;
 	List<Object> keyMap = null;
 
-	getIndexedKeys(key, Vertex.class);
-	getIndex(key, Vertex.class);
+	RamCloudIndex<Vertex> KeyIndex = getIndexedKeys(key, Vertex.class);
+	RamCloudIndex<Vertex> index = (RamCloudIndex<Vertex>) getIndex(key, Vertex.class);
 	int mreadMax = 400;
 
 	if (index.exists()) {
@@ -428,8 +430,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 
     @Override
     public <T extends Element> void dropKeyIndex(String key, Class<T> elementClass) {
-	KeyIndex = getIndexedKeys(key, elementClass);
-	KeyIndex.removeIndex();
+	getIndexedKeys(key, elementClass).removeIndex();
     }
 
     @Override
@@ -438,6 +439,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	if (key == null) {
 	    return;
 	}
+	RamCloudKeyIndex KeyIndex = null;
 	if (elementClass == Vertex.class) {
 	    KeyIndex = new RamCloudKeyIndex(kidxVertTableId, key, this, elementClass);
 	} else if (elementClass == Edge.class) {
@@ -469,7 +471,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 
     public <T extends Element> RamCloudKeyIndex getIndexedKeys(String key, Class<T> elementClass) {
 
-	return KeyIndex = new RamCloudKeyIndex(kidxVertTableId, key, this, elementClass);
+	return new RamCloudKeyIndex(kidxVertTableId, key, this, elementClass);
 
     }
 
@@ -479,6 +481,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	if (indexName == null) {
 	    return null;
 	}
+	RamCloudIndex<T> index = null;
 	if (indexClass == Vertex.class) {
 	    index = new RamCloudIndex(idxVertTableId, indexName, this, indexClass);
 	} else if (indexClass == Edge.class) {
@@ -497,6 +500,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	    return null;
 	}
 
+	RamCloudIndex index = null;
 	if (indexClass.equals(Vertex.class)) {
 	    index = new RamCloudIndex(idxVertTableId, indexName, this, indexClass);
 	} else if (indexClass.equals(Edge.class)) {
@@ -531,7 +535,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
     public void dropIndex(String indexName) {
 	final Iterator<RamCloudIndex> list = (Iterator<RamCloudIndex>) getIndices();
 	while (list.hasNext()) {
-	    index = list.next();
+	    RamCloudIndex index = list.next();
 	    if (new String(index.rcKey).equals(indexName)) {
 		index.removeIndex();
 	    }
@@ -541,7 +545,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
     //@Override
     public void dropIndex(String indexName, Class indexClass) {
 	// Remove ourselves entirely from the vertex table
-	index = (RamCloudIndex) getIndex(indexName, indexClass);
+	RamCloudIndex index = (RamCloudIndex) getIndex(indexName, indexClass);
 	index.removeIndex();
     }
 
