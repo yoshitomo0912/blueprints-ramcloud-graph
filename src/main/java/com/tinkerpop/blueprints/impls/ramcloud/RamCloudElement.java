@@ -46,7 +46,7 @@ public class RamCloudElement implements Element, Serializable {
 	try {
 	    propTableEntry = graph.getRcClient().read(rcPropTableId, rcPropTableKey);
 	} catch (Exception e) {
-	    log.info("Element does not have a property table entry!");
+	    log.warn("Element does not have a property table entry!");
 	    return null;
 	}
 
@@ -55,7 +55,7 @@ public class RamCloudElement implements Element, Serializable {
 
     public static Map<String, Object> getPropertyMap(byte[] byteArray) {
 	if (byteArray == null) {
-	    log.info("Got a null byteArray argument");
+	    log.warn("Got a null byteArray argument");
 	    return null;
 	} else if (byteArray.length != 0) {
 	    try {
@@ -64,10 +64,10 @@ public class RamCloudElement implements Element, Serializable {
 		Map<String, Object> map = (Map<String, Object>) ois.readObject();
 		return map;
 	    } catch (IOException e) {
-		log.info("Got an exception while deserializing element''s property map: {" + e.toString() + "}");
+		log.error("Got an exception while deserializing element''s property map: {" + e.toString() + "}");
 		return null;
 	    } catch (ClassNotFoundException e) {
-		log.info("Got an exception while deserializing element''s property map: {" + e.toString() + "}");
+		log.error("Got an exception while deserializing element''s property map: {" + e.toString() + "}");
 		return null;
 	    }
 	} else {
@@ -84,7 +84,7 @@ public class RamCloudElement implements Element, Serializable {
 	    oot.writeObject(map);
 	    rcValue = baos.toByteArray();
 	} catch (IOException e) {
-	    log.info("Got an exception while serializing element''s property map: {" + e.toString() + "}");
+	    log.error("Got an exception while serializing element''s property map: {" + e.toString() + "}");
 	    return;
 	}
 
