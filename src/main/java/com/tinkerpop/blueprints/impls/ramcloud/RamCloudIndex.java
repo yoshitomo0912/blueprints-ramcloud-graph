@@ -60,7 +60,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	try {
 	    JRamCloud.Object vertTableEntry;
 	    vertTableEntry = graph.getRcClient().read(tableId, rcKey);
-		log.debug("exists() Update version " + indexVersion + " -> " + vertTableEntry.version + "["+this.toString()+"]");
+		log.debug(indexName +" exists(): "+new String(rcKey)+"@"+tableId+" Update version " + indexVersion + " -> " + vertTableEntry.version + "["+this.toString()+"]");
 	    indexVersion = vertTableEntry.version;
 	    return true;
 	} catch (Exception e) {
@@ -218,7 +218,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 		if (writeWithRules(rcValue)) {
 			break;
 		} else {
-			log.debug("remove(String key, Object value, T element) write failure RETRYING" + (i + 1));
+			log.debug("remove({}, {}, T element) write failure RETRYING {}", propName, propValue, (i + 1));
 			if ( i+1 == 5 ) {
 				log.error("remove({}, {}, T element) write failed completely. gave up RETRYING", propName, propValue);
 			}
@@ -233,6 +233,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 
     // FIXME this methods should not be defined here
     public static <T extends Element> void removeElement(long tableId, T element, RamCloudGraph graph) {
+	log.debug("removeElement({}, {}, ...)", tableId, element  );
 	JRamCloud.TableEnumerator tableEnum = graph.getRcClient().new TableEnumerator(tableId);
 
 	while (tableEnum.hasNext()) {
@@ -257,6 +258,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 			// nothing to write
 			continue;
 		}
+		log.debug("removeElement({}, {}, ...) - writing changes", tableId, element );
 		if (writeWithRules( tableId, tableEntry.key, rcValue, tableEntry.version, graph )) {
 			// cond. write success
 			continue;
@@ -307,7 +309,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    indexVersion = propTableEntry.version;
 	} catch (Exception e) {
 	    indexVersion = 0;
-	    log.info(e.toString() + " Element does not have a index property table entry! tableId :"+ tableId + " indexName : " + indexName );
+	    log.warn(e.toString() + " Element does not have a index property table entry! tableId :"+ tableId + " indexName : " + indexName );
 	    return null;
 	}
 
@@ -345,7 +347,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    oot.writeObject(map);
 	    rcValue = baos.toByteArray();
 	} catch (IOException e) {
-	    log.info("Got an exception while serializing element''s property map: {"+ e.toString() + "}");
+	    log.error("Got an exception while serializing element''s property map: {"+ e.toString() + "}");
 	}
 
 	return rcValue;
