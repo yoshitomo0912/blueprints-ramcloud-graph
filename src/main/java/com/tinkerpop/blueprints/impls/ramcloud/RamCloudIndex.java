@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -384,6 +385,29 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	}
 	return map.get(propValue);
     }
+
+    public Set<Object> getIndexPropertyKeys() {
+	Map<Object, List<Object>> map = readIndexPropertyMapFromDB();
+	return map.keySet();
+    }
+
+	public <T> T removeIndexProperty(String key) {
+		for (int i = 0; i < 100; ++i) {
+			Map<Object, List<Object>> map = readIndexPropertyMapFromDB();
+			T retVal = (T) map.remove(key);
+			byte[] rcValue = convertIndexPropertyMapToRcBytes(map);
+			if (rcValue.length != 0) {
+				if (writeWithRules(rcValue)) {
+					return retVal;
+				} else {
+					log.info("write failure " + (i + 1));
+					// TODO ERROR message
+				}
+			}
+		}
+		// XXX ?Is this correct
+		return null;
+	}
 
     public void removeIndex() {
 	log.info("Removing Index: " + indexName + " was version " + indexVersion + " [" + this +"]");

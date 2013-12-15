@@ -51,9 +51,6 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
     private String coordinatorLocation;
     private static final AtomicLong nextVertexId = new AtomicLong(Long.valueOf(System.getProperty("blueprint.initial", "1")));
     private static final Features FEATURES = new Features();
-    // FIXME Index for Vertex only
-    //public RamCloudIndex index = null;
-    //public RamCloudKeyIndex KeyIndex = null;
 
     static {
 	FEATURES.supportsSerializableObjectProperty = true;
@@ -240,6 +237,8 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	RamCloudIndex<Vertex> KeyIndex = getIndexedKeys(key, Vertex.class);
 	RamCloudIndex<Vertex> index = (RamCloudIndex<Vertex>) getIndex(key, Vertex.class);
 	int mreadMax = 400;
+	
+	log.debug("getVertices key : " + key + " value " + value);
 
 	if (index.exists()) {
 	    keyMap = index.getElmIdListForPropValue(value.toString());
@@ -253,12 +252,12 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	    if (keyMap == null) {
 		return vertices;
 	    } else {
+		log.debug("keyMap size " + keyMap.size() + " keyMap " + keyMap);
 		isIndexed = true;
 	    }
 	}
 
 	if (isIndexed) {
-	    //System.out.println("keyMap size : " + keyMap.size());
 	    final int size = Math.min(mreadMax, keyMap.size());
 	    JRamCloud.multiReadObject vertPropTableMread[] = new JRamCloud.multiReadObject[size];
 
@@ -472,9 +471,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
     }
 
     public <T extends Element> RamCloudKeyIndex getIndexedKeys(String key, Class<T> elementClass) {
-
 	return new RamCloudKeyIndex(kidxVertTableId, key, this, elementClass);
-
     }
 
     @Override
