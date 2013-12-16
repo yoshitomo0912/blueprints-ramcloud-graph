@@ -103,53 +103,40 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	getSetProperty(value, element.getId());
     }
 
-    public void getSetProperty(Object propValue, Object elmId) {
-	if (elmId == null) {
-		// FIXME Throw appropriate Exception
-		log.error("Element Id cannot be null");
-		return;
-		//throw ExceptionFactory.vertexIdCanNotBeNull();
-		//throw ExceptionFactory.edgeIdCanNotBeNull();
+	public void getSetProperty(Object propValue, Object elmId) {
+		if (elmId == null) {
+			// FIXME Throw appropriate Exception
+			log.error("Element Id cannot be null");
+			return;
+			//throw ExceptionFactory.vertexIdCanNotBeNull();
+			//throw ExceptionFactory.edgeIdCanNotBeNull();
+		}
+
+		// FIXME give more meaningful loop variable
+		for (int i = 0 ; i < 100 ; i++) {
+			Map<Object, List<Object>> map = readIndexPropertyMapFromDB();
+			List<Object> values = map.get(propValue);
+			if ( values == null ) {
+				values = new ArrayList();
+				map.put(propValue, values);
+			}
+			if (!values.contains(elmId)) {
+				values.add(elmId);
+			}
+
+			byte[] rcValue = convertIndexPropertyMapToRcBytes(map);
+			if (rcValue.length != 0) {
+				if (writeWithRules(rcValue)) {
+					break;
+				} else {
+					log.debug("getSetProperty(String key, Object value) cond. write failure RETRYING " + (i+1));
+					if ( i+1 == 100 ) {
+						log.error("getSetProperty(String key, Object value) cond. write failure Gaveup RETRYING");
+					}
+				}
+			}
+		}
 	}
-
-	// FIXME give more meaningful loop variable
-	for (int i = 0 ; i < 100 ; i++) {
-	    Map<Object, List<Object>> map = readIndexPropertyMapFromDB();
-	    List<Object> values = new ArrayList<Object>();
-
-	    if (map.containsKey(propValue)) {
-		boolean found = false;
-		for (Map.Entry<Object, List<Object>> entry : map.entrySet()) {
-		    if (entry.getKey().equals(propValue)) {
-			values = entry.getValue();
-			found = true;
-			break;
-		    }
-		}
-		if (found) {
-		    if (!values.contains(elmId)) {
-			values.add(elmId);
-		    }
-		}
-	    } else {
-		values.add(elmId);
-	    }
-
-	    map.put(propValue, values);
-
-	    byte[] rcValue = convertIndexPropertyMapToRcBytes(map);
-	    if (rcValue.length != 0) {
-		if (writeWithRules(rcValue)) {
-		    break;
-		} else {
-		    log.debug("getSetProperty(String key, Object value) cond. write failure RETRYING " + (i+1));
-		    if ( i == 4 ) {
-		    	log.error("getSetProperty(String key, Object value) cond. write failure Gaveup RETRYING");
-		    }
-		}
-	    }
-	}
-    }
 
     @Override
     public CloseableIterable<T> get(String string, Object value) {
