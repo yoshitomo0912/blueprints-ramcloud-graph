@@ -140,8 +140,8 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 		if (writeWithRules(rcValue)) {
 		    break;
 		} else {
-		    log.debug("getSetProperty(String key, Object value) cond. write failure RETRYING " + (i+1));
-		    if ( i == 4 ) {
+		    log.debug("--- getSetProperty(String " + propValue + ", Object " +  elmId + ") cond. write failure RETRYING " + (i+1));
+		    if ( i == 100 ) {
 		    	log.error("getSetProperty(String key, Object value) cond. write failure Gaveup RETRYING");
 		    }
 		}
@@ -266,8 +266,10 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 		} else {
 			// cond. write failure
 			// FIXME Dirty hack
-			for ( int retry = 100 ; retry >= 0 ; --retry ) {
-				log.debug("removeElement({}, {}, ...) cond. write failure RETRYING {}", tableId, element, retry );
+		    log.debug("removeElement({}, {}, ...) cond. key/value {} write failure RETRYING 1", tableId, element, indexValMap);
+
+		    for ( int retry = 100 ; retry >= 0 ; --retry ) {
+				log.debug("--- removeElement({}, {}, ...) cond. write failure RETRYING {}", tableId, element, retry );
 				RamCloudIndex<T> idx = new RamCloudIndex<T>(tableId, tableEntry.key, graph, (Class<T>)element.getClass() );
 				Map<Object, List<Object>> rereadMap = idx.readIndexPropertyMapFromDB();
 
@@ -288,6 +290,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 				}
 
 				if ( idx.writeWithRules(convertIndexPropertyMapToRcBytes(rereadMap)) ) {
+					log.debug("--- removeElement({}, {}, ...) cond. key/value {} write failure RETRYING {}", tableId, element, rereadMap, retry );
 					// cond. re-write success
 					break;
 				}
@@ -371,7 +374,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	try {
 	    graph.getRcClient().writeRule(tableId, rcKey, rcValue, rules);
 	} catch (Exception e) {
-	    log.debug("Cond. Write index property: " + new String(rcKey) + " failed " + e.toString() + " expected version: " + expectedVersion);
+	    log.debug("Cond. Write index property: " + new String(rcKey) +  " failed " + e.toString() + " expected version: " + expectedVersion);
 	    return false;
 	}
     	return true;
