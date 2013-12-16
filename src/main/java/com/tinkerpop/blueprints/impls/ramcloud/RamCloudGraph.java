@@ -136,7 +136,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	if (id == null) {
 	    write.lock();
 	    try {
-		longId = (instanceId - 1) * INSTANCE_ID_RANGE + ++nextVertexId;
+		longId = ++nextVertexId;
 	    } finally {
 		write.unlock();
 	    }
@@ -177,7 +177,6 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
     
     private final void initInstance() {
         //long incrementValue = 1;
-	log.debug("start initInstance");
         JRamCloud.Object instanceEntry = null;
         try {
             instanceEntry = getRcClient().read(instanceTableId, "nextInstanceId".getBytes());
@@ -190,7 +189,6 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
         }
         if (instanceEntry != null) {
 	    long curInstanceId = 1;
-	    log.debug("instanceEntry != null");
 	    for (int i = 0 ; i < 100 ; i++) {
 		Map<String, Long> propMap = null;
 		if (instanceEntry.value == null) {
@@ -217,7 +215,6 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 		}
 
 		propMap.put(INSTANCE_TABLE_NAME, curInstanceId);
-		log.debug("current instance id " + curInstanceId);
 
 		byte[] rcValue = null;
 		try {
@@ -229,14 +226,11 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 		    log.error("Got an exception while serializing element''s property map: {" + e.toString() + "}");
 		    return;
 		}
-		// TODO increment call fails
-		//instanceId = rcClient.increment(instanceTableId, "nextInstanceId", incrementValue, null);
 		JRamCloud.RejectRules rules = rcClient.new RejectRules();
 		rules.setNeVersion(instanceEntry.version);
 		try {
 		    getRcClient().writeRule(instanceTableId, "nextInstanceId".getBytes(), rcValue, rules);
 		    instanceId = curInstanceId;
-		    log.debug("instance id is " + instanceId);
 		    break;
 		} catch (Exception ex) {
 		    log.debug("Cond. Write increment Vertex property: " + ex.toString());
@@ -245,6 +239,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 		}
 	    }
 	}
+	nextVertexId = (instanceId - 1) * INSTANCE_ID_RANGE;
     }
 
     @Override
