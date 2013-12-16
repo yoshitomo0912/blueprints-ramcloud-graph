@@ -17,7 +17,6 @@ import edu.stanford.ramcloud.JRamCloud;
 import java.io.*;
 import java.nio.ByteOrder;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -48,7 +47,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
     private String IDX_EDGE_TABLE_NAME = "idx_edge";
     private String KIDX_VERT_TABLE_NAME = "kidx_vert";
     private String KIDX_EDGE_TABLE_NAME = "kidx_edge";
-    private final String INSTANCE_TABLE_NAME = "instance";    
+    private final String INSTANCE_TABLE_NAME = "instance";
     private long instanceId;
     private long nextVertexId;
     private final int INSTANCE_ID_RANGE = 100000;
@@ -175,7 +174,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	    return null;
 	}
     }
-    
+
     private final void initInstance() {
         //long incrementValue = 1;
         JRamCloud.Object instanceEntry = null;
@@ -210,7 +209,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 		} else {
 		    propMap = new HashMap<String, Long>();
 		}
-		
+
 		if (propMap.containsKey(INSTANCE_TABLE_NAME)) {
 		    curInstanceId = propMap.get(INSTANCE_TABLE_NAME) + 1;
 		}
@@ -313,7 +312,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	RamCloudIndex<Vertex> KeyIndex = getIndexedKeys(key, Vertex.class);
 	RamCloudIndex<Vertex> index = (RamCloudIndex<Vertex>) getIndex(key, Vertex.class);
 	int mreadMax = 400;
-	
+
 	log.debug("getVertices key : " + key + " value " + value);
 
 	if (index.exists()) {
@@ -400,7 +399,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 		return newEdge;
 	    } catch (Exception e) {
 		log.warn("Tried to create edge failed: [id="+id+"] {" + newEdge.toString() + "}: {" + e.toString() + "}");
-		
+
 		if (e instanceof NoSuchElementException) {
 		    log.warn("addEdge retry " + i);
 		    continue;

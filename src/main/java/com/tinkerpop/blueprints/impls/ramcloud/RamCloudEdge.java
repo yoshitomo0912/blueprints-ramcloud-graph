@@ -10,8 +10,6 @@ import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
-import edu.stanford.ramcloud.JRamCloud;
-import java.util.NoSuchElementException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -98,7 +96,7 @@ public class RamCloudEdge extends RamCloudElement implements Edge {
 
     @Override
     public Object getId() {
-	return (Object) new String(Base64.encode(rcKey));
+	return new String(Base64.encode(rcKey));
     }
 
     public boolean exists() {

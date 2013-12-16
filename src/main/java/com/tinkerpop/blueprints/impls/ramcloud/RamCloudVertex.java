@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.tinkerpop.blueprints.*;
 import com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraph.RamCloudKeyIndex;
@@ -288,6 +287,12 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
     }
 
     public void setEdgeSet(Set<RamCloudEdge> edgeSet) {
+	//TreeSet<String> adjEdgeIds = new TreeSet<String>();
+	//for(RamCloudEdge e : edgeSet ) {
+	//	adjEdgeIds.add( e.toString() );
+	//}
+	//log.debug("Setting {} Adj. list: {}", this.toString(), adjEdgeIds );
+
 	EdgeListProtoBuf.Builder edgeListBuilder = EdgeListProtoBuf.newBuilder();
 	EdgeProtoBuf.Builder edgeBuilder = EdgeProtoBuf.newBuilder();
 
