@@ -61,7 +61,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	try {
 	    JRamCloud.Object vertTableEntry;
 	    vertTableEntry = graph.getRcClient().read(tableId, rcKey);
-		log.debug("IndexTable entry for "+indexName +" exists(): "+new String(rcKey)+"@"+tableId+" Update version " + indexVersion + " -> " + vertTableEntry.version + "["+this.toString()+"]");
+	    log.debug("IndexTable entry for "+indexName +" exists(): "+new String(rcKey)+"@"+tableId+" Update version " + indexVersion + " -> " + vertTableEntry.version + "["+this.toString()+"]");
 	    indexVersion = vertTableEntry.version;
 	    return true;
 	} catch (Exception e) {

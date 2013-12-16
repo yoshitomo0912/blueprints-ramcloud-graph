@@ -14,8 +14,7 @@ import com.tinkerpop.blueprints.util.DefaultGraphQuery;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 
 import edu.stanford.ramcloud.JRamCloud;
-
-import java.io.Serializable;
+import java.io.*;
 import java.nio.ByteOrder;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
@@ -41,6 +40,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
     protected long idxEdgeTableId;
     protected long kidxVertTableId;
     protected long kidxEdgeTableId;
+    protected long instanceTableId;
     private String VERT_TABLE_NAME = "verts";
     private String EDGE_PROP_TABLE_NAME = "edge_props";
     private String VERT_PROP_TABLE_NAME = "vert_props";
@@ -48,8 +48,11 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
     private String IDX_EDGE_TABLE_NAME = "idx_edge";
     private String KIDX_VERT_TABLE_NAME = "kidx_vert";
     private String KIDX_EDGE_TABLE_NAME = "kidx_edge";
+    private final String INSTANCE_TABLE_NAME = "instance";    
+    private long instanceId;
+    private long nextVertexId;
+    private final int INSTANCE_ID_RANGE = 100000;
     private String coordinatorLocation;
-    private static final AtomicLong nextVertexId = new AtomicLong(Long.valueOf(System.getProperty("blueprint.initial", "1")));
     private static final Features FEATURES = new Features();
 
     static {
@@ -106,9 +109,12 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	idxEdgeTableId = rcClient.createTable(IDX_EDGE_TABLE_NAME);
 	kidxVertTableId = rcClient.createTable(KIDX_VERT_TABLE_NAME);
 	kidxEdgeTableId = rcClient.createTable(KIDX_EDGE_TABLE_NAME);
+	instanceTableId = rcClient.createTable(INSTANCE_TABLE_NAME);
 
 	log.info( "Connected to coordinator at {}", coordinatorLocation);
 	log.debug("VERT_TABLE:{}, VERT_PROP_TABLE:{}, EDGE_PROP_TABLE:{}, IDX_VERT_TABLE:{}, IDX_EDGE_TABLE:{}, KIDX_VERT_TABLE:{}, KIDX_EDGE_TABLE:{}", vertTableId, vertPropTableId, edgePropTableId, idxVertTableId, idxEdgeTableId, kidxVertTableId, kidxEdgeTableId);
+	nextVertexId = 0;
+        initInstance();
     }
 
     public JRamCloud getRcClient() {
@@ -129,11 +135,11 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
     public Vertex addVertex(Object id) {
 	Long longId;
 	if (id == null) {
-	    //write.lock();
+	    write.lock();
 	    try {
-		longId = nextVertexId.getAndIncrement();
+		longId = ++nextVertexId;
 	    } finally {
-		//write.unlock();
+		write.unlock();
 	    }
 	} else if (id instanceof Integer) {
 	    longId = ((Integer) id).longValue();
@@ -168,6 +174,75 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	    log.error("Tried to create vertex failed {" + newVertex.toString() + "}: {" + e.getMessage() + "}");
 	    return null;
 	}
+    }
+    
+    private final void initInstance() {
+        //long incrementValue = 1;
+        JRamCloud.Object instanceEntry = null;
+        try {
+            instanceEntry = getRcClient().read(instanceTableId, "nextInstanceId".getBytes());
+        } catch (Exception e) {
+            if (e instanceof JRamCloud.ObjectDoesntExistException) {
+                log.debug("writing an instance value of 1");
+                instanceId = 0;
+                getRcClient().write(instanceTableId, "nextInstanceId".getBytes(), ByteBuffer.allocate(0).array());
+            }
+        }
+        if (instanceEntry != null) {
+	    long curInstanceId = 1;
+	    for (int i = 0 ; i < 100 ; i++) {
+		Map<String, Long> propMap = null;
+		if (instanceEntry.value == null) {
+		    log.warn("Got a null byteArray argument");
+		    return;
+		} else if (instanceEntry.value.length != 0) {
+		    try {
+			ByteArrayInputStream bais = new ByteArrayInputStream(instanceEntry.value);
+			ObjectInputStream ois = new ObjectInputStream(bais);
+			propMap = (Map<String, Long>) ois.readObject();
+		    } catch (IOException e) {
+			log.error("Got an exception while deserializing element''s property map: {" + e.toString() + "}");
+			return;
+		    } catch (ClassNotFoundException e) {
+			log.error("Got an exception while deserializing element''s property map: {" + e.toString() + "}");
+			return;
+		    }
+		} else {
+		    propMap = new HashMap<String, Long>();
+		}
+		
+		if (propMap.containsKey(INSTANCE_TABLE_NAME)) {
+		    curInstanceId = propMap.get(INSTANCE_TABLE_NAME) + 1;
+		}
+
+		propMap.put(INSTANCE_TABLE_NAME, curInstanceId);
+
+		byte[] rcValue = null;
+		try {
+		    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		    ObjectOutputStream oot = new ObjectOutputStream(baos);
+		    oot.writeObject(propMap);
+		    rcValue = baos.toByteArray();
+		} catch (IOException e) {
+		    log.error("Got an exception while serializing element''s property map: {" + e.toString() + "}");
+		    return;
+		}
+		JRamCloud.RejectRules rules = rcClient.new RejectRules();
+		rules.setNeVersion(instanceEntry.version);
+		try {
+		    getRcClient().writeRule(instanceTableId, "nextInstanceId".getBytes(), rcValue, rules);
+		    instanceId = curInstanceId;
+		    break;
+		} catch (Exception ex) {
+		    log.debug("Cond. Write increment Vertex property: " + ex.toString());
+		    instanceEntry = getRcClient().read(instanceTableId, "nextInstanceId".getBytes());
+		    continue;
+		}
+	    }
+	}
+
+	nextVertexId = instanceId * INSTANCE_ID_RANGE;
+	log.debug("nextVertexID" + nextVertexId);
     }
 
     @Override
