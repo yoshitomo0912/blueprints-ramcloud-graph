@@ -45,6 +45,9 @@ public class RamCloudElement implements Element, Serializable {
 
 	try {
 	    propTableEntry = graph.getRcClient().read(rcPropTableId, rcPropTableKey);
+	    if( propTableEntry.value.length > 1024*1024*0.9 ) {
+	    	log.warn("Element[id={}] property map size is near 1MB limit!", new String(rcPropTableKey) );
+	    }
 	} catch (Exception e) {
 	    log.warn("Element does not have a property table entry!");
 	    return null;
@@ -64,10 +67,10 @@ public class RamCloudElement implements Element, Serializable {
 		Map<String, Object> map = (Map<String, Object>) ois.readObject();
 		return map;
 	    } catch (IOException e) {
-		log.error("Got an exception while deserializing element''s property map: {" + e.toString() + "}");
+		log.error("Got an exception while deserializing element's property map: {" + e.toString() + "}");
 		return null;
 	    } catch (ClassNotFoundException e) {
-		log.error("Got an exception while deserializing element''s property map: {" + e.toString() + "}");
+		log.error("Got an exception while deserializing element's property map: {" + e.toString() + "}");
 		return null;
 	    }
 	} else {
