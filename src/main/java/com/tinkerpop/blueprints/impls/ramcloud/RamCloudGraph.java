@@ -111,7 +111,8 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	kidxEdgeTableId = rcClient.createTable(KIDX_EDGE_TABLE_NAME);
 	instanceTableId = rcClient.createTable(INSTANCE_TABLE_NAME);
 
-	log.info( "Connected to coordinator at {" + coordinatorLocation + "} and created tables {" + vertTableId +"}, {" + vertPropTableId + "}, and {" + edgePropTableId + "}");
+	log.info( "Connected to coordinator at {}", coordinatorLocation);
+	log.debug("VERT_TABLE:{}, VERT_PROP_TABLE:{}, EDGE_PROP_TABLE:{}, IDX_VERT_TABLE:{}, IDX_EDGE_TABLE:{}, KIDX_VERT_TABLE:{}, KIDX_EDGE_TABLE:{}", vertTableId, vertPropTableId, edgePropTableId, idxVertTableId, idxEdgeTableId, kidxVertTableId, kidxEdgeTableId);
 	nextVertexId = 0;
         initInstance();
     }
@@ -316,6 +317,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	log.debug("getVertices key : " + key + " value " + value);
 
 	if (index.exists()) {
+	    log.debug("getVertices({},{}) has plain index", key, value);
 	    keyMap = index.getElmIdListForPropValue(value.toString());
 	    if (keyMap == null) {
 		return vertices;
@@ -323,6 +325,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 		isIndexed = true;
 	    }
 	} else if (KeyIndex.exists()) {
+	    log.debug("getVertices({},{}) has key index", key, value);
 	    keyMap = KeyIndex.getElmIdListForPropValue(value.toString());
 	    if (keyMap == null) {
 		return vertices;
@@ -396,7 +399,8 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 		newEdge.create();
 		return newEdge;
 	    } catch (Exception e) {
-		log.warn("Tried to create edge {" + newEdge.toString() + "}: {" + e.getMessage() + "}");
+		log.warn("Tried to create edge failed: [id="+id+"] {" + newEdge.toString() + "}: {" + e.toString() + "}");
+		
 		if (e instanceof NoSuchElementException) {
 		    log.warn("addEdge retry " + i);
 		    continue;
