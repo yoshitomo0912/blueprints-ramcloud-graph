@@ -239,7 +239,9 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 		}
 	    }
 	}
+
 	nextVertexId = instanceId * INSTANCE_ID_RANGE;
+	log.debug("nextVertexID" + nextVertexId);
     }
 
     @Override
