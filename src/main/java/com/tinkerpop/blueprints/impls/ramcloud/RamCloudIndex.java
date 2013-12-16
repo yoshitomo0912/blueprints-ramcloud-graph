@@ -202,10 +202,11 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 		Map<Object, List<Object>> map = readIndexPropertyMapFromDB();
 
 		if (map.containsKey(propValue)) {
-			List<Object> objects = map.get(propValue);
-			if (null != objects) {
-				objects.remove(element.getId());
-				if (objects.isEmpty()) {
+			List<Object> idList = map.get(propValue);
+			if (null != idList) {
+				idList.remove(element.getId());
+				if (idList.isEmpty()) {
+					log.debug("remove({},{},...) called, and list became empty.", propName, propValue);
 					map.remove(propValue);
 				}
 			}
