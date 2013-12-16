@@ -240,6 +240,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 		    break;
 		} catch (Exception ex) {
 		    log.debug("Cond. Write increment Vertex property: " + ex.toString());
+		    instanceEntry = getRcClient().read(instanceTableId, "nextInstanceId".getBytes());
 		    continue;
 		}
 	    }
