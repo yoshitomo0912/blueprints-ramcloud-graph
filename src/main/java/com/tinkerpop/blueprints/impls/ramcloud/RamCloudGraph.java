@@ -14,11 +14,7 @@ import com.tinkerpop.blueprints.util.DefaultGraphQuery;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 
 import edu.stanford.ramcloud.JRamCloud;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-
-import java.io.Serializable;
+import java.io.*;
 import java.nio.ByteOrder;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
@@ -180,22 +176,43 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
     
     private final void initInstance() {
         //long incrementValue = 1;
+	log.debug("start initInstance");
         JRamCloud.Object instanceEntry = null;
         try {
-            instanceEntry = rcClient.read(instanceTableId, "nextInstanceId".getBytes());
+            instanceEntry = getRcClient().read(instanceTableId, "nextInstanceId".getBytes());
         } catch (Exception e) {
             if (e instanceof JRamCloud.ObjectDoesntExistException) {
                 log.debug("writing an instance value of 1");
                 instanceId = 1;
-                rcClient.write(instanceTableId, "nextInstanceId".getBytes(), ByteBuffer.allocate(0).array());
+                getRcClient().write(instanceTableId, "nextInstanceId".getBytes(), ByteBuffer.allocate(0).array());
             }
         }
         if (instanceEntry != null) {
 	    long curInstanceId = 1;
+	    log.debug("instanceEntry != null");
 	    for (int i = 0 ; i < 100 ; i++) {
-		Map<String, Object> propMap = RamCloudElement.getPropertyMap(instanceEntry.value);
+		Map<String, Long> propMap = null;
+		if (instanceEntry.value == null) {
+		    log.warn("Got a null byteArray argument");
+		    return;
+		} else if (instanceEntry.value.length != 0) {
+		    try {
+			ByteArrayInputStream bais = new ByteArrayInputStream(instanceEntry.value);
+			ObjectInputStream ois = new ObjectInputStream(bais);
+			propMap = (Map<String, Long>) ois.readObject();
+		    } catch (IOException e) {
+			log.error("Got an exception while deserializing element''s property map: {" + e.toString() + "}");
+			return;
+		    } catch (ClassNotFoundException e) {
+			log.error("Got an exception while deserializing element''s property map: {" + e.toString() + "}");
+			return;
+		    }
+		} else {
+		    propMap = new HashMap<String, Long>();
+		}
+		
 		if (propMap.containsKey(vertexIdKey)) {
-		    curInstanceId = Long.valueOf(propMap.get(vertexIdKey).toString()) + 1;
+		    curInstanceId = propMap.get(vertexIdKey) + 1;
 		}
 
 		propMap.put(vertexIdKey, curInstanceId);
@@ -216,7 +233,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 		JRamCloud.RejectRules rules = rcClient.new RejectRules();
 		rules.setNeVersion(instanceEntry.version);
 		try {
-		    rcClient.writeRule(instanceTableId, "nextInstanceId".getBytes(), rcValue, rules);
+		    getRcClient().writeRule(instanceTableId, "nextInstanceId".getBytes(), rcValue, rules);
 		    instanceId = curInstanceId;
 		    log.debug("instance id is " + instanceId);
 		} catch (Exception ex) {
