@@ -61,10 +61,11 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	try {
 	    JRamCloud.Object vertTableEntry;
 	    vertTableEntry = graph.getRcClient().read(tableId, rcKey);
-	    log.debug(indexName +" exists(): "+new String(rcKey)+"@"+tableId+" Update version " + indexVersion + " -> " + vertTableEntry.version + "["+this.toString()+"]");
+	    log.debug("IndexTable entry for "+indexName +" exists(): "+new String(rcKey)+"@"+tableId+" Update version " + indexVersion + " -> " + vertTableEntry.version + "["+this.toString()+"]");
 	    indexVersion = vertTableEntry.version;
 	    return true;
 	} catch (Exception e) {
+		log.debug("IndexTable entry for "+indexName +" does not exists(): "+new String(rcKey)+"@"+tableId + " ["+this.toString()+"]");
 		//log.info(e.toString() + ": exists() Exception thrown ");
 	    return false;
 	}
@@ -76,6 +77,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    rules.setExists();
 	    try {
 		graph.getRcClient().writeRule(tableId, rcKey, ByteBuffer.allocate(0).array(), rules);
+		log.debug("IndexTable entry for "+indexName +" create() success: "+new String(rcKey)+"@"+tableId+" ["+this.toString()+"]");
 	    } catch (Exception e) {
 		log.info(toString() + ": Write create index list: " + e.toString());
 	    }
@@ -101,40 +103,28 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	getSetProperty(value, element.getId());
     }
 
-    public void getSetProperty(Object propValue, Object elmId) {
-	if (elmId == null) {
-		// FIXME Throw appropriate Exception
-		log.error("Element Id cannot be null");
-		return;
-		//throw ExceptionFactory.vertexIdCanNotBeNull();
-		//throw ExceptionFactory.edgeIdCanNotBeNull();
-	}
-
-	// FIXME give more meaningful loop variable
-	for (int i = 0 ; i < 100 ; i++) {
-	    Map<Object, List<Object>> map = readIndexPropertyMapFromDB();
-	    List<Object> values = new ArrayList<Object>();
-
-	    if (map.containsKey(propValue)) {
-		boolean found = false;
-		for (Map.Entry<Object, List<Object>> entry : map.entrySet()) {
-		    if (entry.getKey().equals(propValue)) {
-			values = entry.getValue();
-			found = true;
-			break;
-		    }
+	public void getSetProperty(Object propValue, Object elmId) {
+		if (elmId == null) {
+			// FIXME Throw appropriate Exception
+			log.error("Element Id cannot be null");
+			return;
+			//throw ExceptionFactory.vertexIdCanNotBeNull();
+			//throw ExceptionFactory.edgeIdCanNotBeNull();
 		}
-		if (found) {
-		    if (!values.contains(elmId)) {
-			values.add(elmId);
-		    }
-		}
-	    } else {
-		values.add(elmId);
-	    }
 
-	    map.put(propValue, values);
+		// FIXME give more meaningful loop variable
+		for (int i = 0 ; i < 100 ; i++) {
+			Map<Object, List<Object>> map = readIndexPropertyMapFromDB();
+			List<Object> values = map.get(propValue);
+			if ( values == null ) {
+				values = new ArrayList();
+				map.put(propValue, values);
+			}
+			if (!values.contains(elmId)) {
+				values.add(elmId);
+			}
 
+<<<<<<< HEAD
 	    byte[] rcValue = convertIndexPropertyMapToRcBytes(map);
 	    if (rcValue.length != 0) {
 		if (writeWithRules(rcValue)) {
@@ -144,10 +134,21 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 		    if ( i == 100 ) {
 		    	log.error("getSetProperty(String key, Object value) cond. write failure Gaveup RETRYING");
 		    }
+=======
+			byte[] rcValue = convertIndexPropertyMapToRcBytes(map);
+			if (rcValue.length != 0) {
+				if (writeWithRules(rcValue)) {
+					break;
+				} else {
+					log.debug("getSetProperty(String key, Object value) cond. write failure RETRYING " + (i+1));
+					if ( i+1 == 100 ) {
+						log.error("getSetProperty(String key, Object value) cond. write failure Gaveup RETRYING");
+					}
+				}
+			}
+>>>>>>> 6d150f31b541b7d4f46f11cc48a014166b5883c9
 		}
-	    }
 	}
-    }
 
     @Override
     public CloseableIterable<T> get(String string, Object value) {
@@ -200,16 +201,17 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 		Map<Object, List<Object>> map = readIndexPropertyMapFromDB();
 
 		if (map.containsKey(propValue)) {
-			List<Object> objects = map.get(propValue);
-			if (null != objects) {
-				objects.remove(element.getId());
-				if (objects.isEmpty()) {
+			List<Object> idList = map.get(propValue);
+			if (null != idList) {
+				idList.remove(element.getId());
+				if (idList.isEmpty()) {
+					log.debug("remove({},{},...) called, and list became empty.", propName, propValue);
 					map.remove(propValue);
 				}
 			}
 		} else {
 			// propValue not found
-			log.warn("remove({},{},...) called, but was not found on index. SOMETHING MAY BE WRONG", propName, propValue);
+			log.warn("remove({},{},...) called on '{}' index table, but was not found on index. SOMETHING MAY BE WRONG", propName, propValue, this.indexName);
 			// no change to DB so exit now
 			return;
 		}
@@ -280,6 +282,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 					List<Object> idList = entry.getValue();
 					madeChangeOnRetry |= idList.remove(element.getId());
 					if (idList.isEmpty()) {
+						log.debug("removeElement({}, {}, ...) is now empty", tableId, element );
 						madeChangeOnRetry = true;
 						rereadIndexValMapIt.remove();
 					}
@@ -309,11 +312,11 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 
 	try {
 	    propTableEntry = graph.getRcClient().read(tableId, rcKey);
-		log.debug("getIndexPropertyMap() " + indexName + " Update version " + indexVersion + " -> " + propTableEntry.version + " ["+this.toString()+"]");
+		log.debug("readIndexPropertyMapFromDB() " + indexName + " Update version " + indexVersion + " -> " + propTableEntry.version + " ["+this.toString()+"]");
 	    indexVersion = propTableEntry.version;
 	} catch (Exception e) {
 	    indexVersion = 0;
-	    log.warn(e.toString() + " Element does not have a index property table entry! tableId :"+ tableId + " indexName : " + indexName );
+	    log.warn("readIndexPropertyMapFromDB() Element does not have a index property table entry! tableId :"+ tableId + " indexName : " + indexName + " " + e );
 	    return null;
 	}
 
@@ -331,10 +334,10 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 		Map<Object, List<Object>> map = (Map<Object, List<Object>>) ois.readObject();
 		return map;
 	    } catch (IOException e) {
-		log.error("Got an IOException while deserializing element''s property map: {"+ e.toString() + "}");
+		log.error("Got an IOException while deserializing element's property map: {"+ e.toString() + "}");
 		return null;
 	    } catch (ClassNotFoundException e) {
-		log.error("Got a ClassNotFoundException while deserializing element''s property map: {"+ e.toString() + "}");
+		log.error("Got a ClassNotFoundException while deserializing element's property map: {"+ e.toString() + "}");
 		return null;
 	    }
 	} else {
