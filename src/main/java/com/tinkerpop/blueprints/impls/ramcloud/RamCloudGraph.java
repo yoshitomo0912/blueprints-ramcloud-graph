@@ -183,7 +183,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
         } catch (Exception e) {
             if (e instanceof JRamCloud.ObjectDoesntExistException) {
                 log.debug("writing an instance value of 1");
-                instanceId = 1;
+                instanceId = 0;
                 getRcClient().write(instanceTableId, "nextInstanceId".getBytes(), ByteBuffer.allocate(0).array());
             }
         }
@@ -239,7 +239,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 		}
 	    }
 	}
-	nextVertexId = (instanceId - 1) * INSTANCE_ID_RANGE;
+	nextVertexId = instanceId * INSTANCE_ID_RANGE;
     }
 
     @Override
