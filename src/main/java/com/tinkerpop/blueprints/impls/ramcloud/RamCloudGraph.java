@@ -48,7 +48,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
     private String IDX_EDGE_TABLE_NAME = "idx_edge";
     private String KIDX_VERT_TABLE_NAME = "kidx_vert";
     private String KIDX_EDGE_TABLE_NAME = "kidx_edge";
-    private final String vertexIdKey = "vertexId";
+    private final String INSTANCE_TABLE_NAME = "instance";    
     private long instanceId;
     private long nextVertexId;
     private final int INSTANCE_ID_RANGE = 100000;
@@ -109,6 +109,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	idxEdgeTableId = rcClient.createTable(IDX_EDGE_TABLE_NAME);
 	kidxVertTableId = rcClient.createTable(KIDX_VERT_TABLE_NAME);
 	kidxEdgeTableId = rcClient.createTable(KIDX_EDGE_TABLE_NAME);
+	instanceTableId = rcClient.createTable(INSTANCE_TABLE_NAME);
 
 	log.info( "Connected to coordinator at {" + coordinatorLocation + "} and created tables {" + vertTableId +"}, {" + vertPropTableId + "}, and {" + edgePropTableId + "}");
 	nextVertexId = 0;
@@ -211,11 +212,11 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 		    propMap = new HashMap<String, Long>();
 		}
 		
-		if (propMap.containsKey(vertexIdKey)) {
-		    curInstanceId = propMap.get(vertexIdKey) + 1;
+		if (propMap.containsKey(INSTANCE_TABLE_NAME)) {
+		    curInstanceId = propMap.get(INSTANCE_TABLE_NAME) + 1;
 		}
 
-		propMap.put(vertexIdKey, curInstanceId);
+		propMap.put(INSTANCE_TABLE_NAME, curInstanceId);
 		log.debug("current instance id " + curInstanceId);
 
 		byte[] rcValue = null;
@@ -236,6 +237,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 		    getRcClient().writeRule(instanceTableId, "nextInstanceId".getBytes(), rcValue, rules);
 		    instanceId = curInstanceId;
 		    log.debug("instance id is " + instanceId);
+		    break;
 		} catch (Exception ex) {
 		    log.debug("Cond. Write increment Vertex property: " + ex.toString());
 		    continue;
