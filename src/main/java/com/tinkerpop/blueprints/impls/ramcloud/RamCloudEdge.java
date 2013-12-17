@@ -5,13 +5,14 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.sun.jersey.core.util.Base64;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class RamCloudEdge extends RamCloudElement implements Edge {
 
@@ -81,16 +82,16 @@ public class RamCloudEdge extends RamCloudElement implements Edge {
     @Override
     public void remove() {
 	if (isLoop()) {
-	    outVertex.removeEdgeLocally(this);
+	    outVertex.removeEdgeFromAdjList(this);
 	} else {
-	    outVertex.removeEdgeLocally(this);
-	    inVertex.removeEdgeLocally(this);
+	    outVertex.removeEdgeFromAdjList(this);
+	    inVertex.removeEdgeFromAdjList(this);
 	}
 
 	super.remove();
     }
 
-    public void removeProperties() {
+    void removeProperties() {
 	super.remove();
     }
 
@@ -133,12 +134,13 @@ public class RamCloudEdge extends RamCloudElement implements Edge {
     public void create() throws Exception {
 	// TODO: Existence check costs extra (presently 3 reads), could use option to turn on/off
 	if (!exists()) {
-	    outVertex.addEdgeLocally(this);
-	    if (!isLoop()) {
-		inVertex.addEdgeLocally(this);
-	    }
+		// create edge property table
+		graph.getRcClient().write(graph.edgePropTableId, rcKey, ByteBuffer.allocate(0).array());
 
-	    graph.getRcClient().write(graph.edgePropTableId, rcKey, ByteBuffer.allocate(0).array());
+		outVertex.addEdgeToAdjList(this);
+		if (!isLoop()) {
+			inVertex.addEdgeToAdjList(this);
+		}
 	} else {
 	    throw ExceptionFactory.edgeWithIdAlreadyExist(rcKey);
 	}
@@ -174,10 +176,7 @@ public class RamCloudEdge extends RamCloudElement implements Edge {
 
     @Override
     public int hashCode() {
-	final int prime = 31;
-	int result = 1;
-	result = prime * result + Arrays.hashCode(rcKey);
-	return result;
+	return Arrays.hashCode(rcKey);
     }
 
     @Override
@@ -192,10 +191,7 @@ public class RamCloudEdge extends RamCloudElement implements Edge {
 	    return false;
 	}
 	RamCloudEdge other = (RamCloudEdge) obj;
-	if (!Arrays.equals(rcKey, other.rcKey)) {
-	    return false;
-	}
-	return true;
+	return Arrays.equals(rcKey, other.rcKey);
     }
 
     @Override

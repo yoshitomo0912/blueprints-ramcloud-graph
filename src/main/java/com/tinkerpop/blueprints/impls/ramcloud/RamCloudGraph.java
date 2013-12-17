@@ -1,27 +1,44 @@
 package com.tinkerpop.blueprints.impls.ramcloud;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
-
-import com.sun.jersey.core.util.Base64;
-import com.tinkerpop.blueprints.*;
-import com.tinkerpop.blueprints.util.DefaultGraphQuery;
-import com.tinkerpop.blueprints.util.ExceptionFactory;
-
-import edu.stanford.ramcloud.JRamCloud;
-import java.io.*;
-import java.nio.ByteOrder;
-import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.sun.jersey.core.util.Base64;
+import com.tinkerpop.blueprints.Edge;
+import com.tinkerpop.blueprints.Element;
+import com.tinkerpop.blueprints.Features;
+import com.tinkerpop.blueprints.GraphQuery;
+import com.tinkerpop.blueprints.Index;
+import com.tinkerpop.blueprints.IndexableGraph;
+import com.tinkerpop.blueprints.KeyIndexableGraph;
+import com.tinkerpop.blueprints.Parameter;
+import com.tinkerpop.blueprints.TransactionalGraph;
+import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.util.DefaultGraphQuery;
+import com.tinkerpop.blueprints.util.ExceptionFactory;
+
+import edu.stanford.ramcloud.JRamCloud;
 
 public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, TransactionalGraph, Serializable {
 
@@ -398,7 +415,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 		newEdge.create();
 		return newEdge;
 	    } catch (Exception e) {
-		log.warn("Tried to create edge failed: [id="+id+"] {" + newEdge.toString() + "}: {" + e.toString() + "}");
+		log.warn("Tried to create edge failed: {" + newEdge.toString() + "}: {" + e.toString() + "}");
 
 		if (e instanceof NoSuchElementException) {
 		    log.warn("addEdge retry " + i);
