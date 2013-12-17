@@ -55,7 +55,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
     private String coordinatorLocation;
     private static final Features FEATURES = new Features();
     
-    private final Set<String> indexedKeys = new HashSet<String>();
+    public final Set<String> indexedKeys = new HashSet<String>();
 
     
 
@@ -320,6 +320,9 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	if (indexedKeys.contains(key)) {
 	    RamCloudKeyIndex KeyIndex = new RamCloudKeyIndex(kidxVertTableId, key, value, this, Vertex.class);
 	    vertexList = KeyIndex.getElmIdListForPropValue(value.toString());
+	    if (vertexList == null) {
+		return vertices;
+	    }
 	    
 	    final int size = Math.min(mreadMax, vertexList.size());
 	    JRamCloud.multiReadObject vertPropTableMread[] = new JRamCloud.multiReadObject[size];
