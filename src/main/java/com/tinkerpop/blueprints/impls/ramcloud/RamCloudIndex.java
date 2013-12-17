@@ -1,31 +1,27 @@
 package com.tinkerpop.blueprints.impls.ramcloud;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.esotericsoftware.kryo2.Kryo;
+import com.esotericsoftware.kryo2.io.ByteBufferInput;
+import com.esotericsoftware.kryo2.io.ByteBufferOutput;
 import com.tinkerpop.blueprints.CloseableIterable;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Index;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 
 import edu.stanford.ramcloud.JRamCloud;
-import java.io.*;
-import java.util.logging.Level;
 
 // FIXME Index instance should be representing an Index table, not a IndexTable K-V pair
 public class RamCloudIndex<T extends Element> implements Index<T>, Serializable {
@@ -91,17 +87,17 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    String s = key + "=" + propValue;
 	    return ByteBuffer.allocate(s.getBytes().length).put(s.getBytes("UTF-8")).array();
 	} catch (UnsupportedEncodingException ex) {
-	    java.util.logging.Logger.getLogger(RamCloudIndex.class.getName()).log(Level.SEVERE, null, ex);
+	    log.error("indexToRcKey({}, {}) failed with exception {}", key, propValue, ex);
 	}
 	return null;
     }
-    
+
     public static String rcKeyToIndexName(byte[] rcKey) {
 	try {
 	    String s = new String(rcKey, "UTF-8");
 	    return s.substring(0, s.indexOf('='));
 	} catch (UnsupportedEncodingException ex) {
-	    java.util.logging.Logger.getLogger(RamCloudIndex.class.getName()).log(Level.SEVERE, null, ex);
+	    log.error("rcKeyToIndexName({}) failed with exception {}", rcKey, ex);
 	}
 	return null;
     }
@@ -131,13 +127,13 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	}
 
 	create();
-	
+
 	// FIXME give more meaningful loop variable
 	for (int i = 0; i < 100; i++) {
 	    Map<Object, List<Object>> map = readIndexPropertyMapFromDB();
 	    List<Object> values = map.get(propValue);
 	    if (values == null) {
-		values = new ArrayList();
+		values = new ArrayList<Object>();
 		map.put(propValue, values);
 	    }
 	    if (!values.contains(elmId)) {
@@ -273,10 +269,10 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 			// cond. write failure
 			// FIXME Dirty hack
 		    log.debug("removeElement({}, {}, ...) cond. key/value {} write failure RETRYING 1", tableId, element, indexValMap);
-		    
+
 		    for ( int retry = 100 ; retry >= 0 ; --retry ) {
 				log.debug("--- removeElement({}, {}, ...) cond. write failure RETRYING {}", tableId, element, retry );
-				RamCloudKeyIndex idx = new RamCloudKeyIndex(tableId, tableEntry.key, graph, (Class<T>)element.getClass() );
+				RamCloudKeyIndex idx = new RamCloudKeyIndex(tableId, tableEntry.key, graph, element.getClass() );
 				Map<Object, List<Object>> rereadMap = idx.readIndexPropertyMapFromDB();
 
 				boolean madeChangeOnRetry = false;
@@ -332,36 +328,48 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    log.error("Got a null byteArray argument");
 	    return null;
 	} else if (byteArray.length != 0) {
-	    try {
-		ByteArrayInputStream bais = new ByteArrayInputStream(byteArray);
-		ObjectInputStream ois = new ObjectInputStream(bais);
-		Map<Object, List<Object>> map = (Map<Object, List<Object>>) ois.readObject();
+//	    try {
+		Kryo kryo = new Kryo();
+		ByteBufferInput input = new ByteBufferInput(byteArray);
+		TreeMap map =  kryo.readObject(input, TreeMap.class);
+	    	//log.debug("Kryo: {} bytes ->  {}", byteArray.length, map);
 		return map;
-	    } catch (IOException e) {
-		log.error("Got an IOException while deserializing element's property map: {"+ e.toString() + "}");
-		return null;
-	    } catch (ClassNotFoundException e) {
-		log.error("Got a ClassNotFoundException while deserializing element's property map: {"+ e.toString() + "}");
-		return null;
-	    }
+//		ByteArrayInputStream bais = new ByteArrayInputStream(byteArray);
+//		ObjectInputStream ois = new ObjectInputStream(bais);
+//		Map<Object, List<Object>> map = (Map<Object, List<Object>>) ois.readObject();
+//		return map;
+//	    } catch (IOException e) {
+//		log.error("Got an IOException while deserializing element's property map: {"+ e.toString() + "}");
+//		return null;
+//	    } catch (ClassNotFoundException e) {
+//		log.error("Got a ClassNotFoundException while deserializing element's property map: {"+ e.toString() + "}");
+//		return null;
+//	    }
 	} else {
-	    return new HashMap<Object, List<Object>>();
+	    return new TreeMap<Object, List<Object>>();
 	}
     }
 
     public static byte[] convertIndexPropertyMapToRcBytes(Map<Object, List<Object>> map) {
-	byte[] rcValue = null;
+//	byte[] rcValue = null;
 
-	try {
-	    ByteArrayOutputStream baos = new ByteArrayOutputStream(1024*1024);
-	    ObjectOutputStream oot = new ObjectOutputStream(baos);
-	    oot.writeObject(map);
-	    rcValue = baos.toByteArray();
-	} catch (IOException e) {
-	    log.error("Got an exception while serializing element''s property map: {"+ e.toString() + "}");
-	}
+//	try {
+		Kryo kryo = new Kryo();
+		ByteBufferOutput output = new ByteBufferOutput(1024*1024);
+		kryo.writeObject(output, map);
+		output.flush();
+		byte[] bytes = output.toBytes();
+		//log.debug("Kryo: {} ->  {} bytes", map, bytes.length);
+		return bytes;
+//	    ByteArrayOutputStream baos = new ByteArrayOutputStream(1024*1024);
+//	    ObjectOutputStream oot = new ObjectOutputStream(baos);
+//	    oot.writeObject(map);
+//	    rcValue = baos.toByteArray();
+//	} catch (IOException e) {
+//	    log.error("Got an exception while serializing element''s property map: {"+ e.toString() + "}");
+//	}
 
-	return rcValue;
+//	return rcValue;
 
     }
 

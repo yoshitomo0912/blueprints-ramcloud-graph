@@ -4,10 +4,10 @@
  */
 package com.tinkerpop.blueprints.impls.ramcloud;
 
-import com.tinkerpop.blueprints.Element;
-import com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraph;
 import java.io.Serializable;
 import java.util.Set;
+
+import com.tinkerpop.blueprints.Element;
 
 /**
  *

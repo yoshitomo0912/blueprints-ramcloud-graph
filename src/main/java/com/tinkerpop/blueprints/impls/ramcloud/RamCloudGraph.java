@@ -1,28 +1,44 @@
 package com.tinkerpop.blueprints.impls.ramcloud;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
-
-import com.sun.jersey.core.util.Base64;
-import com.tinkerpop.blueprints.*;
-import com.tinkerpop.blueprints.util.DefaultGraphQuery;
-import com.tinkerpop.blueprints.util.ExceptionFactory;
-
-import edu.stanford.ramcloud.JRamCloud;
-import java.io.*;
-import java.nio.ByteOrder;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.sun.jersey.core.util.Base64;
+import com.tinkerpop.blueprints.Edge;
+import com.tinkerpop.blueprints.Element;
+import com.tinkerpop.blueprints.Features;
+import com.tinkerpop.blueprints.GraphQuery;
+import com.tinkerpop.blueprints.Index;
+import com.tinkerpop.blueprints.IndexableGraph;
+import com.tinkerpop.blueprints.KeyIndexableGraph;
+import com.tinkerpop.blueprints.Parameter;
+import com.tinkerpop.blueprints.TransactionalGraph;
+import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.util.DefaultGraphQuery;
+import com.tinkerpop.blueprints.util.ExceptionFactory;
+
+import edu.stanford.ramcloud.JRamCloud;
 
 public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, TransactionalGraph, Serializable {
 
@@ -48,16 +64,16 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
     private String IDX_EDGE_TABLE_NAME = "idx_edge";
     private String KIDX_VERT_TABLE_NAME = "kidx_vert";
     private String KIDX_EDGE_TABLE_NAME = "kidx_edge";
-    private final String INSTANCE_TABLE_NAME = "instance";    
+    private final String INSTANCE_TABLE_NAME = "instance";
     private long instanceId;
     private long nextVertexId;
     private final int INSTANCE_ID_RANGE = 10000;
     private String coordinatorLocation;
     private static final Features FEATURES = new Features();
-    
+
     public final Set<String> indexedKeys = new HashSet<String>();
 
-    
+
 
     static {
 	FEATURES.supportsSerializableObjectProperty = true;
@@ -179,7 +195,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	    return null;
 	}
     }
-    
+
     private final void initInstance() {
         //long incrementValue = 1;
         JRamCloud.Object instanceEntry = null;
@@ -214,7 +230,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 		} else {
 		    propMap = new HashMap<String, Long>();
 		}
-		
+
 		if (propMap.containsKey(INSTANCE_TABLE_NAME)) {
 		    curInstanceId = propMap.get(INSTANCE_TABLE_NAME) + 1;
 		}
@@ -314,7 +330,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	List<Object> vertexList = null;
 
 	int mreadMax = 400;
-	
+
 	log.debug("getVertices key : " + key + " value " + value);
 
 	if (indexedKeys.contains(key)) {
@@ -323,7 +339,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	    if (vertexList == null) {
 		return vertices;
 	    }
-	    
+
 	    final int size = Math.min(mreadMax, vertexList.size());
 	    JRamCloud.multiReadObject vertPropTableMread[] = new JRamCloud.multiReadObject[size];
 
@@ -361,7 +377,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	    while (tableEnum.hasNext()) {
 		tableEntry = tableEnum.next();
 		if (tableEntry != null) {
-		    Map<String, Object> propMap = RamCloudElement.getPropertyMap(tableEntry.value);
+		    Map<String, Object> propMap = RamCloudElement.convertRcBytesToPropertyMap(tableEntry.value);
 		    if (propMap.containsKey(key) && propMap.get(key).equals(value)) {
 			vertices.add(new RamCloudVertex(tableEntry.key, this));
 		    }
@@ -387,8 +403,8 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 		newEdge.create();
 		return newEdge;
 	    } catch (Exception e) {
-		log.warn("Tried to create edge failed: [id="+id+"] {" + newEdge.toString() + "}: {" + e.toString() + "}");
-		
+		log.warn("Tried to create edge failed: {" + newEdge.toString() + "}: {" + e.toString() + "}");
+
 		if (e instanceof NoSuchElementException) {
 		    log.warn("addEdge retry " + i);
 		    continue;
@@ -455,7 +471,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 
 	while (tableEnum.hasNext()) {
 	    tableEntry = tableEnum.next();
-	    Map<String, Object> propMap = RamCloudElement.getPropertyMap(tableEntry.value);
+	    Map<String, Object> propMap = RamCloudElement.convertRcBytesToPropertyMap(tableEntry.value);
 	    if (propMap.containsKey(key) && propMap.get(key).equals(value)) {
 		edges.add(new RamCloudEdge(tableEntry.key, this));
 	    }
@@ -506,14 +522,14 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 
     @Override
     public <T extends Element> void createKeyIndex(String key,
-	    Class<T> elementClass, Parameter... indexParameters) {	
+	    Class<T> elementClass, Parameter... indexParameters) {
 	if (key == null) {
 	    return;
 	}
 	if (this.indexedKeys.contains(key)) {
 	    return;
-	}    
-	this.indexedKeys.add(key);		
+	}
+	this.indexedKeys.add(key);
     }
 
     @Override
