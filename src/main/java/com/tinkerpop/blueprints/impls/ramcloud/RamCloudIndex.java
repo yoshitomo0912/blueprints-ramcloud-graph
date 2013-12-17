@@ -1,8 +1,8 @@
 package com.tinkerpop.blueprints.impls.ramcloud;
 
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -39,19 +39,19 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
     // FIXME this should not be defined here
     private long indexVersion ;
 
-    public RamCloudIndex(long tableId, String indexName, RamCloudGraph graph, Class<T> indexClass) {
+    public RamCloudIndex(long tableId, String indexName, Object propValue, RamCloudGraph graph, Class<T> indexClass) {
 	this.tableId = tableId;
-	this.rcKey = indexToRcKey(indexName);
 	this.graph = graph;
+	this.rcKey = indexToRcKey(indexName, propValue);
 	this.indexName = indexName;
 	this.indexClass = indexClass;
     }
 
     public RamCloudIndex(long tableId, byte[] rcKey, RamCloudGraph graph, Class<T> indexClass) {
 	this.tableId = tableId;
-	this.rcKey = rcKey;
 	this.graph = graph;
-	this.indexName = new String(rcKey);
+	this.rcKey = rcKey;
+	this.indexName = rcKeyToIndexName(rcKey);
 	this.indexClass = indexClass;
     }
 
@@ -63,8 +63,8 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    indexVersion = vertTableEntry.version;
 	    return true;
 	} catch (Exception e) {
-		log.debug("IndexTable entry for "+indexName +" does not exists(): "+new String(rcKey)+"@"+tableId + " ["+this.toString()+"]");
-		//log.info(e.toString() + ": exists() Exception thrown ");
+	    log.debug("IndexTable entry for "+indexName +" does not exists(): "+new String(rcKey)+"@"+tableId + " ["+this.toString()+"]");
+	    //log.info(e.toString() + ": exists() Exception thrown ");
 	    return false;
 	}
     }
@@ -82,8 +82,24 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	}
     }
 
-    private static byte[] indexToRcKey(String indexName) {
-	return ByteBuffer.allocate(indexName.length()).order(ByteOrder.LITTLE_ENDIAN).put(indexName.getBytes()).array();
+    public static byte[] indexToRcKey(String key, Object propValue) {
+	try {
+	    String s = key + "=" + propValue;
+	    return ByteBuffer.allocate(s.getBytes().length).put(s.getBytes("UTF-8")).array();
+	} catch (UnsupportedEncodingException ex) {
+	    log.error("indexToRcKey({}, {}) failed with exception {}", key, propValue, ex);
+	}
+	return null;
+    }
+
+    public static String rcKeyToIndexName(byte[] rcKey) {
+	try {
+	    String s = new String(rcKey, "UTF-8");
+	    return s.substring(0, s.indexOf('='));
+	} catch (UnsupportedEncodingException ex) {
+	    log.error("rcKeyToIndexName({}) failed with exception {}", rcKey, ex);
+	}
+	return null;
     }
 
     @Override
@@ -98,10 +114,10 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 
     @Override
     public void put(String key, Object value, T element) {
-	getSetProperty(value, element.getId());
+	getSetProperty(key, value, element.getId());
     }
 
-    public void getSetProperty(Object propValue, Object elmId) {
+    public void getSetProperty(String key, Object propValue, Object elmId) {
 	if (elmId == null) {
 	    // FIXME Throw appropriate Exception
 	    log.error("Element Id cannot be null");
@@ -109,6 +125,8 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    //throw ExceptionFactory.vertexIdCanNotBeNull();
 	    //throw ExceptionFactory.edgeIdCanNotBeNull();
 	}
+
+	create();
 
 	// FIXME give more meaningful loop variable
 	for (int i = 0; i < 100; i++) {
@@ -161,10 +179,6 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 
     @Override
     public void remove(String propName, Object propValue, T element) {
-	if (propValue == null) {
-		//FIXME Is this check required?
-		throw ExceptionFactory.propertyValueCanNotBeNull();
-	}
 
 	if (propName == null) {
 	    throw ExceptionFactory.propertyKeyCanNotBeNull();
@@ -258,7 +272,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 
 		    for ( int retry = 100 ; retry >= 0 ; --retry ) {
 				log.debug("--- removeElement({}, {}, ...) cond. write failure RETRYING {}", tableId, element, retry );
-				RamCloudIndex<T> idx = new RamCloudIndex<T>(tableId, tableEntry.key, graph, (Class<T>)element.getClass() );
+				RamCloudKeyIndex idx = new RamCloudKeyIndex(tableId, tableEntry.key, graph, element.getClass() );
 				Map<Object, List<Object>> rereadMap = idx.readIndexPropertyMapFromDB();
 
 				boolean madeChangeOnRetry = false;
@@ -359,7 +373,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 
     }
 
-    private boolean writeWithRules(byte[] rcValue) {
+    protected boolean writeWithRules(byte[] rcValue) {
 	return writeWithRules(this.tableId, this.rcKey, rcValue, this.indexVersion, this.graph);
     }
 

@@ -15,7 +15,6 @@ import com.esotericsoftware.kryo2.io.ByteBufferOutput;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Vertex;
-import com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraph.RamCloudKeyIndex;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 
 import edu.stanford.ramcloud.JRamCloud;
@@ -143,10 +142,10 @@ public class RamCloudElement implements Element, Serializable {
 	setPropertyMap(map);
 
 	if (this instanceof RamCloudVertex) {
-		RamCloudKeyIndex keyIndex = graph.getIndexedKeys(key, Vertex.class);
+		RamCloudKeyIndex keyIndex = new RamCloudKeyIndex(graph.kidxVertTableId, key, value, graph, Vertex.class);
 		keyIndex.autoUpdate(key, value, oldValue, this);
 	} else {
-		RamCloudKeyIndex keyIndex =graph.getIndexedKeys(key, Edge.class);
+		RamCloudKeyIndex keyIndex = new RamCloudKeyIndex(graph.kidxVertTableId, key, value, graph, Edge.class);
 		keyIndex.autoUpdate(key, value, oldValue, this);
 	}
     }
@@ -158,10 +157,10 @@ public class RamCloudElement implements Element, Serializable {
 	setPropertyMap(map);
 
 	if (this instanceof RamCloudVertex) {
-		RamCloudKeyIndex keyIndex = graph.getIndexedKeys(key, Vertex.class);
+		RamCloudKeyIndex keyIndex = new RamCloudKeyIndex(graph.kidxVertTableId, key, retVal, graph, Vertex.class);
 		keyIndex.autoRemove(key, retVal.toString(), this);
 	} else {
-		RamCloudKeyIndex keyIndex = graph.getIndexedKeys(key, Edge.class);
+		RamCloudKeyIndex keyIndex = new RamCloudKeyIndex(graph.kidxVertTableId, key, retVal, graph, Edge.class);
 		keyIndex.autoRemove(key, retVal.toString(), this);
 	}
 

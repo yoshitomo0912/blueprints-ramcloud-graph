@@ -21,7 +21,6 @@ import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.VertexQuery;
-import com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraph.RamCloudKeyIndex;
 import com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeListProtoBuf;
 import com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf;
 import com.tinkerpop.blueprints.util.DefaultVertexQuery;
@@ -132,9 +131,8 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 		log.debug("RamCloudVertex.remove() - removing IndexedKeys");
 		Map<String,Object> props = this.getPropertyMap();
 		for( Map.Entry<String,Object> entry : props.entrySet() ) {
-			@SuppressWarnings("unchecked")
-			RamCloudKeyIndex<RamCloudVertex> keyIndex = graph.getIndexedKeys(entry.getKey(), Vertex.class);
-			if ( !keyIndex.exists() ) continue;
+			if ( !graph.indexedKeys.contains(entry.getKey() ) ) continue;
+			RamCloudKeyIndex keyIndex = new RamCloudKeyIndex(graph.kidxVertTableId, entry.getKey(), entry.getValue(), graph, Vertex.class);
 			keyIndex.remove(entry.getKey(), entry.getValue(), this);
 		}
 
