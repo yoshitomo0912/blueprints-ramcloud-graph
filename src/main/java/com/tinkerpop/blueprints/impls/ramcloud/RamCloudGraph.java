@@ -346,7 +346,8 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	    if (keyMap == null) {
 		return vertices;
 	    } else {
-		log.debug("keyMap size " + keyMap.size() + " keyMap " + keyMap);
+		//log.debug("keyMap size " + keyMap.size() + " keyMap " + keyMap);
+		log.debug("keyMap size " + keyMap.size() );
 		isIndexed = true;
 	    }
 	}
