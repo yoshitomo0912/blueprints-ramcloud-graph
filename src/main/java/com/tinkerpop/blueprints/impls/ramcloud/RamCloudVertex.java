@@ -222,13 +222,15 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 		for (int retry = 1 ; retry <= MAX_RETRIES ; ++retry ) {
 
 			long expected_version = this.cachedAdjEdgeList.getVersion();
-			if ( expected_version == 0 && add == false ) {
+			if ( expected_version == 0L && add == false ) {
 				updateCachedAdjEdgeList();
+				expected_version = this.cachedAdjEdgeList.getVersion();
 			}
 			Set<RamCloudEdge> edges = buildEdgeSetFromProtobuf(this.cachedAdjEdgeList.getValue(), Direction.BOTH);
+			//log.debug( (add?"Adding":"Removing") + " edges to: {"+ edges+ "}");
 
 			try {
-				if( add ) {
+				if ( add ) {
 					if (edges.addAll(edgesToModify) == false) {
 						log.warn("{" + toString() + "}: There aren't any changes to edges ({" + edgesToModify.toString() + "})");
 						return;
@@ -249,6 +251,7 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 				}
 				long updated_version = graph.getRcClient().writeRule(graph.vertTableId, rcKey, edgeList.toByteArray(), rules);
 				this.cachedAdjEdgeList.setValue(edgeList, updated_version);
+				return;
 			} catch (UnsupportedOperationException e) {
 				log.error("{" + toString() + "}: Failed to modify a set of edges ({" + edgesToModify.toString() + "}): {" + e.toString() + "}");
 				return;
@@ -263,6 +266,9 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 				if ( e instanceof WrongVersionException ) {
 					log.debug("Conditional Updating EdgeList failed for {} modifing {} Retrying [{}]", this, edgesToModify, retry);
 					updateCachedAdjEdgeList();
+				} else {
+					log.debug("Cond. Write to modify adj edge list failed, exception thrown {}", e);
+					updateCachedAdjEdgeList();
 				}
 			}
 		}
@@ -276,6 +282,7 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 	}
 
 	private Versioned<EdgeListProtoBuf> updateCachedAdjEdgeList() {
+		log.debug("updateCachedAdjEdgeList() {}", this.toString());
 		JRamCloud.Object vertTableEntry;
 		EdgeListProtoBuf edgeList;
 
