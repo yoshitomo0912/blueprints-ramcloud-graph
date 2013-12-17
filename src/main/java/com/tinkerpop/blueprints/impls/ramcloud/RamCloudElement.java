@@ -1,19 +1,17 @@
 package com.tinkerpop.blueprints.impls.ramcloud;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.esotericsoftware.kryo2.Kryo;
+import com.esotericsoftware.kryo2.io.ByteBufferInput;
+import com.esotericsoftware.kryo2.io.ByteBufferOutput;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Vertex;
@@ -38,7 +36,7 @@ public class RamCloudElement implements Element, Serializable {
 	this.graph = graph;
     }
 
-    public Map<String, Object> getPropertyMap() {
+    protected Map<String, Object> getPropertyMap() {
 	JRamCloud.Object propTableEntry;
 
 	try {
@@ -51,43 +49,56 @@ public class RamCloudElement implements Element, Serializable {
 	    return null;
 	}
 
-	return getPropertyMap(propTableEntry.value);
+	return convertRcBytesToPropertyMap(propTableEntry.value);
     }
 
-    public static Map<String, Object> getPropertyMap(byte[] byteArray) {
+    public static Map<String, Object> convertRcBytesToPropertyMap(byte[] byteArray) {
 	if (byteArray == null) {
 	    log.warn("Got a null byteArray argument");
 	    return null;
 	} else if (byteArray.length != 0) {
-	    try {
-		ByteArrayInputStream bais = new ByteArrayInputStream(byteArray);
-		ObjectInputStream ois = new ObjectInputStream(bais);
-		Map<String, Object> map = (Map<String, Object>) ois.readObject();
-		return map;
-	    } catch (IOException e) {
-		log.error("Got an exception while deserializing element's property map: {" + e.toString() + "}");
-		return null;
-	    } catch (ClassNotFoundException e) {
-		log.error("Got an exception while deserializing element's property map: {" + e.toString() + "}");
-		return null;
-	    }
+//	    try {
+			Kryo kryo = new Kryo();
+			ByteBufferInput input = new ByteBufferInput(byteArray);
+			TreeMap map =  kryo.readObject(input, TreeMap.class);
+			//log.debug("Kryo: {} bytes ->  {}", byteArray.length, map);
+			return map;
+
+//		ByteArrayInputStream bais = new ByteArrayInputStream(byteArray);
+//		ObjectInputStream ois = new ObjectInputStream(bais);
+//		Map<String, Object> map = (Map<String, Object>) ois.readObject();
+//		return map;
+//	    } catch (IOException e) {
+//		log.error("Got an exception while deserializing element's property map: {" + e.toString() + "}");
+//		return null;
+//	    } catch (ClassNotFoundException e) {
+//		log.error("Got an exception while deserializing element's property map: {" + e.toString() + "}");
+//		return null;
+//	    }
 	} else {
-	    return new HashMap<String, Object>();
+	    return new TreeMap<String, Object>();
 	}
     }
 
-    public void setPropertyMap(Map<String, Object> map) {
+    private void setPropertyMap(Map<String, Object> map) {
 	byte[] rcValue;
 
-	try {
-	    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-	    ObjectOutputStream oot = new ObjectOutputStream(baos);
-	    oot.writeObject(map);
-	    rcValue = baos.toByteArray();
-	} catch (IOException e) {
-	    log.error("Got an exception while serializing element''s property map: {" + e.toString() + "}");
-	    return;
-	}
+//	try {
+		Kryo kryo = new Kryo();
+		ByteBufferOutput output = new ByteBufferOutput(1024*1024);
+		kryo.writeObject(output, map);
+		output.flush();
+		rcValue = output.toBytes();
+		//log.debug("Kryo: {} ->  {} bytes", map, rcValue.length);
+
+//	    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//	    ObjectOutputStream oot = new ObjectOutputStream(baos);
+//	    oot.writeObject(map);
+//	    rcValue = baos.toByteArray();
+//	} catch (IOException e) {
+//	    log.error("Got an exception while serializing element''s property map: {" + e.toString() + "}");
+//	    return;
+//	}
 
 	graph.getRcClient().write(rcPropTableId, rcPropTableKey, rcValue);
     }

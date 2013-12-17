@@ -345,7 +345,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 		kryo.writeObject(output, map);
 		output.flush();
 		byte[] bytes = output.toBytes();
-	    	//log.debug("Kryo: {} ->  {} bytes", map, bytes.length);
+		//log.debug("Kryo: {} ->  {} bytes", map, bytes.length);
 		return bytes;
 //	    ByteArrayOutputStream baos = new ByteArrayOutputStream(1024*1024);
 //	    ObjectOutputStream oot = new ObjectOutputStream(baos);
