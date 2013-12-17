@@ -1,23 +1,21 @@
 package com.tinkerpop.blueprints.impls.ramcloud;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.io.ByteBufferInput;
+import com.esotericsoftware.kryo.io.ByteBufferOutput;
 import com.tinkerpop.blueprints.CloseableIterable;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Index;
@@ -117,7 +115,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    Map<Object, List<Object>> map = readIndexPropertyMapFromDB();
 	    List<Object> values = map.get(propValue);
 	    if (values == null) {
-		values = new ArrayList();
+		values = new ArrayList<Object>();
 		map.put(propValue, values);
 	    }
 	    if (!values.contains(elmId)) {
@@ -316,36 +314,44 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    log.error("Got a null byteArray argument");
 	    return null;
 	} else if (byteArray.length != 0) {
-	    try {
-		ByteArrayInputStream bais = new ByteArrayInputStream(byteArray);
-		ObjectInputStream ois = new ObjectInputStream(bais);
-		Map<Object, List<Object>> map = (Map<Object, List<Object>>) ois.readObject();
-		return map;
-	    } catch (IOException e) {
-		log.error("Got an IOException while deserializing element's property map: {"+ e.toString() + "}");
-		return null;
-	    } catch (ClassNotFoundException e) {
-		log.error("Got a ClassNotFoundException while deserializing element's property map: {"+ e.toString() + "}");
-		return null;
-	    }
+//	    try {
+		Kryo kryo = new Kryo();
+		ByteBufferInput input = new ByteBufferInput();
+		return kryo.readObject(input, TreeMap.class);
+//		ByteArrayInputStream bais = new ByteArrayInputStream(byteArray);
+//		ObjectInputStream ois = new ObjectInputStream(bais);
+//		Map<Object, List<Object>> map = (Map<Object, List<Object>>) ois.readObject();
+//		return map;
+//	    } catch (IOException e) {
+//		log.error("Got an IOException while deserializing element's property map: {"+ e.toString() + "}");
+//		return null;
+//	    } catch (ClassNotFoundException e) {
+//		log.error("Got a ClassNotFoundException while deserializing element's property map: {"+ e.toString() + "}");
+//		return null;
+//	    }
 	} else {
-	    return new HashMap<Object, List<Object>>();
+	    return new TreeMap<Object, List<Object>>();
 	}
     }
 
     public static byte[] convertIndexPropertyMapToRcBytes(Map<Object, List<Object>> map) {
-	byte[] rcValue = null;
+//	byte[] rcValue = null;
 
-	try {
-	    ByteArrayOutputStream baos = new ByteArrayOutputStream(1024*1024);
-	    ObjectOutputStream oot = new ObjectOutputStream(baos);
-	    oot.writeObject(map);
-	    rcValue = baos.toByteArray();
-	} catch (IOException e) {
-	    log.error("Got an exception while serializing element''s property map: {"+ e.toString() + "}");
-	}
+//	try {
+		Kryo kryo = new Kryo();
+		ByteBufferOutput output = new ByteBufferOutput();
+		kryo.writeObject(output, map);
+		output.flush();
+		return output.getBuffer();
+//	    ByteArrayOutputStream baos = new ByteArrayOutputStream(1024*1024);
+//	    ObjectOutputStream oot = new ObjectOutputStream(baos);
+//	    oot.writeObject(map);
+//	    rcValue = baos.toByteArray();
+//	} catch (IOException e) {
+//	    log.error("Got an exception while serializing element''s property map: {"+ e.toString() + "}");
+//	}
 
-	return rcValue;
+//	return rcValue;
 
     }
 
