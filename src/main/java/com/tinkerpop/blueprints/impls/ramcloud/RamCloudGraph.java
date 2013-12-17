@@ -54,6 +54,10 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
     private final int INSTANCE_ID_RANGE = 10000;
     private String coordinatorLocation;
     private static final Features FEATURES = new Features();
+    
+    private final Set<String> indexedKeys = new HashSet<String>();
+
+    
 
     static {
 	FEATURES.supportsSerializableObjectProperty = true;
@@ -78,8 +82,8 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	FEATURES.supportsEdgeIndex = false;
 	FEATURES.ignoresSuppliedIds = true;
 	FEATURES.supportsTransactions = false;
-	FEATURES.supportsIndices = true;
-	FEATURES.supportsKeyIndices = false;
+	FEATURES.supportsIndices = false;
+	FEATURES.supportsKeyIndices = true;
 	FEATURES.supportsVertexKeyIndex = true;
 	FEATURES.supportsEdgeKeyIndex = false;
 	FEATURES.supportsEdgeRetrieval = true;
@@ -307,40 +311,21 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
     public Iterable<Vertex> getVertices(String key, Object value) {
 
 	List<Vertex> vertices = new ArrayList<Vertex>();
-	boolean isIndexed = false;
-	List<Object> keyMap = null;
+	List<Object> vertexList = null;
 
-	RamCloudIndex<Vertex> KeyIndex = getIndexedKeys(key, Vertex.class);
-	RamCloudIndex<Vertex> index = (RamCloudIndex<Vertex>) getIndex(key, Vertex.class);
 	int mreadMax = 400;
 	
 	log.debug("getVertices key : " + key + " value " + value);
 
-	if (index.exists()) {
-	    log.debug("getVertices({},{}) has plain index", key, value);
-	    keyMap = index.getElmIdListForPropValue(value.toString());
-	    if (keyMap == null) {
-		return vertices;
-	    } else {
-		isIndexed = true;
-	    }
-	} else if (KeyIndex.exists()) {
-	    log.debug("getVertices({},{}) has key index", key, value);
-	    keyMap = KeyIndex.getElmIdListForPropValue(value.toString());
-	    if (keyMap == null) {
-		return vertices;
-	    } else {
-		log.debug("keyMap size " + keyMap.size() + " keyMap " + keyMap);
-		isIndexed = true;
-	    }
-	}
-
-	if (isIndexed) {
-	    final int size = Math.min(mreadMax, keyMap.size());
+	if (indexedKeys.contains(key)) {
+	    RamCloudKeyIndex KeyIndex = new RamCloudKeyIndex(kidxVertTableId, key, value, this, Vertex.class);
+	    vertexList = KeyIndex.getElmIdListForPropValue(value.toString());
+	    
+	    final int size = Math.min(mreadMax, vertexList.size());
 	    JRamCloud.multiReadObject vertPropTableMread[] = new JRamCloud.multiReadObject[size];
 
 	    int vertexNum = 0;
-	    for (Object vert : keyMap) {
+	    for (Object vert : vertexList) {
 		byte[] rckey =
 			ByteBuffer.allocate(8).order(ByteOrder.LITTLE_ENDIAN).putLong((Long) vert).array();
 		vertPropTableMread[vertexNum] = new JRamCloud.multiReadObject(vertPropTableId, rckey);
@@ -510,135 +495,57 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 
     @Override
     public <T extends Element> void dropKeyIndex(String key, Class<T> elementClass) {
-	getIndexedKeys(key, elementClass).removeIndex();
+	throw new UnsupportedOperationException("Not supported yet.");
+	//FIXME how to dropKeyIndex
+	//new RamCloudKeyIndex(kidxVertTableId, key, this, elementClass);
+	//getIndexedKeys(key, elementClass).removeIndex();
     }
 
     @Override
     public <T extends Element> void createKeyIndex(String key,
-	    Class<T> elementClass, Parameter... indexParameters) {
+	    Class<T> elementClass, Parameter... indexParameters) {	
 	if (key == null) {
 	    return;
 	}
-	RamCloudKeyIndex KeyIndex = null;
-	if (elementClass == Vertex.class) {
-	    KeyIndex = new RamCloudKeyIndex(kidxVertTableId, key, this, elementClass);
-	} else if (elementClass == Edge.class) {
-	    KeyIndex = new RamCloudKeyIndex(kidxEdgeTableId, key, this, elementClass);
-	}
-	KeyIndex.create();
-	//KeyIndex.reIndexElements(this, getVertices(), new HashSet<String>(Arrays.asList(key)));
+	if (this.indexedKeys.contains(key)) {
+	    return;
+	}    
+	this.indexedKeys.add(key);		
     }
 
     @Override
     public <T extends Element> Set< String> getIndexedKeys(Class< T> elementClass) {
-	Set<String> indexkey = new HashSet<String>();
-	JRamCloud.Object tableEntry;
-	JRamCloud.TableEnumerator tableEnum;
-
-	if (elementClass == Vertex.class) {
-	    tableEnum = getRcClient().new TableEnumerator(kidxVertTableId);
+	if (null != this.indexedKeys) {
+	    return new HashSet<String>(this.indexedKeys);
 	} else {
-	    tableEnum = getRcClient().new TableEnumerator(kidxEdgeTableId);
+	    return Collections.emptySet();
 	}
-
-	while (tableEnum.hasNext()) {
-	    tableEntry = tableEnum.next();
-	    String key = new String(tableEntry.key);
-	    indexkey.add(key);
-	}
-	return indexkey;
-    }
-
-    public <T extends Element> RamCloudKeyIndex getIndexedKeys(String key, Class<T> elementClass) {
-	return new RamCloudKeyIndex(kidxVertTableId, key, this, elementClass);
     }
 
     @Override
     public <T extends Element> Index<T> createIndex(String indexName,
 	    Class<T> indexClass, Parameter... indexParameters) {
-	if (indexName == null) {
-	    return null;
-	}
-	RamCloudIndex<T> index = null;
-	if (indexClass == Vertex.class) {
-	    index = new RamCloudIndex(idxVertTableId, indexName, this, indexClass);
-	} else if (indexClass == Edge.class) {
-	    index = new RamCloudIndex(idxEdgeTableId, indexName, this, indexClass);
-	} else {
-	    return null;
-	}
-	index.create();
-
-	return index;
+	throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public <T extends Element> Index<T> getIndex(String indexName, Class<T> indexClass) {
-	if (indexName == null) {
-	    return null;
-	}
-
-	RamCloudIndex index = null;
-	if (indexClass.equals(Vertex.class)) {
-	    index = new RamCloudIndex(idxVertTableId, indexName, this, indexClass);
-	} else if (indexClass.equals(Edge.class)) {
-	    index = new RamCloudIndex(idxEdgeTableId, indexName, this, indexClass);
-	} else {
-	    return null;
-	}
-	return index;
+	throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public Iterable<Index<? extends Element>> getIndices() {
-	final List<Index<? extends Element>> list = new ArrayList<Index<? extends Element>>();
-	JRamCloud.TableEnumerator tableEnum = getRcClient().new TableEnumerator(idxVertTableId);
-	JRamCloud.Object tableEntry;
-
-	while (tableEnum.hasNext()) {
-	    tableEntry = tableEnum.next();
-	    list.add(new RamCloudIndex(idxVertTableId, tableEntry.key, this, Vertex.class));
-	}
-
-	tableEnum = getRcClient().new TableEnumerator(idxEdgeTableId);
-
-	while (tableEnum.hasNext()) {
-	    tableEntry = tableEnum.next();
-	    list.add(new RamCloudIndex(idxEdgeTableId, tableEntry.key, this, Edge.class));
-	}
-	return list;
+	throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public void dropIndex(String indexName) {
-	final Iterator<RamCloudIndex> list = (Iterator<RamCloudIndex>) getIndices();
-	while (list.hasNext()) {
-	    RamCloudIndex index = list.next();
-	    if (new String(index.rcKey).equals(indexName)) {
-		index.removeIndex();
-	    }
-	}
-    }
-
-    //@Override
-    public void dropIndex(String indexName, Class indexClass) {
-	// Remove ourselves entirely from the vertex table
-	RamCloudIndex index = (RamCloudIndex) getIndex(indexName, indexClass);
-	index.removeIndex();
-    }
-
-    public static int count(final Iterator<?> iterator) {
-	int counter = 0;
-	while (iterator.hasNext()) {
-	    iterator.next();
-	    counter++;
-	}
-	return counter;
+	throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public String toString() {
-	return getClass().getSimpleName().toLowerCase() + "[vertices:" + count(getVertices().iterator()) + " edges:" + count(getEdges().iterator()) + "]";
+	return getClass().getSimpleName().toLowerCase() + "[vertices:" + ((List<Vertex>)getVertices()).size() + " edges:" + ((List<Edge>)getEdges()).size() + "]";
     }
 
     public static void main(String[] args) {
@@ -663,41 +570,5 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	graph.addEdge(null, a, g, "friend");
 
 	graph.shutdown();
-    }
-
-    protected class RamCloudKeyIndex<T extends RamCloudElement> extends RamCloudIndex<T> implements Serializable {
-
-	public RamCloudKeyIndex(long tableId, String indexName, RamCloudGraph graph, Class<T> indexClass) {
-	    super(tableId, indexName, graph, indexClass);
-	}
-
-	public void autoUpdate(final String key, final Object newValue, final Object oldValue, final T element) {
-	    if (this.exists()) {
-		if (oldValue != null) {
-		    this.remove(key, oldValue, element);
-		}
-		this.put(key, newValue, element);
-	    }
-	}
-
-	public void autoRemove(final String key, final Object oldValue, final T element) {
-	    if (this.exists()) {
-		this.remove(key, oldValue, element);
-	    }
-	}
-
-	public long reIndexElements(final RamCloudGraph graph, final Iterable<? extends Element> elements, final Set<String> keys) {
-	    long counter = 0;
-	    for (final Element element : elements) {
-		for (final String key : keys) {
-		    final Object value = element.removeProperty(key);
-		    if (null != value) {
-			counter++;
-			element.setProperty(key, value);
-		    }
-		}
-	    }
-	    return counter;
-	}
     }
 }

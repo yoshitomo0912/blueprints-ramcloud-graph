@@ -13,7 +13,7 @@ import java.util.Set;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.tinkerpop.blueprints.*;
-import com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraph.RamCloudKeyIndex;
+import com.tinkerpop.blueprints.impls.ramcloud.RamCloudKeyIndex;
 import com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeListProtoBuf;
 import com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf;
 import com.tinkerpop.blueprints.util.DefaultVertexQuery;
@@ -128,8 +128,7 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 	log.debug("RamCloudVertex.remove() - removing IndexedKeys");
 	Map<String,Object> props = this.getPropertyMap();
 	for( Map.Entry<String,Object> entry : props.entrySet() ) {
-		RamCloudKeyIndex keyIndex = graph.getIndexedKeys(entry.getKey(), Vertex.class);
-		if ( !keyIndex.exists() ) continue;
+		RamCloudKeyIndex keyIndex = new RamCloudKeyIndex(graph.kidxVertTableId, entry.getKey(), entry.getValue(), graph, Vertex.class);
 		keyIndex.remove(entry.getKey(), entry.getValue(), this);
 	}
 
