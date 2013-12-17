@@ -51,7 +51,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
     private final String INSTANCE_TABLE_NAME = "instance";    
     private long instanceId;
     private long nextVertexId;
-    private final int INSTANCE_ID_RANGE = 100000;
+    private final int INSTANCE_ID_RANGE = 10000;
     private String coordinatorLocation;
     private static final Features FEATURES = new Features();
 

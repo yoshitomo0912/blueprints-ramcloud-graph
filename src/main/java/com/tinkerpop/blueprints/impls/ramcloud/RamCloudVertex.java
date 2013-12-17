@@ -335,14 +335,14 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 	try {
 	    vertTableEntry = graph.getRcClient().read(graph.vertTableId, rcKey);
 	} catch (Exception e) {
-	    log.warn("{" + toString() + "}: Error reading vertex table entry: {1}", new Object[]{toString(), e.getMessage()});
+	    log.warn("{" + toString() + "}: Error reading vertex table entry: {" + e.getMessage() + "}");
 	    return null;
 	}
 
 	try {
 	    edgeListPB = EdgeListProtoBuf.parseFrom(vertTableEntry.value);
 	} catch (InvalidProtocolBufferException e) {
-	    log.warn("{" + toString() + "}: Read malformed edge list: {1}", new Object[]{toString(), e.getMessage()});
+	    log.warn("{" + toString() + "}: Read malformed edge list: {" + e.getMessage() + "}");
 	    return null;
 	}
 
