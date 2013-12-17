@@ -13,9 +13,9 @@ import java.util.TreeMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.io.ByteBufferInput;
-import com.esotericsoftware.kryo.io.ByteBufferOutput;
+import com.esotericsoftware.kryo2.Kryo;
+import com.esotericsoftware.kryo2.io.ByteBufferInput;
+import com.esotericsoftware.kryo2.io.ByteBufferOutput;
 import com.tinkerpop.blueprints.CloseableIterable;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Index;
@@ -316,8 +316,10 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	} else if (byteArray.length != 0) {
 //	    try {
 		Kryo kryo = new Kryo();
-		ByteBufferInput input = new ByteBufferInput();
-		return kryo.readObject(input, TreeMap.class);
+		ByteBufferInput input = new ByteBufferInput(byteArray);
+		TreeMap map =  kryo.readObject(input, TreeMap.class);
+	    	//log.debug("Kryo: {} bytes ->  {}", byteArray.length, map);
+		return map;
 //		ByteArrayInputStream bais = new ByteArrayInputStream(byteArray);
 //		ObjectInputStream ois = new ObjectInputStream(bais);
 //		Map<Object, List<Object>> map = (Map<Object, List<Object>>) ois.readObject();
@@ -339,10 +341,12 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 
 //	try {
 		Kryo kryo = new Kryo();
-		ByteBufferOutput output = new ByteBufferOutput();
+		ByteBufferOutput output = new ByteBufferOutput(1024*1024);
 		kryo.writeObject(output, map);
 		output.flush();
-		return output.getBuffer();
+		byte[] bytes = output.toBytes();
+	    	//log.debug("Kryo: {} ->  {} bytes", map, bytes.length);
+		return bytes;
 //	    ByteArrayOutputStream baos = new ByteArrayOutputStream(1024*1024);
 //	    ObjectOutputStream oot = new ObjectOutputStream(baos);
 //	    oot.writeObject(map);
