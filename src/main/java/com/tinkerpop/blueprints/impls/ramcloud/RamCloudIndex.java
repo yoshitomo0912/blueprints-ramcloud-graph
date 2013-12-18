@@ -136,7 +136,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	}
 	
 	long startTime = 0;
-	if (graph.measureRcTimeProp == 1) {
+	if (graph.measureBPTimeProp == 1) {
 	    startTime = System.nanoTime();
 	}
 	
@@ -328,7 +328,15 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	JRamCloud.Object propTableEntry;
 
 	try {
+	    long startTime = 0;
+	    if (graph.measureRcTimeProp == 1) {
+		startTime = System.nanoTime();
+	    }
 	    propTableEntry = graph.getRcClient().read(tableId, rcKey);
+	    if (graph.measureRcTimeProp == 1) {
+		long endTime = System.nanoTime();
+		log.error("Performance readIndexPropertyMapFromDB time {}", endTime - startTime);
+	    }
 	    indexVersion = propTableEntry.version;
 	} catch (Exception e) {
 	    indexVersion = 0;

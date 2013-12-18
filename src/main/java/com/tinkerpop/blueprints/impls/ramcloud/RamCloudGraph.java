@@ -339,7 +339,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	    if (vertexList == null) {
 		if (measureBPTimeProp == 1) { 
 		    long endTime = System.nanoTime();
-		    log.error("Performance getVertices total time {} does not exits", key, endTime - startTime);
+		    log.error("Performance getVertices total time {} does not exits", endTime - startTime);
 		}
 		return vertices;
 	    }
