@@ -69,8 +69,8 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
     private final int INSTANCE_ID_RANGE = 10000;
     private String coordinatorLocation;
     private static final Features FEATURES = new Features();
-    public final Long measureBPTimeProp = Long.valueOf(System.getProperty("benchmark.measureBP", "0"));
-    public final Long measureRcTimeProp = Long.valueOf(System.getProperty("benchmark.measureRc", "0"));
+    public final long measureBPTimeProp = Long.valueOf(System.getProperty("benchmark.measureBP", "0"));
+    public final long measureRcTimeProp = Long.valueOf(System.getProperty("benchmark.measureRc", "0"));
 
     public final Set<String> indexedKeys = new HashSet<String>();
 
