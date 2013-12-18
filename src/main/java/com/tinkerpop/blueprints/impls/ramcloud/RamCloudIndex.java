@@ -61,7 +61,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    vertTableEntry = graph.getRcClient().read(tableId, rcKey);
 	    if (graph.measureRcTimeProp == 1) {
 		long endTime = System.nanoTime();
-		log.error("Performance index exists time {}", endTime - startTime);
+		log.error("Performance index exists read time {}", endTime - startTime);
 	    }
 	    indexVersion = vertTableEntry.version;
 	    return true;
@@ -83,7 +83,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 		graph.getRcClient().writeRule(tableId, rcKey, ByteBuffer.allocate(0).array(), rules);
 		if (graph.measureRcTimeProp == 1) {
 		    long endTime = System.nanoTime();
-		    log.error("Performance index create time {}", endTime - startTime);
+		    log.error("Performance index create write time {}", endTime - startTime);
 		}
 	    } catch (Exception e) {
 		log.info(toString() + ": Write create index list: " + e.toString());
@@ -335,7 +335,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    propTableEntry = graph.getRcClient().read(tableId, rcKey);
 	    if (graph.measureRcTimeProp == 1) {
 		long endTime = System.nanoTime();
-		log.error("Performance readIndexPropertyMapFromDB time {}", endTime - startTime);
+		log.error("Performance readIndexPropertyMapFromDB read time {}", endTime - startTime);
 	    }
 	    indexVersion = propTableEntry.version;
 	} catch (Exception e) {
@@ -391,7 +391,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    graph.getRcClient().writeRule(tableId, rcKey, rcValue, rules);
 	    if (graph.measureRcTimeProp == 1) {
 		long endTime = System.nanoTime();
-		log.error("Performance writeWithRules time {}", endTime - startTime);
+		log.error("Performance writeWithRules write time {}", endTime - startTime);
 	    }
 	} catch (Exception e) {
 	    log.debug("Cond. Write index property: " + new String(rcKey) + " failed " + e.toString() + " expected version: " + expectedVersion);

@@ -26,12 +26,15 @@ public class RamCloudKeyIndex<T extends RamCloudElement> extends RamCloudIndex<T
 	this.graph = graph;
     }
 
-    public void autoUpdate(final String key, final Object newValue, final Object oldValue, final T element) {
+    public boolean autoUpdate(final String key, final Object newValue, final Object oldValue, final T element) {
 	if (graph.indexedKeys.contains(key)) {
 	    if (oldValue != null) {
 		this.remove(key, oldValue, element);
 	    }
 	    this.put(key, newValue, element);
+	    return true;
+	} else {
+	    return false;
 	}
     }
 

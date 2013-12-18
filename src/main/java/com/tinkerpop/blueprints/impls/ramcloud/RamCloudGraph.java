@@ -339,7 +339,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	    if (vertexList == null) {
 		if (measureBPTimeProp == 1) { 
 		    long endTime = System.nanoTime();
-		    log.error("Performance getVertices total time {} does not exits", endTime - startTime);
+		    log.error("Performance getVertices does not exists total time {}", endTime - startTime);
 		}
 		return vertices;
 	    }
@@ -373,7 +373,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 		JRamCloud.Object outvertPropTable[] = getRcClient().multiRead(vertPropTableMread);
 		if (measureRcTimeProp == 1) { 
 		    long endTime2 = System.nanoTime();
-		    log.error("Performance index multiread time {} does not exits", endTime2 - startTime2);
+		    log.error("Performance index multiread time {}", endTime2 - startTime2);
 		}
 		for (int i = 0; i < vertexNum; i++) {
 		    if (outvertPropTable[i] != null) {
@@ -399,7 +399,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	
 	if (measureBPTimeProp == 1) { 
 		long endTime = System.nanoTime();
-		log.error("Performance getVertices total time {}.", endTime - startTime);
+		log.error("Performance getVertices exists total time {}.", endTime - startTime);
 	}
 
 	return vertices;

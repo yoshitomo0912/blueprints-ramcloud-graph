@@ -46,7 +46,7 @@ public class RamCloudElement implements Element, Serializable {
 	    propTableEntry = graph.getRcClient().read(rcPropTableId, rcPropTableKey);
 	    if (graph.measureRcTimeProp == 1) {
 		long endTime = System.nanoTime();
-		log.error("Performance getPropertyMap time {}", endTime - startTime);
+		log.error("Performance getPropertyMap read time {}", endTime - startTime);
 	    }
 	    if (propTableEntry.value.length > 1024 * 1024 * 0.9) {
 		log.warn("Element[id={}] property map size is near 1MB limit!", new String(rcPropTableKey));
@@ -89,7 +89,7 @@ public class RamCloudElement implements Element, Serializable {
 	graph.getRcClient().write(rcPropTableId, rcPropTableKey, rcValue);
 	if (graph.measureRcTimeProp == 1) {
 	    long endTime = System.nanoTime();
-	    log.error("Performance setPropertyMap time {}", endTime - startTime);
+	    log.error("Performance setPropertyMap write time {}", endTime - startTime);
 	}
     }
 
@@ -137,9 +137,10 @@ public class RamCloudElement implements Element, Serializable {
 	oldValue = map.put(key, value);
 	setPropertyMap(map);
 
+	boolean ret = false;
 	if (this instanceof RamCloudVertex) {
 	    RamCloudKeyIndex keyIndex = new RamCloudKeyIndex(graph.kidxVertTableId, key, value, graph, Vertex.class);
-	    keyIndex.autoUpdate(key, value, oldValue, this);
+	    ret = keyIndex.autoUpdate(key, value, oldValue, this);
 	} else {
 	    RamCloudKeyIndex keyIndex = new RamCloudKeyIndex(graph.kidxVertTableId, key, value, graph, Edge.class);
 	    keyIndex.autoUpdate(key, value, oldValue, this);
@@ -147,7 +148,11 @@ public class RamCloudElement implements Element, Serializable {
 	
 	if (graph.measureBPTimeProp == 1) {
 	    long endTime = System.nanoTime();
-	    log.error("Performance vertex setProperty total time {}", endTime - startTime);
+	    if (ret) {
+		log.error("Performance vertex setProperty which is index total time {}", endTime - startTime);
+	    } else {
+		log.error("Performance vertex setProperty does not index time {}", endTime - startTime);
+	    }
 	}
 	
     }
