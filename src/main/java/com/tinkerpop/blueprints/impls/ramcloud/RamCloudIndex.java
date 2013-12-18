@@ -153,7 +153,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	
 	if (graph.measureBPTimeProp == 1) {
 	    long endTime = System.nanoTime();
-	    log.error("Performance vertex setProperty total time {}", endTime - startTime);
+	    log.error("Performance index setProperty total time {}", endTime - startTime);
 	}
     }
 
