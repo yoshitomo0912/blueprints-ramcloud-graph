@@ -46,7 +46,7 @@ public class RamCloudElement implements Element, Serializable {
 	    propTableEntry = graph.getRcClient().read(rcPropTableId, rcPropTableKey);
 	    if (graph.measureRcTimeProp == 1) {
 		long endTime = System.nanoTime();
-		log.error("Performance getPropertyMap total time {}", endTime - startTime);
+		log.error("Performance getPropertyMap time {}", endTime - startTime);
 	    }
 	    if (propTableEntry.value.length > 1024 * 1024 * 0.9) {
 		log.warn("Element[id={}] property map size is near 1MB limit!", new String(rcPropTableKey));
@@ -89,7 +89,7 @@ public class RamCloudElement implements Element, Serializable {
 	graph.getRcClient().write(rcPropTableId, rcPropTableKey, rcValue);
 	if (graph.measureRcTimeProp == 1) {
 	    long endTime = System.nanoTime();
-	    log.error("Performance setPropertyMap total time {}", endTime - startTime);
+	    log.error("Performance setPropertyMap time {}", endTime - startTime);
 	}
     }
 
@@ -157,10 +157,6 @@ public class RamCloudElement implements Element, Serializable {
 	Map<String, Object> map = getPropertyMap();
 	T retVal = (T) map.remove(key);
 	setPropertyMap(map);
-	    long startTime = 0;
-	    if (graph.measureRcTimeProp == 1) {
-		startTime = System.nanoTime();
-	    }
 	if (this instanceof RamCloudVertex) {
 	    RamCloudKeyIndex keyIndex = new RamCloudKeyIndex(graph.kidxVertTableId, key, retVal, graph, Vertex.class);
 	    keyIndex.autoRemove(key, retVal.toString(), this);

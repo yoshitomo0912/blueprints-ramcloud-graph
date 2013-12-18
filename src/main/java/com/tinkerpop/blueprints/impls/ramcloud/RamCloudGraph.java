@@ -366,7 +366,15 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	    }
 
 	    if (vertexNum != 0) {
+		long startTime2 = 0;
+		if (measureRcTimeProp == 1) {
+		    startTime2 = System.nanoTime();
+		}
 		JRamCloud.Object outvertPropTable[] = getRcClient().multiRead(vertPropTableMread);
+		if (measureRcTimeProp == 1) { 
+		    long endTime2 = System.nanoTime();
+		    log.error("Performance index multiread time {} does not exits", endTime2 - startTime2);
+		}
 		for (int i = 0; i < vertexNum; i++) {
 		    if (outvertPropTable[i] != null) {
 			vertices.add(new RamCloudVertex(outvertPropTable[i].key, this));
