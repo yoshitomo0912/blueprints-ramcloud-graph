@@ -199,8 +199,6 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 	/** Conditionally update Adj. Edge List
 	 * */
 	private void updateEdgeAdjList(List<RamCloudEdge> edgesToModify, boolean add) {
-		log.debug( (add?"Adding":"Removing") + " edges: {"+ this + "} [edgesToModify={" + edgesToModify + "}]"  );
-
 		final int MAX_RETRIES = 100;
 		for (int retry = 1 ; retry <= MAX_RETRIES ; ++retry ) {
 
@@ -265,7 +263,6 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 	}
 
 	private Versioned<EdgeListProtoBuf> updateCachedAdjEdgeList() {
-		log.debug("updateCachedAdjEdgeList() {}", this.toString());
 		JRamCloud.Object vertTableEntry;
 		EdgeListProtoBuf edgeList;
 
