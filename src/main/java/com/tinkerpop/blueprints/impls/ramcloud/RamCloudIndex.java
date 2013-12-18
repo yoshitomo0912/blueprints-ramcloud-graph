@@ -54,11 +54,14 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
     public boolean exists() {
 	try {
 	    JRamCloud.Object vertTableEntry;
+	    JRamCloud vertTable = graph.getRcClient();
+
 	    long startTime = 0;
 	    if (graph.measureRcTimeProp == 1) {
 		startTime = System.nanoTime();
 	    }
-	    vertTableEntry = graph.getRcClient().read(tableId, rcKey);
+	    //vertTableEntry = graph.getRcClient().read(tableId, rcKey);
+	    vertTableEntry = vertTable.read(tableId, rcKey);
 	    if (graph.measureRcTimeProp == 1) {
 		long endTime = System.nanoTime();
 		log.error("Performance index exists read time {}", endTime - startTime);
@@ -76,11 +79,14 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    JRamCloud.RejectRules rules = graph.getRcClient().new RejectRules();
 	    rules.setExists();
 	    try {
+		JRamCloud vertTable = graph.getRcClient();
+		
 		long startTime = 0;
 		if (graph.measureRcTimeProp == 1) {
 		    startTime = System.nanoTime();
 		}
-		graph.getRcClient().writeRule(tableId, rcKey, ByteBuffer.allocate(0).array(), rules);
+		//graph.getRcClient().writeRule(tableId, rcKey, ByteBuffer.allocate(0).array(), rules);
+		vertTable.writeRule(tableId, rcKey, ByteBuffer.allocate(0).array(), rules);
 		if (graph.measureRcTimeProp == 1) {
 		    long endTime = System.nanoTime();
 		    log.error("Performance index create write time {}", endTime - startTime);
@@ -328,11 +334,13 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	JRamCloud.Object propTableEntry;
 
 	try {
+	    JRamCloud vertTable = graph.getRcClient();
 	    long startTime = 0;
 	    if (graph.measureRcTimeProp == 1) {
 		startTime = System.nanoTime();
 	    }
-	    propTableEntry = graph.getRcClient().read(tableId, rcKey);
+	    //propTableEntry = graph.getRcClient().read(tableId, rcKey);
+	    propTableEntry = vertTable.read(tableId, rcKey);
 	    if (graph.measureRcTimeProp == 1) {
 		long endTime = System.nanoTime();
 		log.error("Performance readIndexPropertyMapFromDB read time {}", endTime - startTime);
@@ -384,11 +392,12 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	}
 
 	try {
+	    JRamCloud vertTable = graph.getRcClient();
 	    long startTime = 0;
 	    if (graph.measureRcTimeProp == 1) {
 		startTime = System.nanoTime();
 	    }
-	    graph.getRcClient().writeRule(tableId, rcKey, rcValue, rules);
+	    vertTable.writeRule(tableId, rcKey, rcValue, rules);
 	    if (graph.measureRcTimeProp == 1) {
 		long endTime = System.nanoTime();
 		log.error("Performance writeWithRules write time {}", endTime - startTime);

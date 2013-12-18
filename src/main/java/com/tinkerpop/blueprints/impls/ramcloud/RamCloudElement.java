@@ -39,11 +39,12 @@ public class RamCloudElement implements Element, Serializable {
 	JRamCloud.Object propTableEntry;
 
 	try {
+	    JRamCloud vertTable = graph.getRcClient();
 	    long startTime = 0;
 	    if (graph.measureRcTimeProp == 1) {
 		startTime = System.nanoTime();
 	    }
-	    propTableEntry = graph.getRcClient().read(rcPropTableId, rcPropTableKey);
+	    propTableEntry = vertTable.read(rcPropTableId, rcPropTableKey);
 	    if (graph.measureRcTimeProp == 1) {
 		long endTime = System.nanoTime();
 		log.error("Performance getPropertyMap read time {}", endTime - startTime);
@@ -83,10 +84,11 @@ public class RamCloudElement implements Element, Serializable {
 	rcValue = output.toBytes();
 	
 	long startTime = 0;
+	JRamCloud vertTable = graph.getRcClient();
 	if (graph.measureRcTimeProp == 1) {
 	    startTime = System.nanoTime();
 	}
-	graph.getRcClient().write(rcPropTableId, rcPropTableKey, rcValue);
+	vertTable.write(rcPropTableId, rcPropTableKey, rcValue);
 	if (graph.measureRcTimeProp == 1) {
 	    long endTime = System.nanoTime();
 	    log.error("Performance setPropertyMap write time {}", endTime - startTime);
