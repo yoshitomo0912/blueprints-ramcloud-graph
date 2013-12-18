@@ -18,8 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +37,9 @@ import com.tinkerpop.blueprints.util.DefaultGraphQuery;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 
 import edu.stanford.ramcloud.JRamCloud;
+import java.nio.ByteOrder;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, TransactionalGraph, Serializable {
 
@@ -72,8 +73,6 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
     private static final Features FEATURES = new Features();
 
     public final Set<String> indexedKeys = new HashSet<String>();
-
-
 
     static {
 	FEATURES.supportsSerializableObjectProperty = true;
@@ -203,7 +202,6 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
             instanceEntry = getRcClient().read(instanceTableId, "nextInstanceId".getBytes());
         } catch (Exception e) {
             if (e instanceof JRamCloud.ObjectDoesntExistException) {
-                log.debug("writing an instance value of 1");
                 instanceId = 0;
                 getRcClient().write(instanceTableId, "nextInstanceId".getBytes(), ByteBuffer.allocate(0).array());
             }
@@ -262,7 +260,6 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	}
 
 	nextVertexId = instanceId * INSTANCE_ID_RANGE;
-	log.debug("nextVertexID" + nextVertexId);
     }
 
     @Override
@@ -305,10 +302,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 
     @Override
     public void removeVertex(Vertex vertex) {
-	log.info("Removing vertex begin: [vertex={" + vertex + "}]");
-
 	((RamCloudVertex) vertex).remove();
-	log.info("Removing vertex end: [vertex={" + vertex + "}]");
     }
 
     @Override
@@ -330,8 +324,6 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	List<Object> vertexList = null;
 
 	int mreadMax = 400;
-
-	log.debug("getVertices key : " + key + " value " + value);
 
 	if (indexedKeys.contains(key)) {
 	    RamCloudKeyIndex KeyIndex = new RamCloudKeyIndex(kidxVertTableId, key, value, this, Vertex.class);
@@ -445,10 +437,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 
     @Override
     public void removeEdge(Edge edge) {
-	log.info("Removing edge begin: [edge={" + edge + "}]");
-
 	edge.remove();
-	log.info("Removing edge end: [edge={" + edge + "}]");
     }
 
     @Override

@@ -28,16 +28,12 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 
     private final static Logger log = LoggerFactory.getLogger(RamCloudGraph.class);
     private RamCloudGraph graph;
-
     private long tableId;
-
     private String indexName;
     protected byte[] rcKey;
-
     private Class<T> indexClass;
-
     // FIXME this should not be defined here
-    private long indexVersion ;
+    private long indexVersion;
 
     public RamCloudIndex(long tableId, String indexName, Object propValue, RamCloudGraph graph, Class<T> indexClass) {
 	this.tableId = tableId;
@@ -59,12 +55,10 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	try {
 	    JRamCloud.Object vertTableEntry;
 	    vertTableEntry = graph.getRcClient().read(tableId, rcKey);
-	    log.debug("IndexTable entry for "+indexName +" exists(): "+new String(rcKey)+"@"+tableId+" Update version " + indexVersion + " -> " + vertTableEntry.version + "["+this.toString()+"]");
 	    indexVersion = vertTableEntry.version;
 	    return true;
 	} catch (Exception e) {
-	    log.debug("IndexTable entry for "+indexName +" does not exists(): "+new String(rcKey)+"@"+tableId + " ["+this.toString()+"]");
-	    //log.info(e.toString() + ": exists() Exception thrown ");
+	    log.debug("IndexTable entry for " + indexName + " does not exists(): " + new String(rcKey) + "@" + tableId + " [" + this.toString() + "]");
 	    return false;
 	}
     }
@@ -75,7 +69,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    rules.setExists();
 	    try {
 		graph.getRcClient().writeRule(tableId, rcKey, ByteBuffer.allocate(0).array(), rules);
-		log.debug("IndexTable entry for "+indexName +" create() success: "+new String(rcKey)+"@"+tableId+" ["+this.toString()+"]");
+		log.debug("IndexTable entry for " + indexName + " create() success: " + new String(rcKey) + "@" + tableId + " [" + this.toString() + "]");
 	    } catch (Exception e) {
 		log.info(toString() + ": Write create index list: " + e.toString());
 	    }
@@ -145,7 +139,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 		if (writeWithRules(rcValue)) {
 		    break;
 		} else {
-		    log.debug("--- getSetProperty(String " + propValue + ", Object " + elmId + ") cond. write failure RETRYING " + (i + 1));
+		    log.debug("getSetProperty(String " + propValue + ", Object " + elmId + ") cond. write failure RETRYING " + (i + 1));
 		    if (i == 100) {
 			log.error("getSetProperty(String key, Object value) cond. write failure Gaveup RETRYING");
 		    }
@@ -192,40 +186,42 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    throw ExceptionFactory.propertyKeyIdIsReserved();
 	}
 
-	if( !propName.equals(indexName) ) {
-		log.error("Index name mismatch indexName:{}, remove({},{},...). SOMETHING IS WRONG", indexName, propName, propValue);
+	if (!propName.equals(indexName)) {
+	    log.error("Index name mismatch indexName:{}, remove({},{},...). SOMETHING IS WRONG", indexName, propName, propValue);
 	}
 
 	// FIXME better loop variable name
 	for (int i = 0; i < 100; ++i) {
-		Map<Object, List<Object>> map = readIndexPropertyMapFromDB();
+	    Map<Object, List<Object>> map = readIndexPropertyMapFromDB();
 
-		if (map.containsKey(propValue)) {
-			List<Object> idList = map.get(propValue);
-			if (null != idList) {
-				idList.remove(element.getId());
-				if (idList.isEmpty()) {
-					log.debug("remove({},{},...) called, and list became empty.", propName, propValue);
-					map.remove(propValue);
-				}
-			}
-		} else {
-			// propValue not found
-			log.warn("remove({},{},...) called on '{}' index table, but was not found on index. SOMETHING MAY BE WRONG", propName, propValue, this.indexName);
-			// no change to DB so exit now
-			return;
+	    if (map.containsKey(propValue)) {
+		List<Object> idList = map.get(propValue);
+		if (null != idList) {
+		    idList.remove(element.getId());
+		    if (idList.isEmpty()) {
+			log.debug("remove({},{},...) called, and list became empty.", propName, propValue);
+			map.remove(propValue);
+		    }
 		}
-		byte[] rcValue = convertIndexPropertyMapToRcBytes(map);
-		if (rcValue.length == 0) return;
+	    } else {
+		// propValue not found
+		log.warn("remove({},{},...) called on '{}' index table, but was not found on index. SOMETHING MAY BE WRONG", propName, propValue, this.indexName);
+		// no change to DB so exit now
+		return;
+	    }
+	    byte[] rcValue = convertIndexPropertyMapToRcBytes(map);
+	    if (rcValue.length == 0) {
+		return;
+	    }
 
-		if (writeWithRules(rcValue)) {
-			break;
-		} else {
-			log.debug("remove({}, {}, T element) write failure RETRYING {}", propName, propValue, (i + 1));
-			if ( i+1 == 100 ) {
-				log.error("remove({}, {}, T element) write failed completely. gave up RETRYING", propName, propValue);
-			}
+	    if (writeWithRules(rcValue)) {
+		break;
+	    } else {
+		log.debug("remove({}, {}, T element) write failure RETRYING {}", propName, propValue, (i + 1));
+		if (i + 1 == 100) {
+		    log.error("remove({}, {}, T element) write failed completely. gave up RETRYING", propName, propValue);
 		}
+	    }
 	}
 
     }
@@ -236,73 +232,73 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 
     // FIXME this methods should not be defined here
     public static <T extends Element> void removeElement(long tableId, T element, RamCloudGraph graph) {
-	log.debug("removeElement({}, {}, ...)", tableId, element  );
 	JRamCloud.TableEnumerator tableEnum = graph.getRcClient().new TableEnumerator(tableId);
 
 	while (tableEnum.hasNext()) {
-		JRamCloud.Object tableEntry = tableEnum.next();
-		Map<Object, List<Object>> indexValMap = convertRcBytesToIndexPropertyMap(tableEntry.value);
+	    JRamCloud.Object tableEntry = tableEnum.next();
+	    Map<Object, List<Object>> indexValMap = convertRcBytesToIndexPropertyMap(tableEntry.value);
 
-		boolean madeChange = false;
-		Iterator<Map.Entry<Object, List<Object>>> indexValMapIt = indexValMap.entrySet().iterator();
-		while( indexValMapIt.hasNext() ) {
-			Map.Entry<Object, List<Object>> entry = indexValMapIt.next();
+	    boolean madeChange = false;
+	    Iterator<Map.Entry<Object, List<Object>>> indexValMapIt = indexValMap.entrySet().iterator();
+	    while (indexValMapIt.hasNext()) {
+		Map.Entry<Object, List<Object>> entry = indexValMapIt.next();
+		List<Object> idList = entry.getValue();
+		madeChange |= idList.remove(element.getId());
+		if (idList.isEmpty()) {
+		    madeChange = true;
+		    indexValMapIt.remove();
+		}
+	    }
+	    if (madeChange == false) {
+		continue;
+	    }
+
+	    byte[] rcValue = convertIndexPropertyMapToRcBytes(indexValMap);
+	    if (rcValue.length == 0) {
+		// nothing to write
+		continue;
+	    }
+	    if (writeWithRules(tableId, tableEntry.key, rcValue, tableEntry.version, graph)) {
+		// cond. write success
+		continue;
+	    } else {
+		// cond. write failure
+		// FIXME Dirty hack
+		log.debug("removeElement({}, {}, ...) cond. key/value {} write failure RETRYING 1", tableId, element, indexValMap);
+
+		for (int retry = 100; retry >= 0; --retry) {
+		    log.debug("removeElement({}, {}, ...) cond. write failure RETRYING {}", tableId, element, retry);
+		    RamCloudKeyIndex idx = new RamCloudKeyIndex(tableId, tableEntry.key, graph, (Class<T>) element.getClass());
+		    Map<Object, List<Object>> rereadMap = idx.readIndexPropertyMapFromDB();
+
+		    boolean madeChangeOnRetry = false;
+		    Iterator<Map.Entry<Object, List<Object>>> rereadIndexValMapIt = rereadMap.entrySet().iterator();
+		    while (rereadIndexValMapIt.hasNext()) {
+			Map.Entry<Object, List<Object>> entry = rereadIndexValMapIt.next();
 			List<Object> idList = entry.getValue();
-			madeChange |= idList.remove(element.getId());
+			madeChangeOnRetry |= idList.remove(element.getId());
 			if (idList.isEmpty()) {
-				madeChange = true;
-				indexValMapIt.remove();
+			    log.debug("removeElement({}, {}, ...) is now empty", tableId, element);
+			    madeChangeOnRetry = true;
+			    rereadIndexValMapIt.remove();
 			}
+		    }
+		    if (madeChangeOnRetry == false) {
+			log.debug("removeElement({}, {}, ...) no more write required. SOMETHING MAY BE WRONG", tableId, element);
+			break;
+		    }
+
+		    if (idx.writeWithRules(convertIndexPropertyMapToRcBytes(rereadMap))) {
+			log.debug("removeElement({}, {}, ...) cond. key/value {} write failure RETRYING {}", tableId, element, rereadMap, retry);
+			// cond. re-write success
+			break;
+		    }
+		    if (retry == 0) {
+			log.error("removeElement({}, {}, ...) cond. write failed completely. Gave up RETRYING", tableId, element);
+			// XXX may be we should throw some king of exception here?
+		    }
 		}
-		if ( madeChange == false ) continue;
-
-		byte[] rcValue = convertIndexPropertyMapToRcBytes(indexValMap);
-		if (rcValue.length == 0) {
-			// nothing to write
-			continue;
-		}
-		log.debug("removeElement({}, {}, ...) - writing changes", tableId, element );
-		if (writeWithRules( tableId, tableEntry.key, rcValue, tableEntry.version, graph )) {
-			// cond. write success
-			continue;
-		} else {
-			// cond. write failure
-			// FIXME Dirty hack
-		    log.debug("removeElement({}, {}, ...) cond. key/value {} write failure RETRYING 1", tableId, element, indexValMap);
-
-		    for ( int retry = 100 ; retry >= 0 ; --retry ) {
-				log.debug("--- removeElement({}, {}, ...) cond. write failure RETRYING {}", tableId, element, retry );
-				RamCloudKeyIndex idx = new RamCloudKeyIndex(tableId, tableEntry.key, graph, element.getClass() );
-				Map<Object, List<Object>> rereadMap = idx.readIndexPropertyMapFromDB();
-
-				boolean madeChangeOnRetry = false;
-				Iterator<Map.Entry<Object, List<Object>>> rereadIndexValMapIt = rereadMap.entrySet().iterator();
-				while( rereadIndexValMapIt.hasNext() ) {
-					Map.Entry<Object, List<Object>> entry = rereadIndexValMapIt.next();
-					List<Object> idList = entry.getValue();
-					madeChangeOnRetry |= idList.remove(element.getId());
-					if (idList.isEmpty()) {
-						log.debug("removeElement({}, {}, ...) is now empty", tableId, element );
-						madeChangeOnRetry = true;
-						rereadIndexValMapIt.remove();
-					}
-				}
-				if ( madeChangeOnRetry == false ){
-					log.debug("removeElement({}, {}, ...) no more write required. SOMETHING MAY BE WRONG", tableId, element );
-					break;
-				}
-
-				if ( idx.writeWithRules(convertIndexPropertyMapToRcBytes(rereadMap)) ) {
-					log.debug("--- removeElement({}, {}, ...) cond. key/value {} write failure RETRYING {}", tableId, element, rereadMap, retry );
-					// cond. re-write success
-					break;
-				}
-				if ( retry == 0 ) {
-					log.error("removeElement({}, {}, ...) cond. write failed completely. Gave up RETRYING", tableId, element);
-					// XXX may be we should throw some king of exception here?
-				}
-			}
-		}
+	    }
 	}
     }
 
@@ -312,11 +308,10 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 
 	try {
 	    propTableEntry = graph.getRcClient().read(tableId, rcKey);
-		log.debug("readIndexPropertyMapFromDB() " + indexName + " Update version " + indexVersion + " -> " + propTableEntry.version + " ["+this.toString()+"]");
 	    indexVersion = propTableEntry.version;
 	} catch (Exception e) {
 	    indexVersion = 0;
-	    log.warn("readIndexPropertyMapFromDB() Element does not have a index property table entry! tableId :"+ tableId + " indexName : " + indexName + " " + e );
+	    log.warn("readIndexPropertyMapFromDB() Element does not have a index property table entry! tableId :" + tableId + " indexName : " + indexName + " " + e);
 	    return null;
 	}
 
@@ -328,49 +323,22 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    log.error("Got a null byteArray argument");
 	    return null;
 	} else if (byteArray.length != 0) {
-//	    try {
-		Kryo kryo = new Kryo();
-		ByteBufferInput input = new ByteBufferInput(byteArray);
-		TreeMap map =  kryo.readObject(input, TreeMap.class);
-	    	//log.debug("Kryo: {} bytes ->  {}", byteArray.length, map);
-		return map;
-//		ByteArrayInputStream bais = new ByteArrayInputStream(byteArray);
-//		ObjectInputStream ois = new ObjectInputStream(bais);
-//		Map<Object, List<Object>> map = (Map<Object, List<Object>>) ois.readObject();
-//		return map;
-//	    } catch (IOException e) {
-//		log.error("Got an IOException while deserializing element's property map: {"+ e.toString() + "}");
-//		return null;
-//	    } catch (ClassNotFoundException e) {
-//		log.error("Got a ClassNotFoundException while deserializing element's property map: {"+ e.toString() + "}");
-//		return null;
-//	    }
+	    Kryo kryo = new Kryo();
+	    ByteBufferInput input = new ByteBufferInput(byteArray);
+	    TreeMap map = kryo.readObject(input, TreeMap.class);
+	    return map;
 	} else {
 	    return new TreeMap<Object, List<Object>>();
 	}
     }
 
     public static byte[] convertIndexPropertyMapToRcBytes(Map<Object, List<Object>> map) {
-//	byte[] rcValue = null;
-
-//	try {
-		Kryo kryo = new Kryo();
-		ByteBufferOutput output = new ByteBufferOutput(1024*1024);
-		kryo.writeObject(output, map);
-		output.flush();
-		byte[] bytes = output.toBytes();
-		//log.debug("Kryo: {} ->  {} bytes", map, bytes.length);
-		return bytes;
-//	    ByteArrayOutputStream baos = new ByteArrayOutputStream(1024*1024);
-//	    ObjectOutputStream oot = new ObjectOutputStream(baos);
-//	    oot.writeObject(map);
-//	    rcValue = baos.toByteArray();
-//	} catch (IOException e) {
-//	    log.error("Got an exception while serializing element''s property map: {"+ e.toString() + "}");
-//	}
-
-//	return rcValue;
-
+	Kryo kryo = new Kryo();
+	ByteBufferOutput output = new ByteBufferOutput(1024 * 1024);
+	kryo.writeObject(output, map);
+	output.flush();
+	byte[] bytes = output.toBytes();
+	return bytes;
     }
 
     protected boolean writeWithRules(byte[] rcValue) {
@@ -389,17 +357,17 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	try {
 	    graph.getRcClient().writeRule(tableId, rcKey, rcValue, rules);
 	} catch (Exception e) {
-	    log.debug("Cond. Write index property: " + new String(rcKey) +  " failed " + e.toString() + " expected version: " + expectedVersion);
+	    log.debug("Cond. Write index property: " + new String(rcKey) + " failed " + e.toString() + " expected version: " + expectedVersion);
 	    return false;
 	}
-    	return true;
+	return true;
     }
 
     public List<Object> getElmIdListForPropValue(Object propValue) {
 	Map<Object, List<Object>> map = readIndexPropertyMapFromDB();
-	if ( map == null ) {
-		log.error("IndexPropertyMap was null. " + this.indexName +" : " + propValue);
-		return null;
+	if (map == null) {
+	    log.error("IndexPropertyMap was null. " + this.indexName + " : " + propValue);
+	    return null;
 	}
 	return map.get(propValue);
     }
@@ -409,26 +377,26 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	return map.keySet();
     }
 
-	public <T> T removeIndexProperty(String key) {
-		for (int i = 0; i < 100; ++i) {
-			Map<Object, List<Object>> map = readIndexPropertyMapFromDB();
-			T retVal = (T) map.remove(key);
-			byte[] rcValue = convertIndexPropertyMapToRcBytes(map);
-			if (rcValue.length != 0) {
-				if (writeWithRules(rcValue)) {
-					return retVal;
-				} else {
-					log.info("write failure " + (i + 1));
-					// TODO ERROR message
-				}
-			}
+    public <T> T removeIndexProperty(String key) {
+	for (int i = 0; i < 100; ++i) {
+	    Map<Object, List<Object>> map = readIndexPropertyMapFromDB();
+	    T retVal = (T) map.remove(key);
+	    byte[] rcValue = convertIndexPropertyMapToRcBytes(map);
+	    if (rcValue.length != 0) {
+		if (writeWithRules(rcValue)) {
+		    return retVal;
+		} else {
+		    log.info("write failure " + (i + 1));
+		    // TODO ERROR message
 		}
-		// XXX ?Is this correct
-		return null;
+	    }
 	}
+	// XXX ?Is this correct
+	return null;
+    }
 
     public void removeIndex() {
-	log.info("Removing Index: " + indexName + " was version " + indexVersion + " [" + this +"]");
+	log.info("Removing Index: " + indexName + " was version " + indexVersion + " [" + this + "]");
 	graph.getRcClient().remove(tableId, rcKey);
     }
 }

@@ -95,13 +95,11 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 
 	@Override
 	public void remove() {
-		log.debug("RamCloudVertex.remove() begin");
 		Set<RamCloudEdge> edges = getEdgeSet();
 
 		// neighbor vertex -> List of Edges to remove
 		Map<RamCloudVertex, List<RamCloudEdge>> vertexToEdgesMap = new HashMap<RamCloudVertex, List<RamCloudEdge>>( edges.size() );
 
-		log.debug("RamCloudVertex.remove() - removing Edges");
 		// Batch edges together by neighbor vertex
 		for (RamCloudEdge edge : edges) {
 			RamCloudVertex neighbor = (RamCloudVertex) edge.getNeighbor(this);
@@ -128,7 +126,6 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 			}
 		}
 
-		log.debug("RamCloudVertex.remove() - removing IndexedKeys");
 		Map<String,Object> props = this.getPropertyMap();
 		for( Map.Entry<String,Object> entry : props.entrySet() ) {
 			if ( !graph.indexedKeys.contains(entry.getKey() ) ) continue;
@@ -136,22 +133,10 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 			keyIndex.remove(entry.getKey(), entry.getValue(), this);
 		}
 
-		// FIXME Following should be re-enabled once TableEnum perform well.
-		//	Map<String,Object> props = this.getPropertyMap();
-		//	for (String keyindex : graph.getIndexedKeys(Vertex.class)) {
-		//		if ( !props.containsKey(keyindex) ) continue;
-		//		RamCloudKeyIndex keyIndex = graph.getIndexedKeys(keyindex, Vertex.class);
-		//		keyIndex.remove(keyindex, props.get(keyindex), this);
-		//	}
-
-		log.debug("RamCloudVertex.remove() - removing Vertex Table Key");
 		// Remove ourselves entirely from the vertex table
 		graph.getRcClient().remove(graph.vertTableId, rcKey);
 
-		log.debug("RamCloudVertex.remove() - removing Vertex Property Table Key");
-		// Remove ourselves from our property table
 		super.remove();
-		log.debug("RamCloudVertex.remove() end");
 	}
 
 	/*
@@ -429,7 +414,7 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 	public void debugPrintEdgeList() {
 		List<RamCloudEdge> edgeList = getEdgeList();
 
-		System.out.println(toString() + ": Debug Printing Edge List...");
+		log.debug(toString() + ": Debug Printing Edge List...");
 		for (RamCloudEdge edge : edgeList) {
 			System.out.println(edge.toString());
 		}

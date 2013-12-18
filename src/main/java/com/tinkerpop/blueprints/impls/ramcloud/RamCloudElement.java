@@ -40,8 +40,8 @@ public class RamCloudElement implements Element, Serializable {
 
 	try {
 	    propTableEntry = graph.getRcClient().read(rcPropTableId, rcPropTableKey);
-	    if( propTableEntry.value.length > 1024*1024*0.9 ) {
-	    	log.warn("Element[id={}] property map size is near 1MB limit!", new String(rcPropTableKey) );
+	    if (propTableEntry.value.length > 1024 * 1024 * 0.9) {
+		log.warn("Element[id={}] property map size is near 1MB limit!", new String(rcPropTableKey));
 	    }
 	} catch (Exception e) {
 	    log.warn("Element does not have a property table entry!");
@@ -56,24 +56,10 @@ public class RamCloudElement implements Element, Serializable {
 	    log.warn("Got a null byteArray argument");
 	    return null;
 	} else if (byteArray.length != 0) {
-//	    try {
-			Kryo kryo = new Kryo();
-			ByteBufferInput input = new ByteBufferInput(byteArray);
-			TreeMap map =  kryo.readObject(input, TreeMap.class);
-			//log.debug("Kryo: {} bytes ->  {}", byteArray.length, map);
-			return map;
-
-//		ByteArrayInputStream bais = new ByteArrayInputStream(byteArray);
-//		ObjectInputStream ois = new ObjectInputStream(bais);
-//		Map<String, Object> map = (Map<String, Object>) ois.readObject();
-//		return map;
-//	    } catch (IOException e) {
-//		log.error("Got an exception while deserializing element's property map: {" + e.toString() + "}");
-//		return null;
-//	    } catch (ClassNotFoundException e) {
-//		log.error("Got an exception while deserializing element's property map: {" + e.toString() + "}");
-//		return null;
-//	    }
+	    Kryo kryo = new Kryo();
+	    ByteBufferInput input = new ByteBufferInput(byteArray);
+	    TreeMap map = kryo.readObject(input, TreeMap.class);
+	    return map;
 	} else {
 	    return new TreeMap<String, Object>();
 	}
@@ -82,23 +68,11 @@ public class RamCloudElement implements Element, Serializable {
     private void setPropertyMap(Map<String, Object> map) {
 	byte[] rcValue;
 
-//	try {
-		Kryo kryo = new Kryo();
-		ByteBufferOutput output = new ByteBufferOutput(1024*1024);
-		kryo.writeObject(output, map);
-		output.flush();
-		rcValue = output.toBytes();
-		//log.debug("Kryo: {} ->  {} bytes", map, rcValue.length);
-
-//	    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//	    ObjectOutputStream oot = new ObjectOutputStream(baos);
-//	    oot.writeObject(map);
-//	    rcValue = baos.toByteArray();
-//	} catch (IOException e) {
-//	    log.error("Got an exception while serializing element''s property map: {" + e.toString() + "}");
-//	    return;
-//	}
-
+	Kryo kryo = new Kryo();
+	ByteBufferOutput output = new ByteBufferOutput(1024 * 1024);
+	kryo.writeObject(output, map);
+	output.flush();
+	rcValue = output.toBytes();
 	graph.getRcClient().write(rcPropTableId, rcPropTableKey, rcValue);
     }
 
@@ -142,11 +116,11 @@ public class RamCloudElement implements Element, Serializable {
 	setPropertyMap(map);
 
 	if (this instanceof RamCloudVertex) {
-		RamCloudKeyIndex keyIndex = new RamCloudKeyIndex(graph.kidxVertTableId, key, value, graph, Vertex.class);
-		keyIndex.autoUpdate(key, value, oldValue, this);
+	    RamCloudKeyIndex keyIndex = new RamCloudKeyIndex(graph.kidxVertTableId, key, value, graph, Vertex.class);
+	    keyIndex.autoUpdate(key, value, oldValue, this);
 	} else {
-		RamCloudKeyIndex keyIndex = new RamCloudKeyIndex(graph.kidxVertTableId, key, value, graph, Edge.class);
-		keyIndex.autoUpdate(key, value, oldValue, this);
+	    RamCloudKeyIndex keyIndex = new RamCloudKeyIndex(graph.kidxVertTableId, key, value, graph, Edge.class);
+	    keyIndex.autoUpdate(key, value, oldValue, this);
 	}
     }
 
@@ -157,11 +131,11 @@ public class RamCloudElement implements Element, Serializable {
 	setPropertyMap(map);
 
 	if (this instanceof RamCloudVertex) {
-		RamCloudKeyIndex keyIndex = new RamCloudKeyIndex(graph.kidxVertTableId, key, retVal, graph, Vertex.class);
-		keyIndex.autoRemove(key, retVal.toString(), this);
+	    RamCloudKeyIndex keyIndex = new RamCloudKeyIndex(graph.kidxVertTableId, key, retVal, graph, Vertex.class);
+	    keyIndex.autoRemove(key, retVal.toString(), this);
 	} else {
-		RamCloudKeyIndex keyIndex = new RamCloudKeyIndex(graph.kidxVertTableId, key, retVal, graph, Edge.class);
-		keyIndex.autoRemove(key, retVal.toString(), this);
+	    RamCloudKeyIndex keyIndex = new RamCloudKeyIndex(graph.kidxVertTableId, key, retVal, graph, Edge.class);
+	    keyIndex.autoRemove(key, retVal.toString(), this);
 	}
 
 	return retVal;
