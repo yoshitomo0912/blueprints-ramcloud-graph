@@ -54,7 +54,15 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
     public boolean exists() {
 	try {
 	    JRamCloud.Object vertTableEntry;
+	    long startTime = 0;
+	    if (graph.measureRcTimeProp == 1) {
+		startTime = System.nanoTime();
+	    }
 	    vertTableEntry = graph.getRcClient().read(tableId, rcKey);
+	    if (graph.measureRcTimeProp == 1) {
+		long endTime = System.nanoTime();
+		log.error("Performance index exists time {}", endTime - startTime);
+	    }
 	    indexVersion = vertTableEntry.version;
 	    return true;
 	} catch (Exception e) {
@@ -68,7 +76,15 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    JRamCloud.RejectRules rules = graph.getRcClient().new RejectRules();
 	    rules.setExists();
 	    try {
+		long startTime = 0;
+		if (graph.measureRcTimeProp == 1) {
+		    startTime = System.nanoTime();
+		}
 		graph.getRcClient().writeRule(tableId, rcKey, ByteBuffer.allocate(0).array(), rules);
+		if (graph.measureRcTimeProp == 1) {
+		    long endTime = System.nanoTime();
+		    log.error("Performance index create time {}", endTime - startTime);
+		}
 	    } catch (Exception e) {
 		log.info(toString() + ": Write create index list: " + e.toString());
 	    }
@@ -118,9 +134,9 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    //throw ExceptionFactory.vertexIdCanNotBeNull();
 	    //throw ExceptionFactory.edgeIdCanNotBeNull();
 	}
-
+	
 	long startTime = 0;
-	if (graph.measureBPTimeProp == 1) { 
+	if (graph.measureRcTimeProp == 1) {
 	    startTime = System.nanoTime();
 	}
 	
@@ -360,7 +376,15 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	}
 
 	try {
+	    long startTime = 0;
+	    if (graph.measureRcTimeProp == 1) {
+		startTime = System.nanoTime();
+	    }
 	    graph.getRcClient().writeRule(tableId, rcKey, rcValue, rules);
+	    if (graph.measureRcTimeProp == 1) {
+		long endTime = System.nanoTime();
+		log.error("Performance writeWithRules time {}", endTime - startTime);
+	    }
 	} catch (Exception e) {
 	    log.debug("Cond. Write index property: " + new String(rcKey) + " failed " + e.toString() + " expected version: " + expectedVersion);
 	    return false;

@@ -395,7 +395,14 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 		}
 
 		try {
+			if (graph.measureRcTimeProp == 1) {
+			    startTime = System.nanoTime();
+			}
 			graph.getRcClient().read(graph.vertPropTableId, rcKey);
+			if (graph.measureRcTimeProp == 1) {
+			    long endTime = System.nanoTime();
+			    log.error("Performance vertexPropTable read total time {}", endTime - startTime);
+			}
 			vertPropTableEntryExists = true;
 		} catch (Exception e) {
 			// Vertex property table entry does not exist
@@ -414,8 +421,16 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 	protected void create() throws IllegalArgumentException {
 		// TODO: Existence check costs extra (presently 2 reads), could use option to turn on/off
 		if (!exists()) {
+			long startTime = 0;
+			if (graph.measureRcTimeProp == 1) {
+			    startTime = System.nanoTime();
+			}
 			graph.getRcClient().write(graph.vertTableId, rcKey, ByteBuffer.allocate(0).array());
 			graph.getRcClient().write(graph.vertPropTableId, rcKey, ByteBuffer.allocate(0).array());
+			if (graph.measureRcTimeProp == 1) {
+			    long endTime = System.nanoTime();
+			    log.error("Performance vertex/vertexPropTable initial total time {}", endTime - startTime);
+			}
 		} else {
 			throw ExceptionFactory.vertexWithIdAlreadyExists(id);
 		}
