@@ -69,7 +69,6 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    rules.setExists();
 	    try {
 		graph.getRcClient().writeRule(tableId, rcKey, ByteBuffer.allocate(0).array(), rules);
-		log.debug("IndexTable entry for " + indexName + " create() success: " + new String(rcKey) + "@" + tableId + " [" + this.toString() + "]");
 	    } catch (Exception e) {
 		log.info(toString() + ": Write create index list: " + e.toString());
 	    }
@@ -264,10 +263,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    } else {
 		// cond. write failure
 		// FIXME Dirty hack
-		log.debug("removeElement({}, {}, ...) cond. key/value {} write failure RETRYING 1", tableId, element, indexValMap);
-
 		for (int retry = 100; retry >= 0; --retry) {
-		    log.debug("removeElement({}, {}, ...) cond. write failure RETRYING {}", tableId, element, retry);
 		    RamCloudKeyIndex idx = new RamCloudKeyIndex(tableId, tableEntry.key, graph, (Class<T>) element.getClass());
 		    Map<Object, List<Object>> rereadMap = idx.readIndexPropertyMapFromDB();
 
@@ -278,7 +274,6 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 			List<Object> idList = entry.getValue();
 			madeChangeOnRetry |= idList.remove(element.getId());
 			if (idList.isEmpty()) {
-			    log.debug("removeElement({}, {}, ...) is now empty", tableId, element);
 			    madeChangeOnRetry = true;
 			    rereadIndexValMapIt.remove();
 			}
@@ -386,8 +381,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 		if (writeWithRules(rcValue)) {
 		    return retVal;
 		} else {
-		    log.info("write failure " + (i + 1));
-		    // TODO ERROR message
+		    log.info("removeIndexProperty({}, {}, ...) cond. key/value write failure RETRYING {}", tableId, retVal, (i + 1));
 		}
 	    }
 	}
