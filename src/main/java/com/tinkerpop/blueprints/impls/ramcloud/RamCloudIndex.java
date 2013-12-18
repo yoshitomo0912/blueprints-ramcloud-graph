@@ -119,6 +119,11 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    //throw ExceptionFactory.edgeIdCanNotBeNull();
 	}
 
+	long startTime = 0;
+	if (graph.measureBPTimeProp == 1) { 
+	    startTime = System.nanoTime();
+	}
+	
 	create();
 
 	// FIXME give more meaningful loop variable
@@ -144,6 +149,11 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 		    }
 		}
 	    }
+	}
+	
+	if (graph.measureBPTimeProp == 1) {
+	    long endTime = System.nanoTime();
+	    log.error("Performance vertex setProperty total time {}", endTime - startTime);
 	}
     }
 

@@ -373,9 +373,22 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 	protected boolean exists() {
 		boolean vertTableEntryExists = false;
 		boolean vertPropTableEntryExists = false;
+		
+		long startTime = 0;
+		    
+		if (graph.measureRcTimeProp == 1) { 
+		    startTime = System.nanoTime();
+		}
 
 		try {
+			if (graph.measureRcTimeProp == 1) {
+			    startTime = System.nanoTime();
+			}
 			graph.getRcClient().read(graph.vertTableId, rcKey);
+			if (graph.measureRcTimeProp == 1) {
+			    long endTime = System.nanoTime();
+			    log.error("Performance vertexTable read total time {}", endTime - startTime);
+			}
 			vertTableEntryExists = true;
 		} catch (Exception e) {
 			// Vertex table entry does not exist
