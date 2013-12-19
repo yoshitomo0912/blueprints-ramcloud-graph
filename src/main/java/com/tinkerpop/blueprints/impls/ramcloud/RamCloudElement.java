@@ -151,9 +151,9 @@ public class RamCloudElement implements Element, Serializable {
 	if (graph.measureBPTimeProp == 1) {
 	    long endTime = System.nanoTime();
 	    if (ret) {
-		log.error("Performance vertex setProperty which is index total time {}", endTime - startTime);
+		log.error("Performance vertex setProperty(key {}) which is index total time {}", key, endTime - startTime);
 	    } else {
-		log.error("Performance vertex setProperty does not index time {}", endTime - startTime);
+		log.error("Performance vertex setProperty(key {}) does not index time {}", key, endTime - startTime);
 	    }
 	}
 	
