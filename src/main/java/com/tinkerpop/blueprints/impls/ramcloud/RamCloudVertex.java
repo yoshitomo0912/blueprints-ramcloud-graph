@@ -393,6 +393,10 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 			vertTableEntryExists = true;
 		} catch (Exception e) {
 			// Vertex table entry does not exist
+		    if (graph.measureRcTimeProp == 1) {
+			long endTime = System.nanoTime();
+			log.error("Performance vertexTable does not exists read total time {}", endTime - startTime);
+		    }
 		}
 
 		try {
@@ -408,6 +412,10 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 			vertPropTableEntryExists = true;
 		} catch (Exception e) {
 			// Vertex property table entry does not exist
+		    if (graph.measureRcTimeProp == 1) {
+			long endTime = System.nanoTime();
+			log.error("Performance vertexPropTable does not exists read total time {}", endTime - startTime);
+		    }
 		}
 
 		if (vertTableEntryExists && vertPropTableEntryExists) {
