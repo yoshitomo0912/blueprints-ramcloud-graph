@@ -18,10 +18,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.esotericsoftware.kryo2.Kryo;
 import com.sun.jersey.core.util.Base64;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
@@ -73,6 +75,23 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
     public final long measureRcTimeProp = Long.valueOf(System.getProperty("benchmark.measureRc", "0"));
 
     public final Set<String> indexedKeys = new HashSet<String>();
+    static final ThreadLocal<Kryo> kryo = new ThreadLocal<Kryo>() {
+        @Override
+        protected Kryo initialValue() {
+                 Kryo kryo = new Kryo();
+                 kryo.setRegistrationRequired(true);
+                 kryo.register(String.class);
+                 kryo.register(Long.class);
+                 kryo.register(Integer.class);
+                 kryo.register(Short.class);
+                 kryo.register(Byte.class);
+                 kryo.register(TreeMap.class);
+                 kryo.register(ArrayList.class);
+                 kryo.setReferences(false);
+                 return kryo;
+        }
+    };
+
 
     static {
 	FEATURES.supportsSerializableObjectProperty = true;
@@ -190,7 +209,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 		long endTime = System.nanoTime();
 		log.error("Performance addVertex total time {}", endTime - startTime);
 	    }
-	    log.info("Added vertex: [id={" + longId + "}]");
+	    log.info("Added vertex: [id=" + longId + "]");
 	    return newVertex;
 	} catch (IllegalArgumentException e) {
 	    log.error("Tried to create vertex failed {" + newVertex.toString() + "}: {" + e.getMessage() + "}");
@@ -390,9 +409,11 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	    while (tableEnum.hasNext()) {
 		tableEntry = tableEnum.next();
 		if (tableEntry != null) {
-		    Map<String, Object> propMap = RamCloudElement.convertRcBytesToPropertyMap(tableEntry.value);
+		    //XXX remove temp
+			RamCloudVertex temp = new RamCloudVertex(tableEntry.key, this);
+		    Map<String, Object> propMap = temp.convertRcBytesToPropertyMap(tableEntry.value);
 		    if (propMap.containsKey(key) && propMap.get(key).equals(value)) {
-			vertices.add(new RamCloudVertex(tableEntry.key, this));
+			vertices.add(temp);
 		    }
 		}
 	    }
@@ -486,9 +507,11 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 
 	while (tableEnum.hasNext()) {
 	    tableEntry = tableEnum.next();
-	    Map<String, Object> propMap = RamCloudElement.convertRcBytesToPropertyMap(tableEntry.value);
+		// FIXME temp
+		RamCloudEdge temp = new RamCloudEdge(tableEntry.key, this);
+	    Map<String, Object> propMap = temp.convertRcBytesToPropertyMap(tableEntry.value);
 	    if (propMap.containsKey(key) && propMap.get(key).equals(value)) {
-		edges.add(new RamCloudEdge(tableEntry.key, this));
+		edges.add(temp);
 	    }
 	}
 

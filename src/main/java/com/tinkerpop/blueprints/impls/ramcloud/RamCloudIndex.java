@@ -34,6 +34,21 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
     private Class<T> indexClass;
     // FIXME this should not be defined here
     private long indexVersion;
+/*
+    private static final ThreadLocal<Kryo> kryo = new ThreadLocal<Kryo>() {
+        @Override
+        protected Kryo initialValue() {
+                 Kryo kryo = new Kryo();
+                 kryo.setRegistrationRequired(true);
+                 kryo.register(Long.class);
+                 kryo.register(String.class);
+                 kryo.register(TreeMap.class);
+                 kryo.register(ArrayList.class);
+                 kryo.setReferences(false);
+                 return kryo;
+        }
+    };
+*/
 
     public RamCloudIndex(long tableId, String indexName, Object propValue, RamCloudGraph graph, Class<T> indexClass) {
 	this.tableId = tableId;
@@ -85,7 +100,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    rules.setExists();
 	    try {
 		JRamCloud vertTable = graph.getRcClient();
-		
+
 		long startTime = 0;
 		if (graph.measureRcTimeProp == 1) {
 		    startTime = System.nanoTime();
@@ -145,12 +160,12 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    //throw ExceptionFactory.vertexIdCanNotBeNull();
 	    //throw ExceptionFactory.edgeIdCanNotBeNull();
 	}
-	
+
 	long startTime = 0;
 	if (graph.measureBPTimeProp == 1) {
 	    startTime = System.nanoTime();
 	}
-	
+
 	create();
 
 	// FIXME give more meaningful loop variable
@@ -165,7 +180,11 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 		values.add(elmId);
 	    }
 
+	    long serStartTime = System.nanoTime();
 	    byte[] rcValue = convertIndexPropertyMapToRcBytes(map);
+	    long serEndTime = System.nanoTime();
+	    log.error("Performance index kryo serialization [id={}] {} size {}", elmId, serEndTime - serStartTime, rcValue.length);
+
 	    if (rcValue.length != 0) {
 		if (writeWithRules(rcValue)) {
 		    break;
@@ -177,7 +196,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 		}
 	    }
 	}
-	
+
 	if (graph.measureBPTimeProp == 1) {
 	    long endTime = System.nanoTime();
 	    log.error("Performance index setProperty total time {}", endTime - startTime);
@@ -245,7 +264,11 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 		// no change to DB so exit now
 		return;
 	    }
+	    long startTime = System.nanoTime();
 	    byte[] rcValue = convertIndexPropertyMapToRcBytes(map);
+	    long endTime = System.nanoTime();
+	    log.error("Performance index kryo serialization for removal key {} {} size {}", element, endTime - startTime, rcValue.length);
+
 	    if (rcValue.length == 0) {
 		return;
 	    }
@@ -301,7 +324,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 		// cond. write failure
 		// FIXME Dirty hack
 		for (int retry = 100; retry >= 0; --retry) {
-		    RamCloudKeyIndex idx = new RamCloudKeyIndex(tableId, tableEntry.key, graph, (Class<T>) element.getClass());
+		    RamCloudKeyIndex idx = new RamCloudKeyIndex(tableId, tableEntry.key, graph, element.getClass());
 		    Map<Object, List<Object>> rereadMap = idx.readIndexPropertyMapFromDB();
 
 		    boolean madeChangeOnRetry = false;
@@ -369,9 +392,11 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    log.error("Got a null byteArray argument");
 	    return null;
 	} else if (byteArray.length != 0) {
-	    Kryo kryo = new Kryo();
+            long startTime = System.nanoTime();
 	    ByteBufferInput input = new ByteBufferInput(byteArray);
-	    TreeMap map = kryo.readObject(input, TreeMap.class);
+	    TreeMap map = RamCloudGraph.kryo.get().readObject(input, TreeMap.class);
+            long endTime = System.nanoTime();
+            log.error("Performance index kryo deserialization [id=N/A] {} size {}", endTime - startTime, byteArray.length);
 	    return map;
 	} else {
 	    return new TreeMap<Object, List<Object>>();
@@ -379,11 +404,12 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
     }
 
     public static byte[] convertIndexPropertyMapToRcBytes(Map<Object, List<Object>> map) {
-	Kryo kryo = new Kryo();
-	ByteBufferOutput output = new ByteBufferOutput(1024 * 1024);
-	kryo.writeObject(output, map);
-	output.flush();
+        //long startTime = System.nanoTime();
+	ByteBufferOutput output = new ByteBufferOutput(2048,1024 * 1024);
+	RamCloudGraph.kryo.get().writeObject(output, map);
 	byte[] bytes = output.toBytes();
+        //long endTime = System.nanoTime();
+        //log.error("Performance index kryo serialization {}", endTime - startTime);
 	return bytes;
     }
 

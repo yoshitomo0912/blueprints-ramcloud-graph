@@ -1,6 +1,7 @@
 package com.tinkerpop.blueprints.impls.ramcloud;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
@@ -25,7 +26,24 @@ public class RamCloudElement implements Element, Serializable {
     private byte[] rcPropTableKey;
     private long rcPropTableId;
     private RamCloudGraph graph;
-
+/*
+    private static final ThreadLocal<Kryo> kryo = new ThreadLocal<Kryo>() {
+        @Override
+        protected Kryo initialValue() {
+                 Kryo kryo = new Kryo();
+                 kryo.setRegistrationRequired(true);
+                 kryo.register(String.class);
+                 kryo.register(Long.class);
+                 kryo.register(Integer.class);
+                 kryo.register(Short.class);
+                 kryo.register(Byte.class);
+                 kryo.register(TreeMap.class);
+                 kryo.register(ArrayList.class);
+                 kryo.setReferences(false);
+                 return kryo;
+        }
+    };
+*/
     public RamCloudElement() {
     }
 
@@ -60,14 +78,16 @@ public class RamCloudElement implements Element, Serializable {
 	return convertRcBytesToPropertyMap(propTableEntry.value);
     }
 
-    public static Map<String, Object> convertRcBytesToPropertyMap(byte[] byteArray) {
+    public Map<String, Object> convertRcBytesToPropertyMap(byte[] byteArray) {
 	if (byteArray == null) {
 	    log.warn("Got a null byteArray argument");
 	    return null;
 	} else if (byteArray.length != 0) {
-	    Kryo kryo = new Kryo();
+            long startTime = System.nanoTime();
 	    ByteBufferInput input = new ByteBufferInput(byteArray);
-	    TreeMap map = kryo.readObject(input, TreeMap.class);
+	    TreeMap map = graph.kryo.get().readObject(input, TreeMap.class);
+            long endTime = System.nanoTime();
+            log.error("Performance element kryo deserialization key {} {} size {}", this.toString(), endTime - startTime, byteArray.length);
 	    return map;
 	} else {
 	    return new TreeMap<String, Object>();
@@ -77,11 +97,13 @@ public class RamCloudElement implements Element, Serializable {
     private void setPropertyMap(Map<String, Object> map) {
 	byte[] rcValue;
 
-	Kryo kryo = new Kryo();
-	ByteBufferOutput output = new ByteBufferOutput(1024 * 1024);
-	kryo.writeObject(output, map);
-	output.flush();
+        long startKryoTime = System.nanoTime();
+	ByteBufferOutput output = new ByteBufferOutput(256, 1024 * 1024);
+	graph.kryo.get().writeObject(output, map);
+        long midKryoTime = System.nanoTime();
 	rcValue = output.toBytes();
+        long endKryoTime = System.nanoTime();
+        log.error("Performance element kryo serialization key {} mid {}, total {}, size {}", this.toString(), midKryoTime - startKryoTime, endKryoTime - startKryoTime, rcValue.length);
 	
 	long startTime = 0;
 	JRamCloud vertTable = graph.getRcClient();
@@ -91,7 +113,7 @@ public class RamCloudElement implements Element, Serializable {
 	vertTable.write(rcPropTableId, rcPropTableKey, rcValue);
 	if (graph.measureRcTimeProp == 1) {
 	    long endTime = System.nanoTime();
-	    log.error("Performance setPropertyMap write time {}", endTime - startTime);
+	    log.error("Performance setPropertyMap write time key {} {}", this.toString(), endTime - startTime);
 	}
     }
 
