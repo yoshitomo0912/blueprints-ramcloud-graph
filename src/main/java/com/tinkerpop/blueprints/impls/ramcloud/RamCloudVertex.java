@@ -388,7 +388,7 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 			vertTable.read(graph.vertTableId, rcKey);
 			if (graph.measureRcTimeProp == 1) {
 			    long endTime = System.nanoTime();
-			    log.error("Performance vertexTable read total time {}", endTime - startTime);
+			    log.error("Performance vertexTable exists read total time {}", endTime - startTime);
 			}
 			vertTableEntryExists = true;
 		} catch (Exception e) {
@@ -403,7 +403,7 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 			vertTable.read(graph.vertPropTableId, rcKey);
 			if (graph.measureRcTimeProp == 1) {
 			    long endTime = System.nanoTime();
-			    log.error("Performance vertexPropTable read total time {}", endTime - startTime);
+			    log.error("Performance vertexPropTable exists read total time {}", endTime - startTime);
 			}
 			vertPropTableEntryExists = true;
 		} catch (Exception e) {
