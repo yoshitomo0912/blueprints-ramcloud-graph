@@ -73,6 +73,8 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
     private static final Features FEATURES = new Features();
     public final long measureBPTimeProp = Long.valueOf(System.getProperty("benchmark.measureBP", "0"));
     public final long measureRcTimeProp = Long.valueOf(System.getProperty("benchmark.measureRc", "0"));
+    public static final long measureSerializeTimeProp = Long.valueOf(System.getProperty("benchmark.measureSerializeTimeProp", "0"));
+
 
     public final Set<String> indexedKeys = new HashSet<String>();
 
