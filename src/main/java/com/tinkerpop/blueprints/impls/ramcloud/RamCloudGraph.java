@@ -492,7 +492,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	    tableEntry = tableEnum.next();
 		// FIXME temp
 		//RamCloudEdge temp = new RamCloudEdge(tableEntry.key, this);
-	    Map<String, Object> propMap = RamCloudGraph.convertRcBytesToPropertyMapEx(tableEntry.value);
+	    Map<String, Object> propMap = RamCloudElement.convertRcBytesToPropertyMapEx(tableEntry.value);
 	    if (propMap.containsKey(key) && propMap.get(key).equals(value)) {
 		edges.add(new RamCloudEdge(tableEntry.key, this));
 	    }
