@@ -75,23 +75,6 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
     public final long measureRcTimeProp = Long.valueOf(System.getProperty("benchmark.measureRc", "0"));
 
     public final Set<String> indexedKeys = new HashSet<String>();
-    static final ThreadLocal<Kryo> kryo = new ThreadLocal<Kryo>() {
-        @Override
-        protected Kryo initialValue() {
-                 Kryo kryo = new Kryo();
-                 kryo.setRegistrationRequired(true);
-                 kryo.register(String.class);
-                 kryo.register(Long.class);
-                 kryo.register(Integer.class);
-                 kryo.register(Short.class);
-                 kryo.register(Byte.class);
-                 kryo.register(TreeMap.class);
-                 kryo.register(ArrayList.class);
-                 kryo.setReferences(false);
-                 return kryo;
-        }
-    };
-
 
     static {
 	FEATURES.supportsSerializableObjectProperty = true;
@@ -410,10 +393,10 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 		tableEntry = tableEnum.next();
 		if (tableEntry != null) {
 		    //XXX remove temp
-			RamCloudVertex temp = new RamCloudVertex(tableEntry.key, this);
-		    Map<String, Object> propMap = temp.convertRcBytesToPropertyMap(tableEntry.value);
+		    // RamCloudVertex temp = new RamCloudVertex(tableEntry.key, this);
+		    Map<String, Object> propMap = RamCloudElement.convertRcBytesToPropertyMapEx(tableEntry.value);
 		    if (propMap.containsKey(key) && propMap.get(key).equals(value)) {
-			vertices.add(temp);
+			vertices.add(new RamCloudVertex(tableEntry.key, this));
 		    }
 		}
 	    }

@@ -26,7 +26,7 @@ public class RamCloudElement implements Element, Serializable {
     private byte[] rcPropTableKey;
     private long rcPropTableId;
     private RamCloudGraph graph;
-/*
+
     private static final ThreadLocal<Kryo> kryo = new ThreadLocal<Kryo>() {
         @Override
         protected Kryo initialValue() {
@@ -43,7 +43,7 @@ public class RamCloudElement implements Element, Serializable {
                  return kryo;
         }
     };
-*/
+
     public RamCloudElement() {
     }
 
@@ -78,6 +78,19 @@ public class RamCloudElement implements Element, Serializable {
 	return convertRcBytesToPropertyMap(propTableEntry.value);
     }
 
+    public static Map<String, Object> convertRcBytesToPropertyMapEx(byte[] byteArray) {
+	if (byteArray == null) {
+	    log.warn("Got a null byteArray argument");
+	    return null;
+	} else if (byteArray.length != 0) {
+	    ByteBufferInput input = new ByteBufferInput(byteArray);
+	    TreeMap map = kryo.get().readObject(input, TreeMap.class);
+	    return map;
+	} else {
+	    return new TreeMap<String, Object>();
+	}
+    }
+
     public Map<String, Object> convertRcBytesToPropertyMap(byte[] byteArray) {
 	if (byteArray == null) {
 	    log.warn("Got a null byteArray argument");
@@ -85,7 +98,7 @@ public class RamCloudElement implements Element, Serializable {
 	} else if (byteArray.length != 0) {
             long startTime = System.nanoTime();
 	    ByteBufferInput input = new ByteBufferInput(byteArray);
-	    TreeMap map = graph.kryo.get().readObject(input, TreeMap.class);
+	    TreeMap map = kryo.get().readObject(input, TreeMap.class);
             long endTime = System.nanoTime();
             log.error("Performance element kryo deserialization key {} {} size {}", this.toString(), endTime - startTime, byteArray.length);
 	    return map;
@@ -98,8 +111,8 @@ public class RamCloudElement implements Element, Serializable {
 	byte[] rcValue;
 
         long startKryoTime = System.nanoTime();
-	ByteBufferOutput output = new ByteBufferOutput(256, 1024 * 1024);
-	graph.kryo.get().writeObject(output, map);
+	ByteBufferOutput output = new ByteBufferOutput(1024 * 1024);
+	kryo.get().writeObject(output, map);
         long midKryoTime = System.nanoTime();
 	rcValue = output.toBytes();
         long endKryoTime = System.nanoTime();
