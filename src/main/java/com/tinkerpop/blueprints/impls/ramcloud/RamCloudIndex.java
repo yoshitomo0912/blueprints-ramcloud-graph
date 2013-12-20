@@ -182,8 +182,10 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 
 	    long serStartTime = System.nanoTime();
 	    byte[] rcValue = convertIndexPropertyMapToRcBytes(map);
-	    long serEndTime = System.nanoTime();
-	    log.error("Performance index kryo serialization [id={}] {} size {}", elmId, serEndTime - serStartTime, rcValue.length);
+	    if(RamCloudGraph.measureSerializeTimeProp == 1) {
+	    	long serEndTime = System.nanoTime();
+	    	log.error("Performance index kryo serialization [id={}] {} size {}", elmId, serEndTime - serStartTime, rcValue.length);
+	    }
 
 	    if (rcValue.length != 0) {
 		if (writeWithRules(rcValue)) {
