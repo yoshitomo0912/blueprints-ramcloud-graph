@@ -99,8 +99,10 @@ public class RamCloudElement implements Element, Serializable {
             long startTime = System.nanoTime();
 	    ByteBufferInput input = new ByteBufferInput(byteArray);
 	    TreeMap map = kryo.get().readObject(input, TreeMap.class);
-            long endTime = System.nanoTime();
-            log.error("Performance element kryo deserialization key {} {} size {}", this.toString(), endTime - startTime, byteArray.length);
+	    if(RamCloudGraph.measureSerializeTimeProp == 1) {
+            	long endTime = System.nanoTime();
+            	log.error("Performance element kryo deserialization key {} {} size {}", this.toString(), endTime - startTime, byteArray.length);
+	    }
 	    return map;
 	} else {
 	    return new TreeMap<String, Object>();
@@ -115,8 +117,10 @@ public class RamCloudElement implements Element, Serializable {
 	kryo.get().writeObject(output, map);
         long midKryoTime = System.nanoTime();
 	rcValue = output.toBytes();
-        long endKryoTime = System.nanoTime();
-        log.error("Performance element kryo serialization key {} mid {}, total {}, size {}", this.toString(), midKryoTime - startKryoTime, endKryoTime - startKryoTime, rcValue.length);
+	if(RamCloudGraph.measureSerializeTimeProp == 1) {
+        	long endKryoTime = System.nanoTime();
+        	log.error("Performance element kryo serialization key {} mid {}, total {}, size {}", this.toString(), midKryoTime - startKryoTime, endKryoTime - startKryoTime, rcValue.length);
+	}
 	
 	long startTime = 0;
 	JRamCloud vertTable = graph.getRcClient();

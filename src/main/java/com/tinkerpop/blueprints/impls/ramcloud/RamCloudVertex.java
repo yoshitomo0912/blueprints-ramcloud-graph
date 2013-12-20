@@ -304,9 +304,10 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 				}
 			}
 		}
-
-                long endTime = System.nanoTime();
-                log.error("Performance buildEdgeSetFromProtobuf key {}, {}, size={}", this.toString(), endTime - startTime, edgeList.getSerializedSize());
+		if(RamCloudGraph.measureSerializeTimeProp == 1) {
+                	long endTime = System.nanoTime();
+                	log.error("Performance buildEdgeSetFromProtobuf key {}, {}, size={}", this.toString(), endTime - startTime, edgeList.getSerializedSize());
+		}
 		return edgeSet;
 	}
 
@@ -347,8 +348,10 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 		}
 
 		EdgeListProtoBuf buf = edgeListBuilder.build();
-                long endTime = System.nanoTime();
-                log.error("Performance buildProtoBufFromEdgeSet key {}, {}, size={}", this.toString(), endTime - startTime, buf.getSerializedSize());
+		if(RamCloudGraph.measureSerializeTimeProp == 1) {
+                	long endTime = System.nanoTime();
+                	log.error("Performance buildProtoBufFromEdgeSet key {}, {}, size={}", this.toString(), endTime - startTime, buf.getSerializedSize());
+		}
 		return buf;
 	}
 

@@ -266,8 +266,10 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    }
 	    long startTime = System.nanoTime();
 	    byte[] rcValue = convertIndexPropertyMapToRcBytes(map);
-	    long endTime = System.nanoTime();
-	    log.error("Performance index kryo serialization for removal key {} {} size {}", element, endTime - startTime, rcValue.length);
+	    if(RamCloudGraph.measureSerializeTimeProp == 1) {
+	    	long endTime = System.nanoTime();
+	    	log.error("Performance index kryo serialization for removal key {} {} size {}", element, endTime - startTime, rcValue.length);
+	    }
 
 	    if (rcValue.length == 0) {
 		return;
@@ -395,8 +397,10 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
             long startTime = System.nanoTime();
 	    ByteBufferInput input = new ByteBufferInput(byteArray);
 	    TreeMap map = kryo.get().readObject(input, TreeMap.class);
-            long endTime = System.nanoTime();
-            log.error("Performance index kryo deserialization [id=N/A] {} size {}", endTime - startTime, byteArray.length);
+            if(RamCloudGraph.measureSerializeTimeProp == 1) {
+            	long endTime = System.nanoTime();
+                log.error("Performance index kryo deserialization [id=N/A] {} size {}", endTime - startTime, byteArray.length);
+            }
 	    return map;
 	} else {
 	    return new TreeMap<Object, List<Object>>();
@@ -404,12 +408,14 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
     }
 
     public static byte[] convertIndexPropertyMapToRcBytes(Map<Object, List<Object>> map) {
-        //long startTime = System.nanoTime();
+        long startTime = System.nanoTime();
 	ByteBufferOutput output = new ByteBufferOutput(1024*1024);
 	kryo.get().writeObject(output, map);
 	byte[] bytes = output.toBytes();
-        //long endTime = System.nanoTime();
-        //log.error("Performance index kryo serialization {}", endTime - startTime);
+	if(RamCloudGraph.measureSerializeTimeProp == 1) {
+        	long endTime = System.nanoTime();
+        	log.error("Performance index kryo serialization {}", endTime - startTime);
+	}
 	return bytes;
     }
 
