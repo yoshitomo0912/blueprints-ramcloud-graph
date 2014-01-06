@@ -271,11 +271,11 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 
 		try {
 			JRamCloud vertTable = graph.getRcClient();
-			pm.read_start("RF");
+			pm.read_start("RG");
 			vertTableEntry = vertTable.read(graph.vertTableId, rcKey);
-			pm.read_end("RF");
+			pm.read_end("RG");
 		} catch (Exception e) {
-			pm.read_end("RF");
+			pm.read_end("RG");
 			log.error("{" + toString() + "}: Error reading vertex table entry: {" + e.toString() + "}");
 			return null;
 		}
