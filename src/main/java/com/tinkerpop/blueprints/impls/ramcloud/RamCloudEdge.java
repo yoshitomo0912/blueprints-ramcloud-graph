@@ -14,6 +14,7 @@ import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.impls.ramcloud.PerfMon;
+import edu.stanford.ramcloud.JRamCloud;
 
 public class RamCloudEdge extends RamCloudElement implements Edge {
     private static PerfMon pm = PerfMon.getInstance();
@@ -108,8 +109,9 @@ public class RamCloudEdge extends RamCloudElement implements Edge {
 	boolean inVertexEntryExists;
 
 	try {
+	    JRamCloud edgeTable = graph.getRcClient();
 	    pm.read_start("REdge");
-	    graph.getRcClient().read(graph.edgePropTableId, rcKey);
+	    edgeTable.read(graph.edgePropTableId, rcKey);
 	    pm.read_end("REdge");
 	    edgePropTableEntryExists = true;
 	} catch (Exception e) {
@@ -140,8 +142,9 @@ public class RamCloudEdge extends RamCloudElement implements Edge {
 	// TODO: Existence check costs extra (presently 3 reads), could use option to turn on/off
 	if (!exists()) {
 		// create edge property table
+		JRamCloud edgeTable = graph.getRcClient();
 	        pm.write_start("WEdge");
-		graph.getRcClient().write(graph.edgePropTableId, rcKey, ByteBuffer.allocate(0).array());
+		edgeTable.write(graph.edgePropTableId, rcKey, ByteBuffer.allocate(0).array());
 	        pm.write_end("WEdge");
 
 		outVertex.addEdgeToAdjList(this);

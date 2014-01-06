@@ -270,18 +270,25 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 		EdgeListProtoBuf edgeList;
 
 		try {
-			vertTableEntry = graph.getRcClient().read(graph.vertTableId, rcKey);
+			JRamCloud vertTable = graph.getRcClient();
+			pm.read_start("RG");
+			vertTableEntry = vertTable.read(graph.vertTableId, rcKey);
+			pm.read_end("RG");
 		} catch (Exception e) {
+			pm.read_end("RG");
 			log.error("{" + toString() + "}: Error reading vertex table entry: {" + e.toString() + "}");
 			return null;
 		}
 
 		try {
+			pm.deser_start("DC");
 			edgeList = EdgeListProtoBuf.parseFrom(vertTableEntry.value);
 			Versioned<EdgeListProtoBuf> updatedEdgeList = new Versioned<EdgeListProtoBuf>(edgeList, vertTableEntry.version);
 			this.cachedAdjEdgeList = updatedEdgeList;
+			pm.deser_end("DC");
 			return updatedEdgeList;
 		} catch (InvalidProtocolBufferException e) {
+			pm.deser_end("DC");
 			log.error("{" + toString() + "}: Read malformed edge list: {" + e.toString() + "}");
 			return null;
 		}
