@@ -22,7 +22,6 @@ import com.tinkerpop.blueprints.impls.ramcloud.PerfMon;
 import edu.stanford.ramcloud.JRamCloud;
 
 public class RamCloudElement implements Element, Serializable {
-    private static PerfMon pm = PerfMon.getInstance();
 
     private final static Logger log = LoggerFactory.getLogger(RamCloudGraph.class);
     private byte[] rcPropTableKey;
@@ -58,6 +57,7 @@ public class RamCloudElement implements Element, Serializable {
     protected Map<String, Object> getPropertyMap() {
 	JRamCloud.Object propTableEntry;
 
+	PerfMon pm = PerfMon.getInstance();
 	try {
 	    JRamCloud vertTable = graph.getRcClient();
 	    long startTime = 0;
@@ -101,7 +101,11 @@ public class RamCloudElement implements Element, Serializable {
 	    log.warn("Got a null byteArray argument");
 	    return null;
 	} else if (byteArray.length != 0) {
-            long startTime = System.nanoTime();
+	    PerfMon pm = PerfMon.getInstance();
+	    long startTime = 0;
+	    if(RamCloudGraph.measureSerializeTimeProp == 1) {
+		startTime = System.nanoTime();
+	    }
 	    pm.deser_start("DA");
 	    ByteBufferInput input = new ByteBufferInput(byteArray);
 	    TreeMap map = kryo.get().readObject(input, TreeMap.class);
@@ -118,19 +122,26 @@ public class RamCloudElement implements Element, Serializable {
 
     private void setPropertyMap(Map<String, Object> map) {
 	byte[] rcValue;
+	PerfMon pm = PerfMon.getInstance();
 
-        long startKryoTime = System.nanoTime();
+	long startKryoTime = 0;
+	if(RamCloudGraph.measureSerializeTimeProp == 1) {
+	    startKryoTime = System.nanoTime();
+	}
 	pm.ser_start("SA");
 	ByteBufferOutput output = new ByteBufferOutput(1024 * 1024);
 	kryo.get().writeObject(output, map);
-        long midKryoTime = System.nanoTime();
+	long midKryoTime = 0;
+	if(RamCloudGraph.measureSerializeTimeProp == 1) {
+	    midKryoTime = System.nanoTime();
+	}
 	rcValue = output.toBytes();
 	pm.ser_end("SA");
 	if(RamCloudGraph.measureSerializeTimeProp == 1) {
         	long endKryoTime = System.nanoTime();
         	log.error("Performance element kryo serialization key {} mid {}, total {}, size {}", this.toString(), midKryoTime - startKryoTime, endKryoTime - startKryoTime, rcValue.length);
 	}
-	
+
 	long startTime = 0;
 	JRamCloud vertTable = graph.getRcClient();
 	if (graph.measureRcTimeProp == 1) {
@@ -181,10 +192,10 @@ public class RamCloudElement implements Element, Serializable {
 	}
 
 	long startTime = 0;
-	if (graph.measureBPTimeProp == 1) { 
+	if (graph.measureBPTimeProp == 1) {
 	    startTime = System.nanoTime();
 	}
-	
+
 	Map<String, Object> map = getPropertyMap();
 	oldValue = map.put(key, value);
 	setPropertyMap(map);
@@ -197,7 +208,7 @@ public class RamCloudElement implements Element, Serializable {
 	    RamCloudKeyIndex keyIndex = new RamCloudKeyIndex(graph.kidxVertTableId, key, value, graph, Edge.class);
 	    keyIndex.autoUpdate(key, value, oldValue, this);
 	}
-	
+
 	if (graph.measureBPTimeProp == 1) {
 	    long endTime = System.nanoTime();
 	    if (ret) {
@@ -206,7 +217,7 @@ public class RamCloudElement implements Element, Serializable {
 		log.error("Performance vertex setProperty(key {}) does not index time {}", key, endTime - startTime);
 	    }
 	}
-	
+
     }
 
     @Override

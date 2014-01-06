@@ -27,7 +27,6 @@ import edu.stanford.ramcloud.JRamCloud;
 
 // FIXME Index instance should be representing an Index table, not a IndexTable K-V pair
 public class RamCloudIndex<T extends Element> implements Index<T>, Serializable {
-    private static PerfMon pm = PerfMon.getInstance();
 
     private final static Logger log = LoggerFactory.getLogger(RamCloudGraph.class);
     private RamCloudGraph graph;
@@ -71,7 +70,8 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 
     public boolean exists() {
 	long startTime = 0;
-	
+	PerfMon pm = PerfMon.getInstance();
+
 	try {
 	    JRamCloud.Object vertTableEntry;
 	    JRamCloud vertTable = graph.getRcClient();
@@ -104,6 +104,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	if (!exists()) {
 	    JRamCloud.RejectRules rules = graph.getRcClient().new RejectRules();
 	    rules.setExists();
+	    PerfMon pm = PerfMon.getInstance();
 	    try {
 		JRamCloud vertTable = graph.getRcClient();
 
@@ -380,7 +381,8 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	//log.debug("getIndexPropertyMap() ");
 	JRamCloud.Object propTableEntry;
 	long startTime = 0;
-	
+	PerfMon pm = PerfMon.getInstance();
+
 	try {
 	    JRamCloud vertTable = graph.getRcClient();
 	    if (graph.measureRcTimeProp == 1) {
@@ -414,7 +416,11 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    log.error("Got a null byteArray argument");
 	    return null;
 	} else if (byteArray.length != 0) {
-            long startTime = System.nanoTime();
+	    PerfMon pm = PerfMon.getInstance();
+            long startTime = 0;
+            if(RamCloudGraph.measureSerializeTimeProp == 1) {
+        	startTime = System.nanoTime();
+            }
 	    pm.deser_start("DB");
 	    ByteBufferInput input = new ByteBufferInput(byteArray);
 	    TreeMap map = kryo.get().readObject(input, TreeMap.class);
@@ -430,7 +436,11 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
     }
 
     public static byte[] convertIndexPropertyMapToRcBytes(Map<Object, List<Object>> map) {
-        long startTime = System.nanoTime();
+	PerfMon pm = PerfMon.getInstance();
+	long startTime = 0;
+	if(RamCloudGraph.measureSerializeTimeProp == 1) {
+	    startTime = System.nanoTime();
+	}
 	pm.ser_start("SD");
 	ByteBufferOutput output = new ByteBufferOutput(1024*1024);
 	kryo.get().writeObject(output, map);
@@ -456,6 +466,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    rules.setNeVersion(expectedVersion);
 	}
 
+	PerfMon pm = PerfMon.getInstance();
 	try {
 	    JRamCloud vertTable = graph.getRcClient();
 	    long startTime = 0;

@@ -18,12 +18,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
-import java.util.TreeMap;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.esotericsoftware.kryo2.Kryo;
 import com.sun.jersey.core.util.Base64;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
@@ -41,13 +38,8 @@ import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.impls.ramcloud.PerfMon;
 
 import edu.stanford.ramcloud.JRamCloud;
-import java.nio.ByteOrder;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, TransactionalGraph, Serializable {
-    private PerfMon pm;
-
     private final static Logger log = LoggerFactory.getLogger(RamCloudGraph.class);
 
     private static final ThreadLocal<JRamCloud> RamCloudThreadLocal = new ThreadLocal<JRamCloud>();
@@ -118,11 +110,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	System.loadLibrary("edu_stanford_ramcloud_JRamCloud");
     }
 
-    public RamCloudGraph() {
-        pm = PerfMon.getInstance();
-        if ( pm == null ){
-	    log.error("PerfMon get Instance returned null");
-        }
+    private RamCloudGraph() {
     }
 
 
@@ -144,10 +132,6 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	log.debug("VERT_TABLE:{}, VERT_PROP_TABLE:{}, EDGE_PROP_TABLE:{}, IDX_VERT_TABLE:{}, IDX_EDGE_TABLE:{}, KIDX_VERT_TABLE:{}, KIDX_EDGE_TABLE:{}", vertTableId, vertPropTableId, edgePropTableId, idxVertTableId, idxEdgeTableId, kidxVertTableId, kidxEdgeTableId);
 	nextVertexId = 0;
         initInstance();
-        pm = PerfMon.getInstance();
-        if ( pm == null ){
-	    log.error("PerfMon get Instance returned null");
-        }
     }
 
     public JRamCloud getRcClient() {
@@ -170,7 +154,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	long Tstamp1 = 0;
 	long Tstamp2 = 0;
 
-	if (measureBPTimeProp == 1) { 
+	if (measureBPTimeProp == 1) {
 	    startTime = System.nanoTime();
 	}
 	Long longId;
@@ -198,18 +182,18 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	    log.warn("ID argument {" + id.toString() + "} of type {" + id.getClass() + "} is not supported. Returning null.");
 	    return null;
 	}
-	if (measureBPTimeProp == 1) { 
+	if (measureBPTimeProp == 1) {
 	    Tstamp1 = System.nanoTime();
 	}
 	RamCloudVertex newVertex = new RamCloudVertex(longId, this);
-	if (measureBPTimeProp == 1) { 
+	if (measureBPTimeProp == 1) {
 	    Tstamp2 = System.nanoTime();
 	    log.error("Performance addVertex [id={}] : Calling create at {}", longId, Tstamp2);
 	}
 
 	try {
 	    newVertex.create();
-	    if (measureBPTimeProp == 1) { 
+	    if (measureBPTimeProp == 1) {
 		long endTime = System.nanoTime();
 		log.error("Performance addVertex [id={}] : genid {} newVerex {} create {} total time {}", longId, Tstamp1 - startTime, Tstamp2 - Tstamp1, endTime - Tstamp2, endTime - startTime);
 	    }
@@ -345,21 +329,20 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 
     @Override
     public Iterable<Vertex> getVertices(String key, Object value) {
-
 	long startTime = 0;
 	long Tstamp1 = 0;
 	long Tstamp2 = 0;
 	long Tstamp3 = 0;
-	if (measureBPTimeProp == 1) { 
+	if (measureBPTimeProp == 1) {
 	    startTime = System.nanoTime();
 	    log.error("Performance getVertices(key {}) start at {}", key, startTime);
 	}
-	
+
 	List<Vertex> vertices = new ArrayList<Vertex>();
 	List<Object> vertexList = null;
 
 	JRamCloud vertTable = getRcClient();
-	if (measureBPTimeProp == 1) { 
+	if (measureBPTimeProp == 1) {
 	    Tstamp1 = System.nanoTime();
 	    log.error("Performance getVertices(key {}) Calling indexedKeys.contains(key) at {}", key, Tstamp1);
 	}
@@ -367,18 +350,18 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	int mreadMax = 400;
 
 	if (indexedKeys.contains(key)) {
-	    if (measureBPTimeProp == 1) { 
+	    if (measureBPTimeProp == 1) {
 	      Tstamp2 = System.nanoTime();
 	      log.error("Performance getVertices(key {}) Calling new RamCloudKeyIndex at {}", key, Tstamp2);
 	    }
 	    RamCloudKeyIndex KeyIndex = new RamCloudKeyIndex(kidxVertTableId, key, value, this, Vertex.class);
-	    if (measureBPTimeProp == 1) { 
+	    if (measureBPTimeProp == 1) {
 	      Tstamp3 = System.nanoTime();
 	      log.error("Performance getVertices(key {}) Calling KeyIndex.GetElmIdListForPropValue at {}", key, Tstamp3);
 	    }
 	    vertexList = KeyIndex.getElmIdListForPropValue(value.toString());
 	    if (vertexList == null) {
-		if (measureBPTimeProp == 1) { 
+		if (measureBPTimeProp == 1) {
 		    long endTime = System.nanoTime();
 		    log.error("Performance getVertices(key {}) does not exists : getRcClient {} indexedKeys.contains(key) {} new_RamCloudKeyIndex {} KeyIndex.get..Value {} total {} diff {}", key, Tstamp1-startTime, Tstamp2-Tstamp1,Tstamp3-Tstamp2, endTime-Tstamp3, endTime - startTime, (endTime-startTime)- (Tstamp1-startTime)- (Tstamp2-Tstamp1)- (Tstamp3-Tstamp2)-(endTime-Tstamp3));
 		}
@@ -407,6 +390,8 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	    }
 
 	    if (vertexNum != 0) {
+		PerfMon pm = PerfMon.getInstance();
+
 		long startTime2 = 0;
 		if (measureRcTimeProp == 1) {
 		    startTime2 = System.nanoTime();
@@ -414,7 +399,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 		pm.read_start("RB");
 		JRamCloud.Object outvertPropTable[] = vertTable.multiRead(vertPropTableMread);
 		pm.read_end("RB");
-		if (measureRcTimeProp == 1) { 
+		if (measureRcTimeProp == 1) {
 		    long endTime2 = System.nanoTime();
 		    log.error("Performance index multiread(key {}, number {}) time {}", key, vertexNum, endTime2 - startTime2);
 		}
@@ -441,8 +426,8 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 		}
 	    }
 	}
-	
-	if (measureBPTimeProp == 1) { 
+
+	if (measureBPTimeProp == 1) {
 		long endTime = System.nanoTime();
 		log.error("Performance getVertices exists total time {}.", endTime - startTime);
 	}
