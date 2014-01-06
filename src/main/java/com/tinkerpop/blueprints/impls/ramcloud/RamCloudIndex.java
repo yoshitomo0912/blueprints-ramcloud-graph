@@ -21,10 +21,13 @@ import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Index;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 
+import com.tinkerpop.blueprints.impls.ramcloud.PerfMon;
+
 import edu.stanford.ramcloud.JRamCloud;
 
 // FIXME Index instance should be representing an Index table, not a IndexTable K-V pair
 public class RamCloudIndex<T extends Element> implements Index<T>, Serializable {
+    private static PerfMon pm = PerfMon.getInstance();
 
     private final static Logger log = LoggerFactory.getLogger(RamCloudGraph.class);
     private RamCloudGraph graph;
@@ -77,7 +80,9 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 		startTime = System.nanoTime();
 	    }
 	    //vertTableEntry = graph.getRcClient().read(tableId, rcKey);
+	    pm.read_start("RC");
 	    vertTableEntry = vertTable.read(tableId, rcKey);
+	    pm.read_end("RC");
 	    if (graph.measureRcTimeProp == 1) {
 		long endTime = System.nanoTime();
 		log.error("Performance index exists(indexName {}) read time {}", indexName, endTime - startTime);
@@ -85,6 +90,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    indexVersion = vertTableEntry.version;
 	    return true;
 	} catch (Exception e) {
+	    pm.read_end("RC");
 	    if (graph.measureRcTimeProp == 1) {
 		long endTime = System.nanoTime();
 		log.error("Performance index exists(indexName {}) exception read time {}", indexName, endTime - startTime);
@@ -106,12 +112,15 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 		    startTime = System.nanoTime();
 		}
 		//graph.getRcClient().writeRule(tableId, rcKey, ByteBuffer.allocate(0).array(), rules);
+		pm.write_start("WB");
 		vertTable.writeRule(tableId, rcKey, ByteBuffer.allocate(0).array(), rules);
+		pm.write_end("WB");
 		if (graph.measureRcTimeProp == 1) {
 		    long endTime = System.nanoTime();
 		    log.error("Performance index create(indexName {}) write time {}", indexName, endTime - startTime);
 		}
 	    } catch (Exception e) {
+		pm.write_end("WB");
 		log.info(toString() + ": Write create index list: " + e.toString());
 	    }
 	}
@@ -180,12 +189,13 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 		values.add(elmId);
 	    }
 
-	    long serStartTime = System.nanoTime();
+            //Masa commented out the following measurement b/c Serialization delay is measured in onvertIndexPropertyMapToRcBytes(map)
+	    //long serStartTime = System.nanoTime();
 	    byte[] rcValue = convertIndexPropertyMapToRcBytes(map);
-	    if(RamCloudGraph.measureSerializeTimeProp == 1) {
-	    	long serEndTime = System.nanoTime();
-	    	log.error("Performance index kryo serialization [id={}] {} size {}", elmId, serEndTime - serStartTime, rcValue.length);
-	    }
+	    //if(RamCloudGraph.measureSerializeTimeProp == 1) {
+	    //	long serEndTime = System.nanoTime();
+	    //	log.error("Performance index kryo serialization [id={}] {} size {}", elmId, serEndTime - serStartTime, rcValue.length);
+            //}
 
 	    if (rcValue.length != 0) {
 		if (writeWithRules(rcValue)) {
@@ -266,12 +276,17 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 		// no change to DB so exit now
 		return;
 	    }
-	    long startTime = System.nanoTime();
+	    //long startTime = System.nanoTime();
+	    //if(RamCloudGraph.measureSerializeTimeProp == 1) {
+	    //   pm.ser_start("SC");
+	    //}
 	    byte[] rcValue = convertIndexPropertyMapToRcBytes(map);
-	    if(RamCloudGraph.measureSerializeTimeProp == 1) {
-	    	long endTime = System.nanoTime();
-	    	log.error("Performance index kryo serialization for removal key {} {} size {}", element, endTime - startTime, rcValue.length);
-	    }
+	    //if(RamCloudGraph.measureSerializeTimeProp == 1) {
+	    //    pm.ser_end("SC");
+	    	//long endTime = System.nanoTime();
+		//pm.ser_add(endTime - startTime);
+	    	//log.error("Performance index kryo serialization for removal key {} {} size {}", element, endTime - startTime, rcValue.length);
+	    //}
 
 	    if (rcValue.length == 0) {
 		return;
@@ -372,13 +387,16 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 		startTime = System.nanoTime();
 	    }
 	    //propTableEntry = graph.getRcClient().read(tableId, rcKey);
+	    pm.read_start("RD");
 	    propTableEntry = vertTable.read(tableId, rcKey);
+	    pm.read_end("RD");
 	    if (graph.measureRcTimeProp == 1) {
 		long endTime = System.nanoTime();
 		log.error("Performance readIndexPropertyMapFromDB(indexName {}) read time {}", indexName, endTime - startTime);
 	    }
 	    indexVersion = propTableEntry.version;
 	} catch (Exception e) {
+	    pm.read_end("RD");
 	    indexVersion = 0;
 	    if (graph.measureRcTimeProp == 1) {
 		long endTime = System.nanoTime();
@@ -397,8 +415,10 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    return null;
 	} else if (byteArray.length != 0) {
             long startTime = System.nanoTime();
+	    pm.deser_start("DB");
 	    ByteBufferInput input = new ByteBufferInput(byteArray);
 	    TreeMap map = kryo.get().readObject(input, TreeMap.class);
+	    pm.deser_end("DB");
             if(RamCloudGraph.measureSerializeTimeProp == 1) {
             	long endTime = System.nanoTime();
                 log.error("Performance index kryo deserialization [id=N/A] {} size {}", endTime - startTime, byteArray.length);
@@ -411,9 +431,11 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 
     public static byte[] convertIndexPropertyMapToRcBytes(Map<Object, List<Object>> map) {
         long startTime = System.nanoTime();
+	pm.ser_start("SD");
 	ByteBufferOutput output = new ByteBufferOutput(1024*1024);
 	kryo.get().writeObject(output, map);
 	byte[] bytes = output.toBytes();
+        pm.ser_end("SD");
 	if(RamCloudGraph.measureSerializeTimeProp == 1) {
         	long endTime = System.nanoTime();
         	log.error("Performance index kryo serialization {}", endTime - startTime);
@@ -440,12 +462,15 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    if (graph.measureRcTimeProp == 1) {
 		startTime = System.nanoTime();
 	    }
+	    pm.write_start("WC");
 	    vertTable.writeRule(tableId, rcKey, rcValue, rules);
+	    pm.write_end("WC");
 	    if (graph.measureRcTimeProp == 1) {
 		long endTime = System.nanoTime();
 		log.error("Performance writeWithRules(indexName {}) write time {}", rcKeyToIndexName(rcKey), endTime - startTime);
 	    }
 	} catch (Exception e) {
+            pm.write_end("WC");
 	    log.debug("Cond. Write index property: " + new String(rcKey) + " failed " + e.toString() + " expected version: " + expectedVersion);
 	    return false;
 	}

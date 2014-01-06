@@ -17,10 +17,12 @@ import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
+import com.tinkerpop.blueprints.impls.ramcloud.PerfMon;
 
 import edu.stanford.ramcloud.JRamCloud;
 
 public class RamCloudElement implements Element, Serializable {
+    private static PerfMon pm = PerfMon.getInstance();
 
     private final static Logger log = LoggerFactory.getLogger(RamCloudGraph.class);
     private byte[] rcPropTableKey;
@@ -62,7 +64,9 @@ public class RamCloudElement implements Element, Serializable {
 	    if (graph.measureRcTimeProp == 1) {
 		startTime = System.nanoTime();
 	    }
+	    pm.read_start("RA");
 	    propTableEntry = vertTable.read(rcPropTableId, rcPropTableKey);
+	    pm.read_end("RA");
 	    if (graph.measureRcTimeProp == 1) {
 		long endTime = System.nanoTime();
 		log.error("Performance getPropertyMap read time {}", endTime - startTime);
@@ -71,6 +75,7 @@ public class RamCloudElement implements Element, Serializable {
 		log.warn("Element[id={}] property map size is near 1MB limit!", new String(rcPropTableKey));
 	    }
 	} catch (Exception e) {
+	    pm.read_end("RA");
 	    log.warn("Element does not have a property table entry!");
 	    return null;
 	}
@@ -97,8 +102,10 @@ public class RamCloudElement implements Element, Serializable {
 	    return null;
 	} else if (byteArray.length != 0) {
             long startTime = System.nanoTime();
+	    pm.deser_start("DA");
 	    ByteBufferInput input = new ByteBufferInput(byteArray);
 	    TreeMap map = kryo.get().readObject(input, TreeMap.class);
+	    pm.deser_end("DA");
 	    if(RamCloudGraph.measureSerializeTimeProp == 1) {
             	long endTime = System.nanoTime();
             	log.error("Performance element kryo deserialization key {} {} size {}", this.toString(), endTime - startTime, byteArray.length);
@@ -113,10 +120,12 @@ public class RamCloudElement implements Element, Serializable {
 	byte[] rcValue;
 
         long startKryoTime = System.nanoTime();
+	pm.ser_start("SA");
 	ByteBufferOutput output = new ByteBufferOutput(1024 * 1024);
 	kryo.get().writeObject(output, map);
         long midKryoTime = System.nanoTime();
 	rcValue = output.toBytes();
+	pm.ser_end("SA");
 	if(RamCloudGraph.measureSerializeTimeProp == 1) {
         	long endKryoTime = System.nanoTime();
         	log.error("Performance element kryo serialization key {} mid {}, total {}, size {}", this.toString(), midKryoTime - startKryoTime, endKryoTime - startKryoTime, rcValue.length);
@@ -127,7 +136,9 @@ public class RamCloudElement implements Element, Serializable {
 	if (graph.measureRcTimeProp == 1) {
 	    startTime = System.nanoTime();
 	}
+	pm.write_start("WA");
 	vertTable.write(rcPropTableId, rcPropTableKey, rcValue);
+	pm.write_end("WA");
 	if (graph.measureRcTimeProp == 1) {
 	    long endTime = System.nanoTime();
 	    log.error("Performance setPropertyMap write time key {} {}", this.toString(), endTime - startTime);
