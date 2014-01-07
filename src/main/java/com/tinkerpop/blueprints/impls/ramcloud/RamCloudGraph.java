@@ -168,18 +168,18 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	    try {
 		longId = Long.parseLong((String) id, 10);
 	    } catch (NumberFormatException e) {
-		log.warn("ID argument {" + id.toString() + "} of type {" + id.getClass() + "} is not a parseable long number: {" + e.toString() + "}");
+		log.warn("ID argument {} of type {} is not a parseable long number: {}", id, id.getClass(), e);
 		return null;
 	    }
 	} else if (id instanceof byte[]) {
 	    try {
 		longId = ByteBuffer.wrap((byte[]) id).getLong();
 	    } catch (BufferUnderflowException e) {
-		log.warn("ID argument {" + id.toString() + "} of type {" + id.getClass() + "} is not a parseable long number: {" + e.toString() + "}");
+		log.warn("ID argument {} of type {} is not a parseable long number: {}", id, id.getClass(), e);
 		return null;
 	    }
 	} else {
-	    log.warn("ID argument {" + id.toString() + "} of type {" + id.getClass() + "} is not supported. Returning null.");
+	    log.warn("ID argument {} of type {} is not supported. Returning null.", id, id.getClass());
 	    return null;
 	}
 	if (measureBPTimeProp == 1) {
@@ -197,10 +197,10 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 		long endTime = System.nanoTime();
 		log.error("Performance addVertex [id={}] : genid {} newVerex {} create {} total time {}", longId, Tstamp1 - startTime, Tstamp2 - Tstamp1, endTime - Tstamp2, endTime - startTime);
 	    }
-	    log.info("Added vertex: [id=" + longId + "]");
+	    log.info("Added vertex: [id={}]", longId);
 	    return newVertex;
 	} catch (IllegalArgumentException e) {
-	    log.error("Tried to create vertex failed {" + newVertex.toString() + "}: {" + e.getMessage() + "}");
+	    log.error("Tried to create vertex failed {" + newVertex + "}", e);
 	    return null;
 	}
     }
@@ -229,10 +229,10 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 			ObjectInputStream ois = new ObjectInputStream(bais);
 			propMap = (Map<String, Long>) ois.readObject();
 		    } catch (IOException e) {
-			log.error("Got an exception while deserializing element''s property map: {" + e.toString() + "}");
+			log.error("Got an exception while deserializing element's property map: ", e);
 			return;
 		    } catch (ClassNotFoundException e) {
-			log.error("Got an exception while deserializing element''s property map: {" + e.toString() + "}");
+			log.error("Got an exception while deserializing element's property map: ", e);
 			return;
 		    }
 		} else {
@@ -252,7 +252,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 		    oot.writeObject(propMap);
 		    rcValue = baos.toByteArray();
 		} catch (IOException e) {
-		    log.error("Got an exception while serializing element''s property map: {" + e.toString() + "}");
+		    log.error("Got an exception while serializing element's property map", e);
 		    return;
 		}
 		JRamCloud.RejectRules rules = rcClient.new RejectRules();
@@ -262,7 +262,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 		    instanceId = curInstanceId;
 		    break;
 		} catch (Exception ex) {
-		    log.debug("Cond. Write increment Vertex property: " + ex.toString());
+		    log.debug("Cond. Write increment Vertex property: ", ex);
 		    instanceEntry = getRcClient().read(instanceTableId, "nextInstanceId".getBytes());
 		    continue;
 		}
@@ -286,18 +286,18 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	    try {
 		longId = Long.parseLong((String) id, 10);
 	    } catch (NumberFormatException e) {
-		log.warn("ID argument {" + id.toString() + "} of type {" + id.getClass() +"} is not a parseable long number: {" + e.toString() + "}");
+		log.warn("ID argument {} of type {} is not a parseable long number: {}", id, id.getClass(), e);
 		return null;
 	    }
 	} else if (id instanceof byte[]) {
 	    try {
 		longId = ByteBuffer.wrap((byte[]) id).getLong();
 	    } catch (BufferUnderflowException e) {
-		log.warn("ID argument {" + id.toString() + "} of type {" + id.getClass() + "} is not a parseable long number: {" + e.toString() + "}");
+		log.warn("ID argument {} of type {} is not a parseable long number: {}", id, id.getClass(), e);
 		return null;
 	    }
 	} else {
-	    log.warn("ID argument {" + id.toString() + "} of type {" + id.getClass() + "} is not supported. Returning null.");
+	    log.warn("ID argument {} of type {} is not supported. Returning null.", id, id.getClass());
 	    return null;
 	}
 
@@ -393,7 +393,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	    }
 
 	    if (vertexNum != 0) {
-		
+
 		long startTime2 = 0;
 		if (measureRcTimeProp == 1) {
 		    startTime2 = System.nanoTime();
@@ -439,7 +439,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 
     @Override
     public Edge addEdge(Object id, Vertex outVertex, Vertex inVertex, String label) throws IllegalArgumentException {
-	log.info("Adding edge: [id={" + id + "}, outVertex={" + outVertex + "}, inVertex={" + inVertex + "}, label={" + label + "}]");
+	log.info("Adding edge: [id={}, outVertex={}, inVertex={}, label={}]", id, outVertex, inVertex, label);
 
 	if (label == null) {
 	    throw ExceptionFactory.edgeLabelCanNotBeNull();
@@ -452,10 +452,11 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 		newEdge.create();
 		return newEdge;
 	    } catch (Exception e) {
-		log.warn("Tried to create edge failed: {" + newEdge.toString() + "}: {" + e.toString() + "}");
+		log.warn("Tried to create edge failed: {" + newEdge.toString() + "}: ", e);
 
 		if (e instanceof NoSuchElementException) {
-		    log.warn("addEdge retry " + i);
+		    // FIXME raised loglevel for measurent. Was warn
+		    log.error("addEdge RETRYING {}", i);
 		    continue;
 		}
 	    }
@@ -474,12 +475,12 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	} else if (id instanceof String) {
 	    bytearrayId = Base64.decode(((String) id));
 	} else {
-	    log.warn("ID argument {" + id.toString() + "} of type {" + id.getClass() + "} is not supported. Returning null.");
+	    log.warn("ID argument {} of type {} is not supported. Returning null.", id, id.getClass());
 	    return null;
 	}
 
 	if (!RamCloudEdge.isValidEdgeId(bytearrayId)) {
-	    log.warn("ID argument {" + id.toString() + "} of type {" + id.getClass() + "} is malformed. Returning null.");
+	    log.warn("ID argument {} of type {} is malformed. Returning null.", id, id.getClass());
 	    return null;
 	}
 
