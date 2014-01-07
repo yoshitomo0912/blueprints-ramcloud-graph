@@ -312,7 +312,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
     }
 
     // FIXME this methods should not be defined here
-    public static <T extends Element> void removeElement(long tableId, T element, RamCloudGraph graph) {
+    public <T extends Element> void removeElement(long tableId, T element, RamCloudGraph graph) {
 	JRamCloud.TableEnumerator tableEnum = graph.getRcClient().new TableEnumerator(tableId);
 
 	while (tableEnum.hasNext()) {
