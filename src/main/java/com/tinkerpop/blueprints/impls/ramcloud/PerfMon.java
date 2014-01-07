@@ -52,9 +52,6 @@ public final class PerfMon {
    }
 
    private void clear(){
-        if(! Thread.currentThread().getName().equals("main")){
-		return;
-        }
    	read_latency_sum=0L;
    	read_latency_cnt=0L;
    	write_latency_sum=0L;
@@ -64,6 +61,7 @@ public final class PerfMon {
    	deserialize_latency_sum=0L;
    	deserialize_latency_cnt=0L;
 	read_flag=write_flag=deser_flag=ser_flag=0;
+	addflowpath_time = addflowentry_time = addflowentry_cnt = 0;
         //log.error("flag cleared");
    }
    public void addswitch_start(){
@@ -154,7 +152,7 @@ public final class PerfMon {
        long sum;
        delta = System.nanoTime() - addflowentry_time;
        sum = read_latency_sum + write_latency_sum + serialize_latency_sum +  deserialize_latency_sum;
-       log.error("Performance add_flowentry {} ( {} ports ) read {} ({}) write {} ({}) serialize {} ({}) deserialize {} ({}) rwsd total {} other {} ({})",
+       log.error("Performance add_flowentry {} ( {} flows ) read {} ({}) write {} ({}) serialize {} ({}) deserialize {} ({}) rwsd total {} other {} ({})",
 	delta, addflowentry_cnt, read_latency_sum, read_latency_cnt, write_latency_sum, write_latency_cnt, serialize_latency_sum, serialize_latency_cnt, deserialize_latency_sum, deserialize_latency_cnt, sum, delta-sum, (delta-sum)*100.0/(delta));
    }
 
