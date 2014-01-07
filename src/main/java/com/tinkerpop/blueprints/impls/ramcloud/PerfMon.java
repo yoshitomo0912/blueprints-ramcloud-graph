@@ -20,7 +20,7 @@ public final class PerfMon {
    private long read_latency_sum;
    private long read_latency_cnt;
    private int read_flag;
-   
+
    private long multiread_latency_sum;
    private long multiread_latency_cnt;
    private int multiread_flag;
@@ -28,23 +28,23 @@ public final class PerfMon {
    private long indexread_latency_sum;
    private long indexread_latency_cnt;
    private int indexread_flag;
-   
+
    private long write_latency_sum;
    private long write_latency_cnt;
    private int write_flag;
 
    private long indexwrite_latency_sum;
    private long indexwrite_latency_cnt;
-   private int indexwrite_flag;   
-   
+   private int indexwrite_flag;
+
    private long serialize_latency_sum;
    private long serialize_latency_cnt;
    private int ser_flag;
 
    private long indexserialize_latency_sum;
    private long indexserialize_latency_cnt;
-   private int indexser_flag;   
-   
+   private int indexser_flag;
+
    private long deserialize_latency_sum;
    private long deserialize_latency_cnt;
    private int deser_flag;
@@ -52,7 +52,7 @@ public final class PerfMon {
    private long indexdeserialize_latency_sum;
    private long indexdeserialize_latency_cnt;
    private int indexdeser_flag;
-   
+
    private long addsw_time;
    private long addport_time;
    private long addlink_time;
@@ -99,11 +99,11 @@ public final class PerfMon {
 	addflowpath_time = addflowentry_time = addflowentry_cnt = 0;
         //log.error("flag cleared");
    }
-   
+
    private long getSum(){
        return read_latency_sum + multiread_latency_sum + indexread_latency_sum + write_latency_sum + indexwrite_latency_sum + serialize_latency_sum + indexserialize_latency_sum + deserialize_latency_sum + indexdeserialize_latency_sum;
-   }   
-   
+   }
+
    public void addswitch_start(){
         if(measureAllTimeProp==0)
 		return;
@@ -243,7 +243,7 @@ public final class PerfMon {
    }
 
    public void read_start(String key){
-       	log.error("read_start " + key);
+       	log.error("read_start {}", key);
         if(measureAllTimeProp==0)
 		return;
 	read_time=System.nanoTime();
@@ -270,7 +270,7 @@ public final class PerfMon {
 	read_flag = 0;
    }
    public void multiread_start(String key){
-        log.error("multiread_start " + key);
+        log.error("multiread start {}", key);
         if(measureAllTimeProp==0)
 		return;
 	multiread_time=System.nanoTime();
@@ -290,22 +290,22 @@ public final class PerfMon {
         multiread_latency_cnt ++;
 
 	if ( debug==1 )
-            log.error("read end {}", key);
+            log.error("multiread end {}", key);
         if ( multiread_flag != 1){
-            log.error("read_end called before read_start");
+            log.error("multiread_end called before multiread_start");
 	}
 	multiread_flag = 0;
    }
    public void indexread_start(String key){
-        log.error("indexread_start " + key);
+        log.error("indexread_start {}", key);
         if(measureAllTimeProp==0)
 		return;
 	indexread_time=System.nanoTime();
 
 	if ( debug==1 )
-            log.error("read start {}", key);
+            log.error("indexread start {}", key);
         if ( indexread_flag != 0){
-            log.error("read_start called twice");
+            log.error("indexread_start called twice");
 	}
 
 	indexread_flag = 1;
@@ -319,12 +319,12 @@ public final class PerfMon {
 	if ( debug==1 )
             log.error("indexread end {}", key);
         if ( indexread_flag != 1){
-            log.error("indexread_end called before read_start");
+            log.error("indexread_end called before indexread_start");
 	}
 	indexread_flag = 0;
    }
    public void write_start(String key){
-        log.error("write_start " + key);
+        log.error("write_start {}", key);
         if(measureAllTimeProp==0)
 		return;
 	write_time = System.nanoTime();
@@ -344,12 +344,12 @@ public final class PerfMon {
         write_latency_sum += System.nanoTime() - write_time;
         write_latency_cnt ++;
         if ( write_flag != 1){
-            log.error("write_end claled before write_start");
+            log.error("write_end called before write_start");
 	}
 	write_flag = 0;
    }
    public void indexwrite_start(String key){
-        log.error("indexwrite_start " + key);
+        log.error("indexwrite_start {}", key);
         if(measureAllTimeProp==0)
 		return;
 	indexwrite_time = System.nanoTime();
@@ -365,16 +365,16 @@ public final class PerfMon {
         if(measureAllTimeProp==0)
 		return;
 	if ( debug==1 )
-            log.error("write end {}", key);
+            log.error("indexwrite end {}", key);
         indexwrite_latency_sum += System.nanoTime() - indexwrite_time;
         indexwrite_latency_cnt ++;
         if ( indexwrite_flag != 1){
-            log.error("indexwrite_end claled before write_start");
+            log.error("indexwrite_end called before indexwrite_start");
 	}
 	indexwrite_flag = 0;
    }
    public void ser_start(String key){
-        log.error("ser_start " + key);
+        log.error("ser_start {}", key);
         if(measureAllTimeProp==0)
 		return;
 	ser_time = System.nanoTime();
@@ -400,15 +400,15 @@ public final class PerfMon {
 
    }
    public void indexser_start(String key){
-        log.error("indexser_start " + key);
+        log.error("indexser_start {}", key);
         if(measureAllTimeProp==0)
 		return;
 	indexser_time = System.nanoTime();
 
 	if ( debug==1 )
-            log.error("ser start {}", key);
+            log.error("indexser start {}", key);
         if ( indexser_flag != 0 ){
-            	log.error("ser_start called twice");
+            	log.error("indexser_start called twice");
 	}
 	indexser_flag = 1;
    }
@@ -416,17 +416,17 @@ public final class PerfMon {
         if(measureAllTimeProp==0)
 		return;
 	if ( debug==1 )
-            log.error("ser end {}", key);
+            log.error("indexser end {}", key);
         indexserialize_latency_sum += System.nanoTime() - indexser_time;
         indexserialize_latency_cnt ++;
         if ( indexser_flag != 1 ){
-            	log.error("ser_end called before ser_start");
+            	log.error("indexser_end called before indexser_start");
 	}
 	indexser_flag = 0;
 
    }
    public void deser_start(String key){
-        log.error("deser_start " + key);
+        log.error("deser_start {}", key);
         if(measureAllTimeProp==0)
 		return;
 	deser_time = System.nanoTime();
@@ -453,16 +453,16 @@ public final class PerfMon {
 	deser_flag = 0;
    }
    public void indexdeser_start(String key){
-        log.error("indexdeser_start " + key);
+        log.error("indexdeser_start {}", key);
         if(measureAllTimeProp==0)
 		return;
 	indexdeser_time = System.nanoTime();
 
 	if ( debug==1 )
-            log.error("deser start {}", key);
+            log.error("indexdeser start {}", key);
 	indexdeser_time = System.nanoTime();
         if ( indexdeser_flag != 0){
-            log.error("deser_start called twice");
+            log.error("indexdeser_start called twice");
 	}
 	indexdeser_flag = 1;
    }
@@ -470,12 +470,12 @@ public final class PerfMon {
         if(measureAllTimeProp==0)
 		return;
 	if ( debug==1 )
-            log.error("deser end {}", key);
+            log.error("indexdeser end {}", key);
 
         indexdeserialize_latency_sum += System.nanoTime() - indexdeser_time;
         indexdeserialize_latency_cnt ++;
         if ( indexdeser_flag != 1){
-            log.error("deser_end called before deser_start");
+            log.error("indexdeser_end called before indexdeser_start");
 	}
 	indexdeser_flag = 0;
    }
