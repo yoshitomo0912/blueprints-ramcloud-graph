@@ -271,24 +271,24 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 		PerfMon pm = PerfMon.getInstance();
 		try {
 			JRamCloud vertTable = graph.getRcClient();
-			pm.read_start("RG");
+			pm.read_start("RamCloudVertex updateCachedAdjEdgeList()");
 			vertTableEntry = vertTable.read(graph.vertTableId, rcKey);
-			pm.read_end("RG");
+			pm.read_end("RamCloudVertex updateCachedAdjEdgeList()");
 		} catch (Exception e) {
-			pm.read_end("RG");
+			pm.read_end("RamCloudVertex updateCachedAdjEdgeList()");
 			log.error("{" + toString() + "}: Error reading vertex table entry: {" + e.toString() + "}");
 			return null;
 		}
 
 		try {
-			pm.deser_start("DC");
+			pm.deser_start("RamCloudVertex updateCachedAdjEdgeList()");
 			edgeList = EdgeListProtoBuf.parseFrom(vertTableEntry.value);
 			Versioned<EdgeListProtoBuf> updatedEdgeList = new Versioned<EdgeListProtoBuf>(edgeList, vertTableEntry.version);
 			this.cachedAdjEdgeList = updatedEdgeList;
-			pm.deser_end("DC");
+			pm.deser_end("RamCloudVertex updateCachedAdjEdgeList()");
 			return updatedEdgeList;
 		} catch (InvalidProtocolBufferException e) {
-			pm.deser_end("DC");
+			pm.deser_end("RamCloudVertex updateCachedAdjEdgeList()");
 			log.error("{" + toString() + "}: Read malformed edge list: {" + e.toString() + "}");
 			return null;
 		}
@@ -306,7 +306,7 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 		if(RamCloudGraph.measureSerializeTimeProp == 1) {
 		    startTime = System.nanoTime();
 		}
-		pm.ser_start("SE");
+		pm.ser_start("RamCloudVertex buildEdgeSetFromProtobuf()");
 		Set<RamCloudEdge> edgeSet = new HashSet<RamCloudEdge>( edgeList.getEdgeCount() );
 		for (EdgeProtoBuf edge : edgeList.getEdgeList()) {
 			if ((direction.equals(Direction.BOTH) || (edge.getOutgoing() ^ direction.equals(Direction.IN)))
@@ -319,7 +319,7 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 				}
 			}
 		}
-		pm.ser_end("SE");
+		pm.ser_end("RamCloudVertex buildEdgeSetFromProtobuf()");
 		if(RamCloudGraph.measureSerializeTimeProp == 1) {
                  	long endTime = System.nanoTime();
                 	log.error("Performance buildEdgeSetFromProtobuf key {}, {}, size={}", this.toString(), endTime - startTime, edgeList.getSerializedSize());
@@ -336,7 +336,7 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 		    startTime = System.nanoTime();
 		}
 
-		pm.ser_start("SF");
+		pm.ser_start("RamCloudVertex buildProtoBufFromEdgeSet()");
 
 		EdgeListProtoBuf.Builder edgeListBuilder = EdgeListProtoBuf.newBuilder();
 		EdgeProtoBuf.Builder edgeBuilder = EdgeProtoBuf.newBuilder();
@@ -370,7 +370,7 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 		}
 
 		EdgeListProtoBuf buf = edgeListBuilder.build();
-		pm.ser_end("SF");
+		pm.ser_end("RamCloudVertex buildProtoBufFromEdgeSet");
 		if(RamCloudGraph.measureSerializeTimeProp == 1) {
                 	long endTime = System.nanoTime();
                 	log.error("Performance buildProtoBufFromEdgeSet key {}, {}, size={}", this.toString(), endTime - startTime, buf.getSerializedSize());
@@ -419,9 +419,9 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 			if (graph.measureRcTimeProp == 1) {
 			    startTime = System.nanoTime();
 			}
-		        pm.read_start("RE");
+		        pm.read_start("RamCloudVertex exists()");
 			vertTable.read(graph.vertTableId, rcKey);
-			pm.read_end("RE");
+			pm.read_end("RamCloudVertex exists()");
 			if (graph.measureRcTimeProp == 1) {
 			    long endTime = System.nanoTime();
 			    log.error("Performance vertexTable exists read total time {}", endTime - startTime);
@@ -429,7 +429,7 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 			vertTableEntryExists = true;
 		} catch (Exception e) {
 			// Vertex table entry does not exist
-		        pm.read_end("RE");
+		        pm.read_end("RamCloudVertex exists()");
 		        if (graph.measureRcTimeProp == 1) {
 			    long endTime = System.nanoTime();
 			    log.error("Performance vertexTable does not exists read total time {}", endTime - startTime);
@@ -441,9 +441,9 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 			if (graph.measureRcTimeProp == 1) {
 			    startTime = System.nanoTime();
 			}
-			pm.read_start("RF");
+			pm.read_start("RamCloudVertex exists()");
 			vertTable.read(graph.vertPropTableId, rcKey);
-		        pm.read_end("RF");
+		        pm.read_end("RamCloudVertex exists()");
 			if (graph.measureRcTimeProp == 1) {
 			    long endTime = System.nanoTime();
 			    log.error("Performance vertexPropTable exists read total time {}", endTime - startTime);
@@ -451,7 +451,7 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 			vertPropTableEntryExists = true;
 		} catch (Exception e) {
 			// Vertex property table entry does not exist
-		        pm.read_end("RF");
+		        pm.read_end("RamCloudVertex exists()");
 		    	if (graph.measureRcTimeProp == 1) {
 		            long endTime = System.nanoTime();
 			    log.error("Performance vertexPropTable does not exists read total time {}", endTime - startTime);
@@ -477,10 +477,10 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 			if (graph.measureRcTimeProp == 1) {
 			    startTime = System.nanoTime();
 			}
-			pm.write_start("WD");
+			pm.write_start("RamCloudVertex create()");
 			vertTable.write(graph.vertTableId, rcKey, ByteBuffer.allocate(0).array());
 			vertTable.write(graph.vertPropTableId, rcKey, ByteBuffer.allocate(0).array());
-			pm.write_end("WD");
+			pm.write_end("RamCloudVertex create()");
 			if (graph.measureRcTimeProp == 1) {
 			    long endTime = System.nanoTime();
 			    log.error("Performance vertex/vertexPropTable initial total time {}", endTime - startTime);

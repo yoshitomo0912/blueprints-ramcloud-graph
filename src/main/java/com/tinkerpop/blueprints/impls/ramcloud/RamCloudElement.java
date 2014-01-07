@@ -64,9 +64,9 @@ public class RamCloudElement implements Element, Serializable {
 	    if (graph.measureRcTimeProp == 1) {
 		startTime = System.nanoTime();
 	    }
-	    pm.read_start("RA");
+	    pm.read_start("RamCloudElement getPropertyMap()");
 	    propTableEntry = vertTable.read(rcPropTableId, rcPropTableKey);
-	    pm.read_end("RA");
+	    pm.read_end("RamCloudElement getPropertyMap()");
 	    if (graph.measureRcTimeProp == 1) {
 		long endTime = System.nanoTime();
 		log.error("Performance getPropertyMap read time {}", endTime - startTime);
@@ -75,7 +75,7 @@ public class RamCloudElement implements Element, Serializable {
 		log.warn("Element[id={}] property map size is near 1MB limit!", new String(rcPropTableKey));
 	    }
 	} catch (Exception e) {
-	    pm.read_end("RA");
+	    pm.read_end("RamCloudElement getPropertyMap()");
 	    log.warn("Element does not have a property table entry!");
 	    return null;
 	}
@@ -89,10 +89,10 @@ public class RamCloudElement implements Element, Serializable {
 	    return null;
 	} else if (byteArray.length != 0) {
 	    PerfMon pm = PerfMon.getInstance();
-	    pm.deser_start("DA");
+	    pm.deser_start("RamCloudElement convertRcBytesToPropertyMapEx()");
 	    ByteBufferInput input = new ByteBufferInput(byteArray);
 	    TreeMap map = kryo.get().readObject(input, TreeMap.class);
-	    pm.deser_end("DA");
+	    pm.deser_end("RamCloudElement convertRcBytesToPropertyMapEx()");
 	    return map;
 	} else {
 	    return new TreeMap<String, Object>();
@@ -109,10 +109,10 @@ public class RamCloudElement implements Element, Serializable {
 	    if(RamCloudGraph.measureSerializeTimeProp == 1) {
 		startTime = System.nanoTime();
 	    }
-	    pm.deser_start("DB");
+	    pm.deser_start("RamCloudElement convertRcBytesToPropertyMap()");
 	    ByteBufferInput input = new ByteBufferInput(byteArray);
 	    TreeMap map = kryo.get().readObject(input, TreeMap.class);
-	    pm.deser_end("DB");
+	    pm.deser_end("RamCloudElement convertRcBytesToPropertyMap()");
 	    if(RamCloudGraph.measureSerializeTimeProp == 1) {
             	long endTime = System.nanoTime();
             	log.error("Performance element kryo deserialization key {} {} size {}", this.toString(), endTime - startTime, byteArray.length);
@@ -131,7 +131,7 @@ public class RamCloudElement implements Element, Serializable {
 	if(RamCloudGraph.measureSerializeTimeProp == 1) {
 	    startKryoTime = System.nanoTime();
 	}
-	pm.ser_start("SA");
+	pm.ser_start("RamCloudElement setPropertyMap()");
 	ByteBufferOutput output = new ByteBufferOutput(1024 * 1024);
 	kryo.get().writeObject(output, map);
 	long midKryoTime = 0;
@@ -139,7 +139,7 @@ public class RamCloudElement implements Element, Serializable {
 	    midKryoTime = System.nanoTime();
 	}
 	rcValue = output.toBytes();
-	pm.ser_end("SA");
+	pm.ser_end("RamCloudElement setPropertyMap()");
 	if(RamCloudGraph.measureSerializeTimeProp == 1) {
         	long endKryoTime = System.nanoTime();
         	log.error("Performance element kryo serialization key {} mid {}, total {}, size {}", this.toString(), midKryoTime - startKryoTime, endKryoTime - startKryoTime, rcValue.length);
@@ -150,9 +150,9 @@ public class RamCloudElement implements Element, Serializable {
 	if (graph.measureRcTimeProp == 1) {
 	    startTime = System.nanoTime();
 	}
-	pm.write_start("WA");
+	pm.write_start("RamCloudElement setPropertyMap()");
 	vertTable.write(rcPropTableId, rcPropTableKey, rcValue);
-	pm.write_end("WA");
+	pm.write_end("RamCloudElement setPropertyMap()");
 	if (graph.measureRcTimeProp == 1) {
 	    long endTime = System.nanoTime();
 	    log.error("Performance setPropertyMap write time key {} {}", this.toString(), endTime - startTime);
