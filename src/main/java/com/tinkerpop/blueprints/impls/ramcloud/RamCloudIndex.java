@@ -505,7 +505,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
     public List<Object> getElmIdListForPropValue(Object propValue) {
 	Map<Object, List<Object>> map = readIndexPropertyMapFromDB();
 	if (map == null) {
-	    log.error("IndexPropertyMap was null. {} : {}", indexName, propValue);
+	    log.debug("IndexPropertyMap was null. {} : {}", indexName, propValue);
 	    return null;
 	}
 	return map.get(propValue);
