@@ -202,7 +202,8 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 		if (writeWithRules(rcValue)) {
 		    break;
 		} else {
-		    log.debug("getSetProperty(String " + propValue + ", Object " + elmId + ") cond. write failure RETRYING " + (i + 1));
+		    // FIXME loglevel raised for measurement. Was debug
+		    log.error("getSetProperty(String " + propValue + ", Object " + elmId + ") cond. write failure RETRYING " + (i + 1));
 		    if (i == 100) {
 			log.error("getSetProperty(String key, Object value) cond. write failure Gaveup RETRYING");
 		    }
@@ -296,7 +297,8 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    if (writeWithRules(rcValue)) {
 		break;
 	    } else {
-		log.debug("remove({}, {}, T element) write failure RETRYING {}", propName, propValue, (i + 1));
+		// FIXME loglevel raised for measurement. Was debug
+		log.error("remove({}, {}, T element) write failure RETRYING {}", propName, propValue, (i + 1));
 		if (i + 1 == 100) {
 		    log.error("remove({}, {}, T element) write failed completely. gave up RETRYING", propName, propValue);
 		}
@@ -342,8 +344,11 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 		continue;
 	    } else {
 		// cond. write failure
+		// FIXME loglevel raised for measurement. Was warn
+		log.error("removeElement({}, {}, ...) cond. key/value write failure RETRYING", tableId, element );
 		// FIXME Dirty hack
-		for (int retry = 100; retry >= 0; --retry) {
+		final int RETRY_MAX = 100;
+		for (int retry = RETRY_MAX; retry >= 0; --retry) {
 		    RamCloudKeyIndex idx = new RamCloudKeyIndex(tableId, tableEntry.key, graph, element.getClass());
 		    Map<Object, List<Object>> rereadMap = idx.readIndexPropertyMapFromDB();
 
@@ -364,7 +369,8 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 		    }
 
 		    if (idx.writeWithRules(convertIndexPropertyMapToRcBytes(rereadMap))) {
-			log.debug("removeElement({}, {}, ...) cond. key/value {} write failure RETRYING {}", tableId, element, rereadMap, retry);
+			// FIXME loglevel raised for measurement. Was warn
+			log.error("removeElement({}, {}, ...) cond. key/value {} write failure RETRYING {}", tableId, element, rereadMap, RETRY_MAX - retry);
 			// cond. re-write success
 			break;
 		    }
@@ -511,7 +517,8 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 		if (writeWithRules(rcValue)) {
 		    return retVal;
 		} else {
-		    log.info("removeIndexProperty({}, {}, ...) cond. key/value write failure RETRYING {}", tableId, retVal, (i + 1));
+		    // FIXME loglevel raised for measurement. Was info
+		    log.error("removeIndexProperty({}, {}, ...) cond. key/value write failure RETRYING {}", tableId, retVal, (i + 1));
 		}
 	    }
 	}
