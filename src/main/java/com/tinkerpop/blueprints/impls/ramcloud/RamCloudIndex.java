@@ -102,11 +102,11 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 
     public void create() {
 	if (!exists()) {
-	    JRamCloud.RejectRules rules = graph.getRcClient().new RejectRules();
-	    rules.setExists();
 	    PerfMon pm = PerfMon.getInstance();
 	    try {
-		JRamCloud vertTable = graph.getRcClient();
+		JRamCloud rcClient = graph.getRcClient();
+		JRamCloud.RejectRules rules = rcClient.new RejectRules();
+		rules.setExists();
 
 		long startTime = 0;
 		if (graph.measureRcTimeProp == 1) {
@@ -114,7 +114,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 		}
 		//graph.getRcClient().writeRule(tableId, rcKey, ByteBuffer.allocate(0).array(), rules);
 		pm.indexwrite_start("RamCloudIndex create()");
-		vertTable.writeRule(tableId, rcKey, ByteBuffer.allocate(0).array(), rules);
+		rcClient.writeRule(tableId, rcKey, ByteBuffer.allocate(0).array(), rules);
 		pm.indexwrite_end("RamCloudIndex create()");
 		if (graph.measureRcTimeProp == 1) {
 		    long endTime = System.nanoTime();
