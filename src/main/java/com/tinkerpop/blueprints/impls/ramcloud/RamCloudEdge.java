@@ -17,7 +17,6 @@ import com.tinkerpop.blueprints.impls.ramcloud.PerfMon;
 import edu.stanford.ramcloud.JRamCloud;
 
 public class RamCloudEdge extends RamCloudElement implements Edge {
-    private static PerfMon pm = PerfMon.getInstance();
 
     private final static Logger log = LoggerFactory.getLogger(RamCloudGraph.class);
     private RamCloudVertex outVertex;
@@ -108,6 +107,7 @@ public class RamCloudEdge extends RamCloudElement implements Edge {
 	boolean outVertexEntryExists;
 	boolean inVertexEntryExists;
 
+	PerfMon pm = PerfMon.getInstance();
 	try {
 	    JRamCloud edgeTable = graph.getRcClient();
 	    pm.read_start("REdge");
@@ -141,6 +141,7 @@ public class RamCloudEdge extends RamCloudElement implements Edge {
     public void create() throws Exception {
 	// TODO: Existence check costs extra (presently 3 reads), could use option to turn on/off
 	if (!exists()) {
+		PerfMon pm = PerfMon.getInstance();
 		// create edge property table
 		JRamCloud edgeTable = graph.getRcClient();
 	        pm.write_start("WEdge");
@@ -152,7 +153,6 @@ public class RamCloudEdge extends RamCloudElement implements Edge {
 			inVertex.addEdgeToAdjList(this);
 		}
 	} else {
-	    pm.write_end("WEdge");
 	    throw ExceptionFactory.edgeWithIdAlreadyExist(rcKey);
 	}
     }
