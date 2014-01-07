@@ -417,7 +417,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	return convertRcBytesToIndexPropertyMap(propTableEntry.value);
     }
 
-    public static Map<Object, List<Object>> convertRcBytesToIndexPropertyMap(byte[] byteArray) {
+    public Map<Object, List<Object>> convertRcBytesToIndexPropertyMap(byte[] byteArray) {
 	if (byteArray == null) {
 	    log.error("Got a null byteArray argument");
 	    return null;
@@ -429,7 +429,10 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
             }
 	    pm.indexdeser_start("RamCloudIndex convertRcBytesToIndexPropertyMap()");
 	    ByteBufferInput input = new ByteBufferInput(byteArray);
-	    TreeMap map = kryo.get().readObject(input, TreeMap.class);
+	    ArrayList list = kryo.get().readObject(input, ArrayList.class);
+	    TreeMap map = new TreeMap();
+	    String propVal = indexName.substring(indexName.indexOf('=')+1);
+	    map.put(propVal, list);
 	    pm.indexdeser_end("RamCloudIndex convertRcBytesToIndexPropertyMap()");
             if(RamCloudGraph.measureSerializeTimeProp == 1) {
             	long endTime = System.nanoTime();
@@ -449,7 +452,11 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	}
 	pm.indexser_start("RamCloudIndex convertIndexPropertyMapToRcBytes()");
 	ByteBufferOutput output = new ByteBufferOutput(1024*1024);
-	kryo.get().writeObject(output, map);
+	if ( map.values().size() == 0 ) {
+	    kryo.get().writeObject(output, new ArrayList<Object>());
+	} else {
+	    kryo.get().writeObject(output, map.values().iterator().next());
+	}
 	byte[] bytes = output.toBytes();
         pm.indexser_end("RamCloudIndex convertIndexPropertyMapToRcBytes()");
 	if(RamCloudGraph.measureSerializeTimeProp == 1) {
