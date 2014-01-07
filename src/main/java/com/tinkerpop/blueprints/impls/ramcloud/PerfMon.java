@@ -155,7 +155,7 @@ public final class PerfMon {
         long sum;
         delta = System.nanoTime() - addport_time;
 	sum = getSum();
-        log.error("Performance add_port {} ( {} ports ) read {} ({}) multiread {} ({}) index_read {} ({}) write {} ({}) index_write {} ({}) serialize {} indexserialize {} ({}) deserialize {} ({}) indexdeserialize {} ({}) rwsd total {} other {} ({}) writefail ({}) indexwritefail({})",
+        log.error("Performance add_port {} ( {} ports ) read {} ({}) multiread {} ({}) index_read {} ({}) write {} ({}) index_write {} ({}) serialize {} ({}) indexserialize {} ({}) deserialize {} ({}) indexdeserialize {} ({}) rwsd total {} other {} ({}) writefail ({}) indexwritefail({})",
 	       delta, addport_cnt, read_latency_sum, read_latency_cnt,
 	       multiread_latency_sum, multiread_latency_cnt,
 	       indexread_latency_sum, indexread_latency_cnt,
