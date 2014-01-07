@@ -71,6 +71,7 @@ public final class PerfMon {
    private long read_time;
    private long multiread_time;
    private long indexread_time;
+   private long read_whole_topology_time;
 
    public static PerfMon getInstance() {
         return instance.get();
@@ -100,6 +101,7 @@ public final class PerfMon {
 	read_flag=multiread_flag=indexread_flag=write_flag=indexwrite_flag=deser_flag=indexdeser_flag=ser_flag=indexser_flag=0;
 	addflowpath_time = addflowentry_time = addflowentry_cnt = 0;
 	write_condfails = indexwrite_condfails = 0;
+	read_whole_topology_time = 0;
         //log.error("flag cleared");
    }
 
@@ -249,6 +251,33 @@ public final class PerfMon {
 	       sum, delta - sum, (delta - sum) * 100.0 / (delta),
 	       write_condfails, indexwrite_condfails);
    }
+
+   public void read_whole_topology_start(){
+       if(measureAllTimeProp==0) return;
+	clear();
+	read_whole_topology_time = System.nanoTime();
+	log.error("read_whole_topology_start");
+   }
+   public void read_whole_topology_end(){
+       if(measureAllTimeProp==0) return;
+       long delta;
+       long sum;
+       delta = System.nanoTime() - read_whole_topology_time;
+       sum = getSum();
+       log.error("Performance read_whole_topology {} read {} ({}) multiread {} ({}) index_read {} ({}) write {} ({}) index_write {} ({}) serialize {} ({}) indexserialize {} ({}) deserialize {} ({}) indexdeserialize {} ({}) rwsd total {} other {} ({}) writefail ({}) indexwritefail({})",
+	       delta, read_latency_sum, read_latency_cnt,
+	       multiread_latency_sum, multiread_latency_cnt,
+	       indexread_latency_sum, indexread_latency_cnt,
+	       write_latency_sum, write_latency_cnt,
+	       indexwrite_latency_sum, indexwrite_latency_cnt,
+	       serialize_latency_sum, serialize_latency_cnt,
+	       indexserialize_latency_sum, indexserialize_latency_cnt,
+	       deserialize_latency_sum, deserialize_latency_cnt,
+	       indexdeserialize_latency_sum, indexdeserialize_latency_cnt,
+	       sum, delta - sum, (delta - sum) * 100.0 / (delta),
+	       write_condfails, indexwrite_condfails);
+   }
+
 
    public void read_start(String key){
        	log.error("read_start {}", key);
