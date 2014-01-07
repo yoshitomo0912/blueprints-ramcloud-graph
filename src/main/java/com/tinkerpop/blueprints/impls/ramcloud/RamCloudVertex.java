@@ -201,6 +201,8 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 	/** Conditionally update Adj. Edge List
 	 * */
 	private void updateEdgeAdjList(List<RamCloudEdge> edgesToModify, boolean add) {
+		PerfMon pm = PerfMon.getInstance();
+		JRamCloud rcClient = graph.getRcClient();
 		final int MAX_RETRIES = 100;
 		for (int retry = 1 ; retry <= MAX_RETRIES ; ++retry ) {
 
@@ -226,25 +228,31 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 				}
 
 				EdgeListProtoBuf edgeList = buildProtoBufFromEdgeSet(edges);
-				JRamCloud.RejectRules rules = graph.getRcClient().new RejectRules();
+				JRamCloud.RejectRules rules = rcClient.new RejectRules();
 				if ( expected_version == 0L ) {
 					rules.setExists();
 				} else {
 					rules.setNeVersion(expected_version);
 				}
-				long updated_version = graph.getRcClient().writeRule(graph.vertTableId, rcKey, edgeList.toByteArray(), rules);
+				pm.write_start("RAMCloudVertex updateEdgeAdjList()");
+				long updated_version = rcClient.writeRule(graph.vertTableId, rcKey, edgeList.toByteArray(), rules);
+				pm.write_end("RAMCloudVertex updateEdgeAdjList()");
 				this.cachedAdjEdgeList.setValue(edgeList, updated_version);
 				return;
 			} catch (UnsupportedOperationException e) {
+				pm.write_end("RAMCloudVertex updateEdgeAdjList()");
 				log.error("{" + toString() + "}: Failed to modify a set of edges ({" + edgesToModify.toString() + "}): ", e);
 				return;
 			} catch (ClassCastException e) {
+				pm.write_end("RAMCloudVertex updateEdgeAdjList()");
 				log.error("{" + toString() + "}: Failed to modify a set of edges ({" + edgesToModify.toString() + "}): ", e);
 				return;
 			} catch (NullPointerException e) {
+				pm.write_end("RAMCloudVertex updateEdgeAdjList()");
 				log.error("{" + toString() + "}: Failed to modify a set of edges ({" + edgesToModify.toString() + "}): ", e);
 				return;
 			} catch (Exception e) {
+				pm.write_end("RAMCloudVertex updateEdgeAdjList()");
 				// FIXME Workaround for native method exception declaration bug
 				if ( e instanceof WrongVersionException ) {
 					// FIXME loglevel raised for measurement. Was debug
