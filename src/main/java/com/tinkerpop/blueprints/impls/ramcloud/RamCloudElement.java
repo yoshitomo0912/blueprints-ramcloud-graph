@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.HashMap;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -169,6 +170,65 @@ public class RamCloudElement implements Element, Serializable {
     public Set<String> getPropertyKeys() {
 	Map<String, Object> map = getPropertyMap();
 	return map.keySet();
+    }
+
+    public void setProperties(Map<String, Object> properties) {
+        Object oldValue;
+        long startTime = 0;
+        if (graph.measureBPTimeProp == 1) {
+            startTime = System.nanoTime();
+        }
+
+        Map<String, Object> map = getPropertyMap();
+        Map<String, Object> oldValueMap = new HashMap<String, Object>(map.size());
+        for (Map.Entry<String, Object> property : properties.entrySet()) {
+            String key = property.getKey();
+            if (key == null) {
+                throw ExceptionFactory.propertyKeyCanNotBeNull();
+            }
+
+            if (key.equals("")) {
+                throw ExceptionFactory.propertyKeyCanNotBeEmpty();
+            }
+
+            if (key.equals("id")) {
+                throw ExceptionFactory.propertyKeyIdIsReserved();
+            }
+
+            if (this instanceof RamCloudEdge && key.equals("label")) {
+                throw ExceptionFactory.propertyKeyLabelIsReservedForEdges();
+            }
+            Object value = property.getValue();
+            if (value == null) {
+                throw ExceptionFactory.propertyValueCanNotBeNull();
+            }
+
+            oldValueMap.put(key, map.put(key, value));
+
+        }
+        setPropertyMap(map);
+        for (Map.Entry<String, Object> oldProperty : oldValueMap.entrySet()) {
+            String key = oldProperty.getKey();
+            oldValue = oldProperty.getValue();
+            Object value = map.get(key);
+            boolean ret = false;
+            if (this instanceof RamCloudVertex) {
+                RamCloudKeyIndex keyIndex = new RamCloudKeyIndex(graph.kidxVertTableId, key, value, graph, Vertex.class);
+                ret = keyIndex.autoUpdate(key, value, oldValue, this);
+            } else {
+                RamCloudKeyIndex keyIndex = new RamCloudKeyIndex(graph.kidxVertTableId, key, value, graph, Edge.class);
+                keyIndex.autoUpdate(key, value, oldValue, this);
+            }
+
+            if (graph.measureBPTimeProp == 1) {
+	        long endTime = System.nanoTime();
+	        if (ret) {
+		    log.error("Performance vertex setProperty(key {}) which is index total time {}", key, endTime - startTime);
+	        } else {
+		    log.error("Performance vertex setProperty(key {}) does not index time {}", key, endTime - startTime);
+	        }
+	    }
+        }
     }
 
     @Override
