@@ -20,19 +20,39 @@ public final class PerfMon {
    private long read_latency_sum;
    private long read_latency_cnt;
    private int read_flag;
+   
+   private long multiread_latency_sum;
+   private long multiread_latency_cnt;
+   private int multiread_flag;
 
+   private long indexread_latency_sum;
+   private long indexread_latency_cnt;
+   private int indexread_flag;
+   
    private long write_latency_sum;
    private long write_latency_cnt;
    private int write_flag;
 
+   private long indexwrite_latency_sum;
+   private long indexwrite_latency_cnt;
+   private int indexwrite_flag;   
+   
    private long serialize_latency_sum;
    private long serialize_latency_cnt;
    private int ser_flag;
 
+   private long indexserialize_latency_sum;
+   private long indexserialize_latency_cnt;
+   private int indexser_flag;   
+   
    private long deserialize_latency_sum;
    private long deserialize_latency_cnt;
    private int deser_flag;
 
+   private long indexdeserialize_latency_sum;
+   private long indexdeserialize_latency_cnt;
+   private int indexdeser_flag;
+   
    private long addsw_time;
    private long addport_time;
    private long addlink_time;
@@ -41,9 +61,14 @@ public final class PerfMon {
    private long addflowentry_time;
    private long addflowentry_cnt;
    private long ser_time;
+   private long indexser_time;
    private long deser_time;
+   private long indexdeser_time;
    private long write_time;
+   private long indexwrite_time;
    private long read_time;
+   private long multiread_time;
+   private long indexread_time;
 
    public static PerfMon getInstance() {
         return instance.get();
@@ -54,16 +79,31 @@ public final class PerfMon {
    private void clear(){
    	read_latency_sum=0L;
    	read_latency_cnt=0L;
-   	write_latency_sum=0L;
+	multiread_latency_sum=0L;
+   	multiread_latency_cnt=0L;
+   	indexread_latency_sum=0L;
+   	indexread_latency_cnt=0L;
+	write_latency_sum=0L;
    	write_latency_cnt=0L;
+	indexwrite_latency_sum=0L;
+   	indexwrite_latency_cnt=0L;
    	serialize_latency_sum=0L;
    	serialize_latency_cnt=0L;
+	indexserialize_latency_sum=0L;
+   	indexserialize_latency_cnt=0L;
    	deserialize_latency_sum=0L;
    	deserialize_latency_cnt=0L;
-	read_flag=write_flag=deser_flag=ser_flag=0;
+   	indexdeserialize_latency_sum=0L;
+   	indexdeserialize_latency_cnt=0L;
+	read_flag=multiread_flag=indexread_flag=write_flag=indexwrite_flag=deser_flag=indexdeser_flag=ser_flag=indexser_flag=0;
 	addflowpath_time = addflowentry_time = addflowentry_cnt = 0;
         //log.error("flag cleared");
    }
+   
+   private long getSum(){
+       return read_latency_sum + multiread_latency_sum + indexread_latency_sum + write_latency_sum + indexwrite_latency_sum + serialize_latency_sum + indexserialize_latency_sum + deserialize_latency_sum + indexdeserialize_latency_sum;
+   }   
+   
    public void addswitch_start(){
         if(measureAllTimeProp==0)
 		return;
@@ -79,9 +119,18 @@ public final class PerfMon {
         long sum;
 
         delta = System.nanoTime() - addsw_time;
-        sum = read_latency_sum + write_latency_sum + serialize_latency_sum +  deserialize_latency_sum;
-        log.error("Performance add_switch {} read {} ({}) write {} ({}) serialize {} ({}) deserialize {} ({}) rwsd total {} other {} ({})",
-	delta, read_latency_sum, read_latency_cnt, write_latency_sum, write_latency_cnt, serialize_latency_sum, serialize_latency_cnt, deserialize_latency_sum, deserialize_latency_cnt, sum, delta-sum, (delta-sum)*100.0/(delta));
+	sum = getSum();
+        log.error("Performance add_switch {} read {} ({}) multiread {} ({}) index_read {} ({}) write {} ({}) index_write {} ({}) serialize {} ({}) indexserialize {} ({}) deserialize {} ({}) indexdeserialize {} ({}) rwsd total {} other {} ({})",
+	       delta, read_latency_sum, read_latency_cnt,
+	       multiread_latency_sum, multiread_latency_cnt,
+	       indexread_latency_sum, indexread_latency_cnt,
+	       write_latency_sum, write_latency_cnt,
+	       indexwrite_latency_sum, indexwrite_latency_cnt,
+	       serialize_latency_sum, serialize_latency_cnt,
+	       indexserialize_latency_sum, indexserialize_latency_cnt,
+	       deserialize_latency_sum, deserialize_latency_cnt,
+	       indexdeserialize_latency_sum, indexdeserialize_latency_cnt,
+	       sum, delta - sum, (delta - sum) * 100.0 / (delta));
    }
    public void addport_start(){
         if(measureAllTimeProp==0)
@@ -101,9 +150,18 @@ public final class PerfMon {
         long delta;
         long sum;
         delta = System.nanoTime() - addport_time;
-        sum = read_latency_sum + write_latency_sum + serialize_latency_sum +  deserialize_latency_sum;
-        log.error("Performance add_port {} ( {} ports ) read {} ({}) write {} ({}) serialize {} ({}) deserialize {} ({}) rwsd total {} other {} ({})",
-	delta, addport_cnt, read_latency_sum, read_latency_cnt, write_latency_sum, write_latency_cnt, serialize_latency_sum, serialize_latency_cnt, deserialize_latency_sum, deserialize_latency_cnt, sum, delta-sum, (delta-sum)*100.0/(delta));
+	sum = getSum();
+        log.error("Performance add_port {} ( {} ports ) read {} ({}) multiread {} ({}) index_read {} ({}) write {} ({}) index_write {} ({}) serialize {} indexserialize {} ({}) deserialize {} ({}) indexdeserialize {} ({}) rwsd total {} other {} ({})",
+	       delta, addport_cnt, read_latency_sum, read_latency_cnt,
+	       multiread_latency_sum, multiread_latency_cnt,
+	       indexread_latency_sum, indexread_latency_cnt,
+	       write_latency_sum, write_latency_cnt,
+	       indexwrite_latency_sum, indexwrite_latency_cnt,
+	       serialize_latency_sum, serialize_latency_cnt,
+	       indexserialize_latency_sum, indexserialize_latency_cnt,
+	       deserialize_latency_sum, deserialize_latency_cnt,
+	       indexdeserialize_latency_sum, indexdeserialize_latency_cnt,
+	       sum, delta - sum, (delta - sum) * 100.0 / (delta));
    }
    public void addlink_start(){
         if(measureAllTimeProp==0)
@@ -117,9 +175,18 @@ public final class PerfMon {
         long delta;
         long sum;
         delta = System.nanoTime() - addlink_time;
-        sum = read_latency_sum + write_latency_sum + serialize_latency_sum +  deserialize_latency_sum;
-        log.error("Performance add_link {} read {} ({}) write {} ({}) serialize {} ({}) deserialize {} ({}) rwsd total {} other {} ({})",
-	delta, read_latency_sum, read_latency_cnt, write_latency_sum, write_latency_cnt, serialize_latency_sum, serialize_latency_cnt, deserialize_latency_sum, deserialize_latency_cnt, sum, delta-sum, (delta-sum)*100.0/(delta));
+	sum = getSum();
+        log.error("Performance add_link {} read {} ({}) multiread {} ({}) index_read {} ({}) write {} ({}) index_write {} ({}) serialize {} ({}) indexserialize {} ({}) deserialize {} ({}) indexdeserialize {} ({}) rwsd total {} other {} ({})",
+	       delta, read_latency_sum, read_latency_cnt,
+	       multiread_latency_sum, multiread_latency_cnt,
+	       indexread_latency_sum, indexread_latency_cnt,
+	       write_latency_sum, write_latency_cnt,
+	       indexwrite_latency_sum, indexwrite_latency_cnt,
+	       serialize_latency_sum, serialize_latency_cnt,
+	       indexserialize_latency_sum, indexserialize_latency_cnt,
+	       deserialize_latency_sum, deserialize_latency_cnt,
+	       indexdeserialize_latency_sum, indexdeserialize_latency_cnt,
+	       sum, delta - sum, (delta - sum) * 100.0 / (delta));
    }
 
    public void addflowpath_start(){
@@ -132,9 +199,18 @@ public final class PerfMon {
        long delta;
        long sum;
        delta = System.nanoTime() - addflowpath_time;
-       sum = read_latency_sum + write_latency_sum + serialize_latency_sum +  deserialize_latency_sum;
-       log.error("Performance add_flowpath {} read {} ({}) write {} ({}) serialize {} ({}) deserialize {} ({}) rwsd total {} other {} ({})",
-	delta, read_latency_sum, read_latency_cnt, write_latency_sum, write_latency_cnt, serialize_latency_sum, serialize_latency_cnt, deserialize_latency_sum, deserialize_latency_cnt, sum, delta-sum, (delta-sum)*100.0/(delta));
+       sum = getSum();
+       log.error("Performance add_flowpath {} read {} ({}) multiread {} ({}) index_read {} ({}) write {} ({}) index_write {} ({}) serialize {} ({}) indexserialize {} ({}) deserialize {} ({}) indexdeserialize {} ({}) rwsd total {} other {} ({})",
+	       delta, read_latency_sum, read_latency_cnt,
+	       multiread_latency_sum, multiread_latency_cnt,
+	       indexread_latency_sum, indexread_latency_cnt,
+	       write_latency_sum, write_latency_cnt,
+	       indexwrite_latency_sum, indexwrite_latency_cnt,
+	       serialize_latency_sum, serialize_latency_cnt,
+	       indexserialize_latency_sum, indexserialize_latency_cnt,
+	       deserialize_latency_sum, deserialize_latency_cnt,
+	       indexdeserialize_latency_sum, indexdeserialize_latency_cnt,
+	       sum, delta - sum, (delta - sum) * 100.0 / (delta));
    }
 
    public void addflowentry_start(){
@@ -151,9 +227,18 @@ public final class PerfMon {
        long delta;
        long sum;
        delta = System.nanoTime() - addflowentry_time;
-       sum = read_latency_sum + write_latency_sum + serialize_latency_sum +  deserialize_latency_sum;
-       log.error("Performance add_flowentry {} ( {} flows ) read {} ({}) write {} ({}) serialize {} ({}) deserialize {} ({}) rwsd total {} other {} ({})",
-	delta, addflowentry_cnt, read_latency_sum, read_latency_cnt, write_latency_sum, write_latency_cnt, serialize_latency_sum, serialize_latency_cnt, deserialize_latency_sum, deserialize_latency_cnt, sum, delta-sum, (delta-sum)*100.0/(delta));
+       sum = getSum();
+       log.error("Performance add_flowentry {} ( {} flows ) read {} ({}) multiread {} ({}) index_read {} ({}) write {} ({}) index_write {} ({}) serialize {} ({}) indexserialize {} ({}) deserialize {} ({}) indexdeserialize {} ({}) rwsd total {} other {} ({})",
+	       delta, addflowentry_cnt, read_latency_sum, read_latency_cnt,
+	       multiread_latency_sum, multiread_latency_cnt,
+	       indexread_latency_sum, indexread_latency_cnt,
+	       write_latency_sum, write_latency_cnt,
+	       indexwrite_latency_sum, indexwrite_latency_cnt,
+	       serialize_latency_sum, serialize_latency_cnt,
+	       indexserialize_latency_sum, indexserialize_latency_cnt,
+	       deserialize_latency_sum, deserialize_latency_cnt,
+	       indexdeserialize_latency_sum, indexdeserialize_latency_cnt,
+	       sum, delta - sum, (delta - sum) * 100.0 / (delta));
    }
 
    public void read_start(String key){
@@ -182,6 +267,58 @@ public final class PerfMon {
 	}
 	read_flag = 0;
    }
+   public void multiread_start(String key){
+        if(measureAllTimeProp==0)
+		return;
+	multiread_time=System.nanoTime();
+
+	if ( debug==1 )
+            log.error("multiread start {}", key);
+        if ( multiread_flag != 0){
+            log.error("multiread_start called twice");
+	}
+
+	multiread_flag = 1;
+   }
+   public void multiread_end(String key){
+        if(measureAllTimeProp==0)
+		return;
+        multiread_latency_sum += System.nanoTime() - multiread_time;
+        multiread_latency_cnt ++;
+
+	if ( debug==1 )
+            log.error("read end {}", key);
+        if ( multiread_flag != 1){
+            log.error("read_end called before read_start");
+	}
+	multiread_flag = 0;
+   }
+   public void indexread_start(String key){
+        if(measureAllTimeProp==0)
+		return;
+	indexread_time=System.nanoTime();
+
+	if ( debug==1 )
+            log.error("read start {}", key);
+        if ( indexread_flag != 0){
+            log.error("read_start called twice");
+	}
+
+	indexread_flag = 1;
+   }
+   public void indexread_end(String key){
+        if(measureAllTimeProp==0)
+		return;
+        indexread_latency_sum += System.nanoTime() - indexread_time;
+        indexread_latency_cnt ++;
+
+	if ( debug==1 )
+            log.error("indexread end {}", key);
+        if ( indexread_flag != 1){
+            log.error("indexread_end called before read_start");
+	}
+	indexread_flag = 0;
+   }
    public void write_start(String key){
         if(measureAllTimeProp==0)
 		return;
@@ -206,6 +343,30 @@ public final class PerfMon {
 	}
 	write_flag = 0;
    }
+   public void indexwrite_start(String key){
+        if(measureAllTimeProp==0)
+		return;
+	indexwrite_time = System.nanoTime();
+
+	if ( debug==1 )
+            log.error("index write start {}", key);
+        if ( indexwrite_flag != 0){
+            log.error("indexwrite_start called twice");
+	}
+	indexwrite_flag = 1;
+   }
+   public void indexwrite_end(String key){
+        if(measureAllTimeProp==0)
+		return;
+	if ( debug==1 )
+            log.error("write end {}", key);
+        indexwrite_latency_sum += System.nanoTime() - indexwrite_time;
+        indexwrite_latency_cnt ++;
+        if ( indexwrite_flag != 1){
+            log.error("indexwrite_end claled before write_start");
+	}
+	indexwrite_flag = 0;
+   }
    public void ser_start(String key){
         if(measureAllTimeProp==0)
 		return;
@@ -229,6 +390,31 @@ public final class PerfMon {
             	log.error("ser_end called before ser_start");
 	}
 	ser_flag = 0;
+
+   }
+   public void indexser_start(String key){
+        if(measureAllTimeProp==0)
+		return;
+	indexser_time = System.nanoTime();
+
+	if ( debug==1 )
+            log.error("ser start {}", key);
+        if ( indexser_flag != 0 ){
+            	log.error("ser_start called twice");
+	}
+	indexser_flag = 1;
+   }
+   public void indexser_end(String key){
+        if(measureAllTimeProp==0)
+		return;
+	if ( debug==1 )
+            log.error("ser end {}", key);
+        indexserialize_latency_sum += System.nanoTime() - indexser_time;
+        indexserialize_latency_cnt ++;
+        if ( indexser_flag != 1 ){
+            	log.error("ser_end called before ser_start");
+	}
+	indexser_flag = 0;
 
    }
    public void deser_start(String key){
@@ -256,5 +442,31 @@ public final class PerfMon {
             log.error("deser_end called before deser_start");
 	}
 	deser_flag = 0;
+   }
+   public void indexdeser_start(String key){
+        if(measureAllTimeProp==0)
+		return;
+	indexdeser_time = System.nanoTime();
+
+	if ( debug==1 )
+            log.error("deser start {}", key);
+	indexdeser_time = System.nanoTime();
+        if ( indexdeser_flag != 0){
+            log.error("deser_start called twice");
+	}
+	indexdeser_flag = 1;
+   }
+   public void indexdeser_end(String key){
+        if(measureAllTimeProp==0)
+		return;
+	if ( debug==1 )
+            log.error("deser end {}", key);
+
+        indexdeserialize_latency_sum += System.nanoTime() - indexdeser_time;
+        indexdeserialize_latency_cnt ++;
+        if ( indexdeser_flag != 1){
+            log.error("deser_end called before deser_start");
+	}
+	indexdeser_flag = 0;
    }
 }

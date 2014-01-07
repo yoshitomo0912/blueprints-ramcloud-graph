@@ -80,9 +80,9 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 		startTime = System.nanoTime();
 	    }
 	    //vertTableEntry = graph.getRcClient().read(tableId, rcKey);
-	    pm.read_start("RC");
+	    pm.indexread_start("IRA");
 	    vertTableEntry = vertTable.read(tableId, rcKey);
-	    pm.read_end("RC");
+	    pm.indexread_end("IRA");
 	    if (graph.measureRcTimeProp == 1) {
 		long endTime = System.nanoTime();
 		log.error("Performance index exists(indexName {}) read time {}", indexName, endTime - startTime);
@@ -90,7 +90,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    indexVersion = vertTableEntry.version;
 	    return true;
 	} catch (Exception e) {
-	    pm.read_end("RC");
+	    pm.indexread_end("IRA");
 	    if (graph.measureRcTimeProp == 1) {
 		long endTime = System.nanoTime();
 		log.error("Performance index exists(indexName {}) exception read time {}", indexName, endTime - startTime);
@@ -113,15 +113,15 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 		    startTime = System.nanoTime();
 		}
 		//graph.getRcClient().writeRule(tableId, rcKey, ByteBuffer.allocate(0).array(), rules);
-		pm.write_start("WB");
+		pm.indexwrite_start("IWA");
 		vertTable.writeRule(tableId, rcKey, ByteBuffer.allocate(0).array(), rules);
-		pm.write_end("WB");
+		pm.indexwrite_end("IWA");
 		if (graph.measureRcTimeProp == 1) {
 		    long endTime = System.nanoTime();
 		    log.error("Performance index create(indexName {}) write time {}", indexName, endTime - startTime);
 		}
 	    } catch (Exception e) {
-		pm.write_end("WB");
+		pm.indexwrite_end("IWA");
 		log.info(toString() + ": Write create index list: " + e.toString());
 	    }
 	}
@@ -389,16 +389,16 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 		startTime = System.nanoTime();
 	    }
 	    //propTableEntry = graph.getRcClient().read(tableId, rcKey);
-	    pm.read_start("RD");
+	    pm.indexread_start("IRB");
 	    propTableEntry = vertTable.read(tableId, rcKey);
-	    pm.read_end("RD");
+	    pm.indexread_end("IRB");
 	    if (graph.measureRcTimeProp == 1) {
 		long endTime = System.nanoTime();
 		log.error("Performance readIndexPropertyMapFromDB(indexName {}) read time {}", indexName, endTime - startTime);
 	    }
 	    indexVersion = propTableEntry.version;
 	} catch (Exception e) {
-	    pm.read_end("RD");
+	    pm.indexread_end("IRB");
 	    indexVersion = 0;
 	    if (graph.measureRcTimeProp == 1) {
 		long endTime = System.nanoTime();
@@ -421,10 +421,10 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
             if(RamCloudGraph.measureSerializeTimeProp == 1) {
         	startTime = System.nanoTime();
             }
-	    pm.deser_start("DB");
+	    pm.indexdeser_start("IDA");
 	    ByteBufferInput input = new ByteBufferInput(byteArray);
 	    TreeMap map = kryo.get().readObject(input, TreeMap.class);
-	    pm.deser_end("DB");
+	    pm.indexdeser_end("IDA");
             if(RamCloudGraph.measureSerializeTimeProp == 1) {
             	long endTime = System.nanoTime();
                 log.error("Performance index kryo deserialization [id=N/A] {} size {}", endTime - startTime, byteArray.length);
@@ -441,11 +441,11 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	if(RamCloudGraph.measureSerializeTimeProp == 1) {
 	    startTime = System.nanoTime();
 	}
-	pm.ser_start("SD");
+	pm.indexser_start("ISA");
 	ByteBufferOutput output = new ByteBufferOutput(1024*1024);
 	kryo.get().writeObject(output, map);
 	byte[] bytes = output.toBytes();
-        pm.ser_end("SD");
+        pm.indexser_end("ISA");
 	if(RamCloudGraph.measureSerializeTimeProp == 1) {
         	long endTime = System.nanoTime();
         	log.error("Performance index kryo serialization {}", endTime - startTime);
@@ -473,15 +473,15 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    if (graph.measureRcTimeProp == 1) {
 		startTime = System.nanoTime();
 	    }
-	    pm.write_start("WC");
+	    pm.indexwrite_start("IWB");
 	    vertTable.writeRule(tableId, rcKey, rcValue, rules);
-	    pm.write_end("WC");
+	    pm.indexwrite_end("IWB");
 	    if (graph.measureRcTimeProp == 1) {
 		long endTime = System.nanoTime();
 		log.error("Performance writeWithRules(indexName {}) write time {}", rcKeyToIndexName(rcKey), endTime - startTime);
 	    }
 	} catch (Exception e) {
-            pm.write_end("WC");
+            pm.indexwrite_end("IWB");
 	    log.debug("Cond. Write index property: " + new String(rcKey) + " failed " + e.toString() + " expected version: " + expectedVersion);
 	    return false;
 	}

@@ -88,8 +88,11 @@ public class RamCloudElement implements Element, Serializable {
 	    log.warn("Got a null byteArray argument");
 	    return null;
 	} else if (byteArray.length != 0) {
+	    PerfMon pm = PerfMon.getInstance();
+	    pm.deser_start("DA");
 	    ByteBufferInput input = new ByteBufferInput(byteArray);
 	    TreeMap map = kryo.get().readObject(input, TreeMap.class);
+	    pm.deser_end("DA");
 	    return map;
 	} else {
 	    return new TreeMap<String, Object>();
@@ -106,10 +109,10 @@ public class RamCloudElement implements Element, Serializable {
 	    if(RamCloudGraph.measureSerializeTimeProp == 1) {
 		startTime = System.nanoTime();
 	    }
-	    pm.deser_start("DA");
+	    pm.deser_start("DB");
 	    ByteBufferInput input = new ByteBufferInput(byteArray);
 	    TreeMap map = kryo.get().readObject(input, TreeMap.class);
-	    pm.deser_end("DA");
+	    pm.deser_end("DB");
 	    if(RamCloudGraph.measureSerializeTimeProp == 1) {
             	long endTime = System.nanoTime();
             	log.error("Performance element kryo deserialization key {} {} size {}", this.toString(), endTime - startTime, byteArray.length);

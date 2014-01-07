@@ -350,6 +350,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	int mreadMax = 400;
 
 	if (indexedKeys.contains(key)) {
+	    PerfMon pm = PerfMon.getInstance();
 	    if (measureBPTimeProp == 1) {
 	      Tstamp2 = System.nanoTime();
 	      log.error("Performance getVertices(key {}) Calling new RamCloudKeyIndex at {}", key, Tstamp2);
@@ -377,8 +378,10 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 			ByteBuffer.allocate(8).order(ByteOrder.LITTLE_ENDIAN).putLong((Long) vert).array();
 		vertPropTableMread[vertexNum] = new JRamCloud.multiReadObject(vertPropTableId, rckey);
 		if (vertexNum >= (mreadMax - 1)) {
+		    pm.multiread_start("MRA");
 		    JRamCloud.Object outvertPropTable[] =
 			    vertTable.multiRead(vertPropTableMread);
+		    pm.multiread_end("MRA");
 		    for (int i = 0; i < vertexNum; i++) {
 			if (outvertPropTable[i] != null) {
 			    vertices.add(new RamCloudVertex(outvertPropTable[i].key, this));
@@ -390,15 +393,14 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	    }
 
 	    if (vertexNum != 0) {
-		PerfMon pm = PerfMon.getInstance();
-
+		
 		long startTime2 = 0;
 		if (measureRcTimeProp == 1) {
 		    startTime2 = System.nanoTime();
 		}
-		pm.read_start("RB");
+		pm.multiread_start("MRB");
 		JRamCloud.Object outvertPropTable[] = vertTable.multiRead(vertPropTableMread);
-		pm.read_end("RB");
+		pm.multiread_end("MRB");
 		if (measureRcTimeProp == 1) {
 		    long endTime2 = System.nanoTime();
 		    log.error("Performance index multiread(key {}, number {}) time {}", key, vertexNum, endTime2 - startTime2);
