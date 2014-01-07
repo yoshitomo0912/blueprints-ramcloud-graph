@@ -247,7 +247,8 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 			} catch (Exception e) {
 				// FIXME Workaround for native method exception declaration bug
 				if ( e instanceof WrongVersionException ) {
-					log.debug("Conditional Updating EdgeList failed for {} modifing {} Retrying [{}]", this, edgesToModify, retry);
+					// FIXME loglevel raised for measurement. Was debug
+					log.error("Conditional Updating EdgeList failed for {} modifing {} RETRYING [{}]", this, edgesToModify, retry);
 					updateCachedAdjEdgeList();
 				} else {
 					log.debug("Cond. Write to modify adj edge list failed, exception thrown {}", e);
