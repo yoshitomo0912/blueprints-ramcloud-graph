@@ -110,12 +110,12 @@ public class RamCloudEdge extends RamCloudElement implements Edge {
 	PerfMon pm = PerfMon.getInstance();
 	try {
 	    JRamCloud edgeTable = graph.getRcClient();
-	    pm.read_start("REdge");
+	    pm.read_start("RamCloudEdge exists()");
 	    edgeTable.read(graph.edgePropTableId, rcKey);
-	    pm.read_end("REdge");
+	    pm.read_end("RamCloudEdge exists()");
 	    edgePropTableEntryExists = true;
 	} catch (Exception e) {
-	    pm.read_end("REdge");
+	    pm.read_end("RamCloudEdge exists()");
 	    // Edge property table entry does not exist
 	    edgePropTableEntryExists = false;
 	}
@@ -144,9 +144,9 @@ public class RamCloudEdge extends RamCloudElement implements Edge {
 		PerfMon pm = PerfMon.getInstance();
 		// create edge property table
 		JRamCloud edgeTable = graph.getRcClient();
-	        pm.write_start("WEdge");
+	        pm.write_start("RamCloudEdge create()");
 		edgeTable.write(graph.edgePropTableId, rcKey, ByteBuffer.allocate(0).array());
-	        pm.write_end("WEdge");
+	        pm.write_end("RamCloudEdge create()");
 
 		outVertex.addEdgeToAdjList(this);
 		if (!isLoop()) {

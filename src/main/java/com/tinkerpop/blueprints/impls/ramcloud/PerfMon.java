@@ -217,6 +217,7 @@ public final class PerfMon {
        if(measureAllTimeProp==0) return;
 	clear();
 	addflowentry_time = System.nanoTime();
+	log.error("addflowentry_start");
    }
    public void addflowentry_incr(){
        if(measureAllTimeProp==0) return;
@@ -242,6 +243,7 @@ public final class PerfMon {
    }
 
    public void read_start(String key){
+       	log.error("read_start " + key);
         if(measureAllTimeProp==0)
 		return;
 	read_time=System.nanoTime();
@@ -268,6 +270,7 @@ public final class PerfMon {
 	read_flag = 0;
    }
    public void multiread_start(String key){
+        log.error("multiread_start " + key);
         if(measureAllTimeProp==0)
 		return;
 	multiread_time=System.nanoTime();
@@ -294,6 +297,7 @@ public final class PerfMon {
 	multiread_flag = 0;
    }
    public void indexread_start(String key){
+        log.error("indexread_start " + key);
         if(measureAllTimeProp==0)
 		return;
 	indexread_time=System.nanoTime();
@@ -320,6 +324,7 @@ public final class PerfMon {
 	indexread_flag = 0;
    }
    public void write_start(String key){
+        log.error("write_start " + key);
         if(measureAllTimeProp==0)
 		return;
 	write_time = System.nanoTime();
@@ -344,6 +349,7 @@ public final class PerfMon {
 	write_flag = 0;
    }
    public void indexwrite_start(String key){
+        log.error("indexwrite_start " + key);
         if(measureAllTimeProp==0)
 		return;
 	indexwrite_time = System.nanoTime();
@@ -368,6 +374,7 @@ public final class PerfMon {
 	indexwrite_flag = 0;
    }
    public void ser_start(String key){
+        log.error("ser_start " + key);
         if(measureAllTimeProp==0)
 		return;
 	ser_time = System.nanoTime();
@@ -393,6 +400,7 @@ public final class PerfMon {
 
    }
    public void indexser_start(String key){
+        log.error("indexser_start " + key);
         if(measureAllTimeProp==0)
 		return;
 	indexser_time = System.nanoTime();
@@ -418,6 +426,7 @@ public final class PerfMon {
 
    }
    public void deser_start(String key){
+        log.error("deser_start " + key);
         if(measureAllTimeProp==0)
 		return;
 	deser_time = System.nanoTime();
@@ -444,6 +453,7 @@ public final class PerfMon {
 	deser_flag = 0;
    }
    public void indexdeser_start(String key){
+        log.error("indexdeser_start " + key);
         if(measureAllTimeProp==0)
 		return;
 	indexdeser_time = System.nanoTime();

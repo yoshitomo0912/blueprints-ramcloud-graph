@@ -378,10 +378,10 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 			ByteBuffer.allocate(8).order(ByteOrder.LITTLE_ENDIAN).putLong((Long) vert).array();
 		vertPropTableMread[vertexNum] = new JRamCloud.multiReadObject(vertPropTableId, rckey);
 		if (vertexNum >= (mreadMax - 1)) {
-		    pm.multiread_start("MRA");
+		    pm.multiread_start("RamCloudGraph getVertices()");
 		    JRamCloud.Object outvertPropTable[] =
 			    vertTable.multiRead(vertPropTableMread);
-		    pm.multiread_end("MRA");
+		    pm.multiread_end("RamCloudGraph getVertices()");
 		    for (int i = 0; i < vertexNum; i++) {
 			if (outvertPropTable[i] != null) {
 			    vertices.add(new RamCloudVertex(outvertPropTable[i].key, this));
@@ -398,9 +398,9 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 		if (measureRcTimeProp == 1) {
 		    startTime2 = System.nanoTime();
 		}
-		pm.multiread_start("MRB");
+		pm.multiread_start("RamCloudGraph getVertices()");
 		JRamCloud.Object outvertPropTable[] = vertTable.multiRead(vertPropTableMread);
-		pm.multiread_end("MRB");
+		pm.multiread_end("RamCloudGraph getVertices()");
 		if (measureRcTimeProp == 1) {
 		    long endTime2 = System.nanoTime();
 		    log.error("Performance index multiread(key {}, number {}) time {}", key, vertexNum, endTime2 - startTime2);
