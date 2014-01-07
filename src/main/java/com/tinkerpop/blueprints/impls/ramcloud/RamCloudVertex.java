@@ -42,7 +42,7 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 	private Versioned<EdgeListProtoBuf> cachedAdjEdgeList;
 
 	public RamCloudVertex(long id, RamCloudGraph graph) {
-		super(idToRcKey(id), graph.vertPropTableId, graph.getRcClient(), graph);
+		super(idToRcKey(id), graph.vertPropTableId, graph);
 
 		this.id = id;
 		this.rcKey = idToRcKey(id);
@@ -51,7 +51,7 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 	}
 
 	public RamCloudVertex(byte[] rcKey, RamCloudGraph graph) {
-		super(rcKey, graph.vertPropTableId, graph.getRcClient(), graph);
+		super(rcKey, graph.vertPropTableId, graph);
 
 		this.id = rcKeyToId(rcKey);
 		this.rcKey = rcKey;
