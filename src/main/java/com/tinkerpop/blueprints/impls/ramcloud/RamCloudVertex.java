@@ -241,18 +241,22 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 				return;
 			} catch (UnsupportedOperationException e) {
 				pm.write_end("RAMCloudVertex updateEdgeAdjList()");
+				pm.write_condfail("RAMCloudVertex updateEdgeAdjList()");
 				log.error("{" + toString() + "}: Failed to modify a set of edges ({" + edgesToModify.toString() + "}): ", e);
 				return;
 			} catch (ClassCastException e) {
 				pm.write_end("RAMCloudVertex updateEdgeAdjList()");
+				pm.write_condfail("RAMCloudVertex updateEdgeAdjList()");
 				log.error("{" + toString() + "}: Failed to modify a set of edges ({" + edgesToModify.toString() + "}): ", e);
 				return;
 			} catch (NullPointerException e) {
 				pm.write_end("RAMCloudVertex updateEdgeAdjList()");
+				pm.write_condfail("RAMCloudVertex updateEdgeAdjList()");
 				log.error("{" + toString() + "}: Failed to modify a set of edges ({" + edgesToModify.toString() + "}): ", e);
 				return;
 			} catch (Exception e) {
 				pm.write_end("RAMCloudVertex updateEdgeAdjList()");
+				pm.write_condfail("RAMCloudVertex updateEdgeAdjList()");
 				// FIXME Workaround for native method exception declaration bug
 				if ( e instanceof WrongVersionException ) {
 					// FIXME loglevel raised for measurement. Was debug

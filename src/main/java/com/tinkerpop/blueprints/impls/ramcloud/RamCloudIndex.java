@@ -488,6 +488,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    }
 	} catch (Exception e) {
             pm.indexwrite_end("RamCloudIndex writeWithRules()");
+            pm.indexwrite_condfail("RamCloudIndex writeWithRules()");
 	    log.debug("Cond. Write index property: {} failed {} expected version: {}", new String(rcKey), e, expectedVersion);
 	    return false;
 	}
