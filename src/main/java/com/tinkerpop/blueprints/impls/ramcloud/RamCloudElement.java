@@ -48,7 +48,7 @@ public class RamCloudElement implements Element, Serializable {
     public RamCloudElement() {
     }
 
-    public RamCloudElement(byte[] rcPropTableKey, long rcPropTableId, JRamCloud rcClient, RamCloudGraph graph) {
+    public RamCloudElement(byte[] rcPropTableKey, long rcPropTableId, RamCloudGraph graph) {
 	this.rcPropTableKey = rcPropTableKey;
 	this.rcPropTableId = rcPropTableId;
 	this.graph = graph;
