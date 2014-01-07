@@ -215,12 +215,12 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 			try {
 				if ( add ) {
 					if (edges.addAll(edgesToModify) == false) {
-						log.warn("{" + toString() + "}: There aren't any changes to edges ({" + edgesToModify.toString() + "})");
+						log.warn("{}: There aren't any changes to edges ({})", this, edgesToModify);
 						return;
 					}
 				} else {
 					if (edges.removeAll(edgesToModify) == false) {
-						log.warn("{" + toString() + "}: There aren't any changes to edges ({" + edgesToModify.toString() + "})");
+						log.warn("{}: There aren't any changes to edges ({})", this, edgesToModify);
 						return;
 					}
 				}
@@ -236,19 +236,20 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 				this.cachedAdjEdgeList.setValue(edgeList, updated_version);
 				return;
 			} catch (UnsupportedOperationException e) {
-				log.error("{" + toString() + "}: Failed to modify a set of edges ({" + edgesToModify.toString() + "}): {" + e.toString() + "}");
+				log.error("{" + toString() + "}: Failed to modify a set of edges ({" + edgesToModify.toString() + "}): ", e);
 				return;
 			} catch (ClassCastException e) {
-				log.error("{" + toString() + "}: Failed to modify a set of edges ({" + edgesToModify.toString() + "}): {" + e.toString() + "}");
+				log.error("{" + toString() + "}: Failed to modify a set of edges ({" + edgesToModify.toString() + "}): ", e);
 				return;
 			} catch (NullPointerException e) {
-				log.error("{" + toString() + "}: Failed to modify a set of edges ({" + edgesToModify.toString() + "}): {" + e.toString() + "}");
+				log.error("{" + toString() + "}: Failed to modify a set of edges ({" + edgesToModify.toString() + "}): ", e);
 				return;
 			} catch (Exception e) {
 				// FIXME Workaround for native method exception declaration bug
 				if ( e instanceof WrongVersionException ) {
 					// FIXME loglevel raised for measurement. Was debug
-					log.error("Conditional Updating EdgeList failed for {} modifing {} RETRYING [{}]", this, edgesToModify, retry);
+					log.error("Conditional Updating EdgeList failed for {} RETRYING [{}]", this, retry);
+					//log.debug("Conditional Updating EdgeList failed for {} modifing {} RETRYING [{}]", this, edgesToModify, retry);
 					updateCachedAdjEdgeList();
 				} else {
 					log.debug("Cond. Write to modify adj edge list failed, exception thrown {}", e);
@@ -277,7 +278,7 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 			pm.read_end("RamCloudVertex updateCachedAdjEdgeList()");
 		} catch (Exception e) {
 			pm.read_end("RamCloudVertex updateCachedAdjEdgeList()");
-			log.error("{" + toString() + "}: Error reading vertex table entry: {" + e.toString() + "}");
+			log.error("{" + toString() + "}: Error reading vertex table entry: ", e);
 			return null;
 		}
 
@@ -290,7 +291,7 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 			return updatedEdgeList;
 		} catch (InvalidProtocolBufferException e) {
 			pm.deser_end("RamCloudVertex updateCachedAdjEdgeList()");
-			log.error("{" + toString() + "}: Read malformed edge list: {" + e.toString() + "}");
+			log.error("{" + toString() + "}: Read malformed edge list: ", e);
 			return null;
 		}
 	}
@@ -323,7 +324,7 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 		pm.ser_end("RamCloudVertex buildEdgeSetFromProtobuf()");
 		if(RamCloudGraph.measureSerializeTimeProp == 1) {
                  	long endTime = System.nanoTime();
-                	log.error("Performance buildEdgeSetFromProtobuf key {}, {}, size={}", this.toString(), endTime - startTime, edgeList.getSerializedSize());
+                	log.error("Performance buildEdgeSetFromProtobuf key {}, {}, size={}", this, endTime - startTime, edgeList.getSerializedSize());
 		}
 		return edgeSet;
 	}
@@ -366,7 +367,7 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 					}
 				}
 			} else {
-				log.warn("{" + toString() + "}: Tried to add an edge unowned by this vertex ({" + edge.toString() + "})");
+				log.warn("{}: Tried to add an edge unowned by this vertex ({})", this, edge);
 			}
 		}
 
@@ -374,7 +375,7 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 		pm.ser_end("RamCloudVertex buildProtoBufFromEdgeSet");
 		if(RamCloudGraph.measureSerializeTimeProp == 1) {
                 	long endTime = System.nanoTime();
-                	log.error("Performance buildProtoBufFromEdgeSet key {}, {}, size={}", this.toString(), endTime - startTime, buf.getSerializedSize());
+                	log.error("Performance buildProtoBufFromEdgeSet key {}, {}, size={}", this, endTime - startTime, buf.getSerializedSize());
 		}
 		return buf;
 	}
@@ -464,7 +465,7 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 		} else if (!vertTableEntryExists && !vertPropTableEntryExists) {
 			return false;
 		} else {
-			log.warn("{" + toString() + "}: Detected RamCloudGraph inconsistency: vertTableEntryExists={" + vertTableEntryExists + "}, vertPropTableEntryExists={" + vertPropTableEntryExists + "}.");
+			log.warn("{}: Detected RamCloudGraph inconsistency: vertTableEntryExists={}, vertPropTableEntryExists={}.", this, vertTableEntryExists, vertPropTableEntryExists);
 			return true;
 		}
 	}
@@ -494,7 +495,7 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 	public void debugPrintEdgeList() {
 		List<RamCloudEdge> edgeList = getEdgeList();
 
-		log.debug(toString() + ": Debug Printing Edge List...");
+		log.debug("{}: Debug Printing Edge List...", this);
 		for (RamCloudEdge edge : edgeList) {
 			System.out.println(edge.toString());
 		}

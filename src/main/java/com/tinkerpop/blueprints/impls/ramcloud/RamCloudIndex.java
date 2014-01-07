@@ -95,7 +95,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 		long endTime = System.nanoTime();
 		log.error("Performance index exists(indexName {}) exception read time {}", indexName, endTime - startTime);
 	    }
-	    log.debug("IndexTable entry for " + indexName + " does not exists(): " + new String(rcKey) + "@" + tableId + " [" + this.toString() + "]");
+	    log.debug("IndexTable entry for {} does not exists(): {}@{} [{}]", indexName, new String(rcKey), tableId, this);
 	    return false;
 	}
     }
@@ -122,7 +122,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 		}
 	    } catch (Exception e) {
 		pm.indexwrite_end("RamCloudIndex create()");
-		log.info(toString() + ": Write create index list: " + e.toString());
+		log.info(toString() + ": Write create index list: ", e);
 	    }
 	}
     }
@@ -203,7 +203,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 		    break;
 		} else {
 		    // FIXME loglevel raised for measurement. Was debug
-		    log.error("getSetProperty(String " + propValue + ", Object " + elmId + ") cond. write failure RETRYING " + (i + 1));
+		    log.error("getSetProperty(String {}, Object {}) cond. write failure RETRYING {}", propValue, elmId, i+1);
 		    if (i == 100) {
 			log.error("getSetProperty(String key, Object value) cond. write failure Gaveup RETRYING");
 		    }
@@ -410,7 +410,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 		long endTime = System.nanoTime();
 		log.error("Performance readIndexPropertyMapFromDB(indexName {}) exception read time {}", indexName, endTime - startTime);
 	    }
-	    log.warn("readIndexPropertyMapFromDB() Element does not have a index property table entry! tableId :" + tableId + " indexName : " + indexName + " " + e);
+	    log.warn("readIndexPropertyMapFromDB() Element does not have a index property table entry! tableId :" + tableId + " indexName : " + indexName + " ", e);
 	    return null;
 	}
 
@@ -488,7 +488,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    }
 	} catch (Exception e) {
             pm.indexwrite_end("RamCloudIndex writeWithRules()");
-	    log.debug("Cond. Write index property: " + new String(rcKey) + " failed " + e.toString() + " expected version: " + expectedVersion);
+	    log.debug("Cond. Write index property: {} failed {} expected version: {}", new String(rcKey), e, expectedVersion);
 	    return false;
 	}
 	return true;
@@ -497,7 +497,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
     public List<Object> getElmIdListForPropValue(Object propValue) {
 	Map<Object, List<Object>> map = readIndexPropertyMapFromDB();
 	if (map == null) {
-	    log.error("IndexPropertyMap was null. " + this.indexName + " : " + propValue);
+	    log.error("IndexPropertyMap was null. {} : {}", indexName, propValue);
 	    return null;
 	}
 	return map.get(propValue);
@@ -527,7 +527,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
     }
 
     public void removeIndex() {
-	log.info("Removing Index: " + indexName + " was version " + indexVersion + " [" + this + "]");
+	log.info("Removing Index: {} was version {} [{}]", indexName, indexVersion, this);
 	graph.getRcClient().remove(tableId, rcKey);
     }
 }
