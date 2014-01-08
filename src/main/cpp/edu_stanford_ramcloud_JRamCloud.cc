@@ -95,6 +95,35 @@ class JByteArrayGetter {
     const jsize length;
 };
 
+class JByteArrayReference {
+  public:
+    JByteArrayReference(JNIEnv* env, jbyteArray jByteArray)
+        : env(env)
+        , jByteArray(jByteArray)
+        , pointer(static_cast<const void*>(env->GetByteArrayElements(jByteArray, 0)))
+        , length(env->GetArrayLength(jByteArray))
+    {
+        check_null(pointer, "GetByteArrayElements failed");
+    }
+
+    ~JByteArrayReference()
+    {
+        if (pointer != NULL) {
+            env->ReleaseByteArrayElements(jByteArray,
+                                          reinterpret_cast<jbyte*>(pointer),
+                                          JNI_ABORT);
+        }
+    }
+
+  private:
+    JNIEnv* env;
+    jbyteArray jByteArray;
+
+  public:
+    const void* const pointer;
+    const jsize length;
+};
+
 static RamCloud*
 getRamCloud(JNIEnv* env, jobject jRamCloud)
 {
@@ -291,7 +320,7 @@ JNICALL Java_edu_stanford_ramcloud_JRamCloud_read__J_3B(JNIEnv *env,
                                   jbyteArray jKey)
 {
     RamCloud* ramcloud = getRamCloud(env, jRamCloud);
-    JByteArrayGetter key(env, jKey);
+    JByteArrayReference key(env, jKey);
 
     Buffer buffer;
     uint64_t version;
@@ -418,7 +447,7 @@ JNICALL Java_edu_stanford_ramcloud_JRamCloud_remove__J_3B(JNIEnv *env,
                                     jbyteArray jKey)
 {
     RamCloud* ramcloud = getRamCloud(env, jRamCloud);
-    JByteArrayGetter key(env, jKey);
+    JByteArrayReference key(env, jKey);
     uint64_t version;
     try {
         ramcloud->remove(jTableId, key.pointer, key.length, NULL, &version);
@@ -440,7 +469,7 @@ JNICALL Java_edu_stanford_ramcloud_JRamCloud_remove__J_3BLJRamCloud_RejectRules_
 {
     // XXX- handle RejectRules
     RamCloud* ramcloud = getRamCloud(env, jRamCloud);
-    JByteArrayGetter key(env, jKey);
+    JByteArrayReference key(env, jKey);
     uint64_t version;
     try {
         ramcloud->remove(jTableId, key.pointer, key.length, NULL, &version);
@@ -461,7 +490,7 @@ JNICALL Java_edu_stanford_ramcloud_JRamCloud_write__J_3B_3B(JNIEnv *env,
                                       jbyteArray jValue)
 {
     RamCloud* ramcloud = getRamCloud(env, jRamCloud);
-    JByteArrayGetter key(env, jKey);
+    JByteArrayReference key(env, jKey);
     JByteArrayGetter value(env, jValue);
     uint64_t version;
     try {
@@ -489,7 +518,7 @@ JNICALL Java_edu_stanford_ramcloud_JRamCloud_write__J_3B_3BLJRamCloud_RejectRule
 {
     // XXX- handle RejectRules    
     RamCloud* ramcloud = getRamCloud(env, jRamCloud);
-    JByteArrayGetter key(env, jKey);
+    JByteArrayReference key(env, jKey);
     JByteArrayGetter value(env, jValue);
     RejectRules rules;
     jclass ruleClass = env->GetObjectClass(jRejectRules);
@@ -528,7 +557,7 @@ JNICALL Java_edu_stanford_ramcloud_JRamCloud_writeRule(JNIEnv *env,
         jbyteArray jValue,
         jobject jRejectRules) {
     RamCloud* ramcloud = getRamCloud(env, jRamCloud);
-    JByteArrayGetter key(env, jKey);
+    JByteArrayReference key(env, jKey);
     JByteArrayGetter value(env, jValue);
     uint64_t version;
     RejectRules rules = {};
@@ -619,7 +648,7 @@ JNIEXPORT jobject JNICALL Java_edu_stanford_ramcloud_JRamCloud_00024TableEnumera
         jbyteArray jKey = env->NewByteArray(object.getKeyLength());
         jbyteArray jValue = env->NewByteArray(object.getDataLength());
         
-        JByteArrayGetter key(env, jKey);
+        JByteArrayReference key(env, jKey);
         JByteArrayGetter value(env, jValue);
 
         memcpy(key.pointer, object.getKey(), object.getKeyLength());
