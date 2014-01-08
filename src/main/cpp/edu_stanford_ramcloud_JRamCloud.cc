@@ -349,10 +349,11 @@ JNICALL Java_edu_stanford_ramcloud_JRamCloud_multiRead(JNIEnv *env,
                                                         jobjectArray jmultiReadArray){
 
     RamCloud* ramcloud = getRamCloud(env, jRamCloud);
-    jint requestNum = env->GetArrayLength(jmultiReadArray);
+    const jint requestNum = env->GetArrayLength(jmultiReadArray);
     MultiReadObject objects[requestNum];
     Tub<Buffer> values[requestNum];
     jbyteArray jKey[requestNum];
+    MultiReadObject* requests[requestNum];
 
     const static jclass cls = (jclass)env->NewGlobalRef(env->FindClass(PACKAGE_PATH "JRamCloud$multiReadObject"));
     const static jfieldID jf_tableId = env->GetFieldID(cls, "tableId", "J");
@@ -363,7 +364,7 @@ JNICALL Java_edu_stanford_ramcloud_JRamCloud_multiRead(JNIEnv *env,
         check_null(obj, "GetObjectArrayElement failed");
         jlong jTableId = env->GetLongField(obj, jf_tableId);
 
-        jKey[i] = (jbyteArray)env->GetObjectField (obj, jf_key);
+        jKey[i] = (jbyteArray)env->GetObjectField(obj, jf_key);
 
         jbyte* data = env->GetByteArrayElements(jKey[i], NULL);
         check_null(data, "GetByteArrayElements failed");
@@ -372,11 +373,7 @@ JNICALL Java_edu_stanford_ramcloud_JRamCloud_multiRead(JNIEnv *env,
         objects[i].key = data;
         objects[i].keyLength = env->GetArrayLength(jKey[i]);
         objects[i].value = &values[i];
-    }
-
-    MultiReadObject* requests[requestNum];
-    for (int i = 0 ; i < requestNum ; i++) {
-    	requests[i] = &objects[i];
+        requests[i] = &objects[i];
     }
 
     try {
@@ -533,8 +530,7 @@ JNICALL Java_edu_stanford_ramcloud_JRamCloud_writeRule(JNIEnv *env,
     JByteArrayGetter key(env, jKey);
     JByteArrayGetter value(env, jValue);
     uint64_t version;
-    RejectRules rules;
-    memset(&rules, 0, sizeof(rules));
+    RejectRules rules = {};
     const static jclass jc_RejectRules = (jclass)env->NewGlobalRef(env->FindClass(PACKAGE_PATH "JRamCloud$RejectRules"));
 
     const static jfieldID jf_doesntExist = env->GetFieldID(jc_RejectRules, "doesntExist", "Z");
