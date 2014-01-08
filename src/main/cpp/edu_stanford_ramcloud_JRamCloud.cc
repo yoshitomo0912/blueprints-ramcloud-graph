@@ -98,7 +98,7 @@ class JByteArrayGetter {
 static RamCloud*
 getRamCloud(JNIEnv* env, jobject jRamCloud)
 {
-    const static jclass cls = env->FindClass(PACKAGE_PATH "JRamCloud");
+    const static jclass cls = (jclass)env->NewGlobalRef(env->FindClass(PACKAGE_PATH "JRamCloud"));
     const static jfieldID fieldId = env->GetFieldID(cls, "ramcloudObjectPointer", "J");
     return reinterpret_cast<RamCloud*>(env->GetLongField(jRamCloud, fieldId));
 }
@@ -106,7 +106,7 @@ getRamCloud(JNIEnv* env, jobject jRamCloud)
 static TableEnumerator*
 getTableEnumerator(JNIEnv* env, jobject jTableEnumerator)
 {
-    const static jclass cls = env->FindClass(PACKAGE_PATH "JRamCloud$TableEnumerator");
+    const static jclass cls = (jclass)env->NewGlobalRef(env->FindClass(PACKAGE_PATH "JRamCloud$TableEnumerator"));
     const static jfieldID fieldId = env->GetFieldID(cls, "tableEnumeratorObjectPointer", "J");
     return reinterpret_cast<TableEnumerator*>(env->GetLongField(jTableEnumerator, fieldId));    
 }
@@ -306,7 +306,7 @@ JNICALL Java_edu_stanford_ramcloud_JRamCloud_read__J_3B(JNIEnv *env,
 
     // Note that using 'javap -s' on the class file will print out the method
     // signatures (the third argument to GetMethodID).
-    const static jclass cls = env->FindClass(PACKAGE_PATH "JRamCloud$Object");
+    const static jclass cls = (jclass)env->NewGlobalRef(env->FindClass(PACKAGE_PATH "JRamCloud$Object"));
     check_null(cls, "FindClass failed");
 
     const static jmethodID methodId = env->GetMethodID(cls,
@@ -354,15 +354,15 @@ JNICALL Java_edu_stanford_ramcloud_JRamCloud_multiRead(JNIEnv *env,
     Tub<Buffer> values[requestNum];
     jbyteArray jKey[requestNum];
 
+    const static jclass cls = (jclass)env->NewGlobalRef(env->FindClass(PACKAGE_PATH "JRamCloud$multiReadObject"));
+    const static jfieldID jf_tableId = env->GetFieldID(cls, "tableId", "J");
+    const static jfieldID jf_key = env->GetFieldID(cls, "key", "[B");
+
     for (int i = 0 ; i < requestNum ; i++){
         jobject obj = env->GetObjectArrayElement(jmultiReadArray, i);
         check_null(obj, "GetObjectArrayElement failed");
-        const static jclass cls = env->FindClass(PACKAGE_PATH "JRamCloud$multiReadObject");
-
-        const static jfieldID jf_tableId = env->GetFieldID(cls, "tableId", "J");
         jlong jTableId = env->GetLongField(obj, jf_tableId);
 
-        const static jfieldID jf_key = env->GetFieldID(cls, "key", "[B");
         jKey[i] = (jbyteArray)env->GetObjectField (obj, jf_key);
 
         jbyte* data = env->GetByteArrayElements(jKey[i], NULL);
@@ -383,7 +383,7 @@ JNICALL Java_edu_stanford_ramcloud_JRamCloud_multiRead(JNIEnv *env,
         ramcloud->multiRead(requests, requestNum);
     } EXCEPTION_CATCHER(NULL);
     
-    const static jclass cls = env->FindClass(PACKAGE_PATH "JRamCloud$Object");
+    const static jclass cls = (jclass)env->NewGlobalRef(env->FindClass(PACKAGE_PATH "JRamCloud$Object"));
     check_null(cls, "FindClass failed");
     const static jmethodID methodId = env->GetMethodID(cls,
                                         "<init>",
@@ -535,7 +535,7 @@ JNICALL Java_edu_stanford_ramcloud_JRamCloud_writeRule(JNIEnv *env,
     uint64_t version;
     RejectRules rules;
     memset(&rules, 0, sizeof(rules));
-    const static jclass jc_RejectRules = env->FindClass(PACKAGE_PATH "JRamCloud$RejectRules");
+    const static jclass jc_RejectRules = (jclass)env->NewGlobalRef(env->FindClass(PACKAGE_PATH "JRamCloud$RejectRules"));
 
     const static jfieldID jf_doesntExist = env->GetFieldID(jc_RejectRules, "doesntExist", "Z");
     check_null(jf_doesntExist, "doesentExist field id is null");
@@ -581,7 +581,7 @@ JNIEXPORT jlong JNICALL Java_edu_stanford_ramcloud_JRamCloud_00024TableEnumerato
                                                                                       jobject jTableEnumerator, 
                                                                                       jlong jTableId)
 {
-    const static jclass cls = env->FindClass(PACKAGE_PATH "JRamCloud$TableEnumerator");
+    const static jclass cls = (jclass)env->NewGlobalRef(env->FindClass(PACKAGE_PATH "JRamCloud$TableEnumerator"));
     const static jfieldID fieldId = env->GetFieldID(cls, "ramCloudObjectPointer", "J");
     RamCloud* ramcloud = reinterpret_cast<RamCloud*>(env->GetLongField(jTableEnumerator, fieldId));
   
@@ -630,7 +630,7 @@ JNIEXPORT jobject JNICALL Java_edu_stanford_ramcloud_JRamCloud_00024TableEnumera
 
         version = object.getVersion();
         
-        const static jclass cls = env->FindClass(PACKAGE_PATH "JRamCloud$Object");
+        const static jclass cls = (jclass)env->NewGlobalRef(env->FindClass(PACKAGE_PATH "JRamCloud$Object"));
         check_null(cls, "FindClass failed");
         const static jmethodID methodId = env->GetMethodID(cls,
                                           "<init>",
