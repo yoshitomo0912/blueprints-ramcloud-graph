@@ -47,7 +47,10 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 		this.id = id;
 		this.rcKey = idToRcKey(id);
 		this.graph = graph;
+		PerfMon pm = PerfMon.getInstance();
+		pm.ser_start("RamCloudVertex(long,...)");
 		cachedAdjEdgeList = new Versioned<EdgeListProtoBuf>(EdgeListProtoBuf.newBuilder().build());
+		pm.ser_end("RamCloudVertex(long,...)");
 	}
 
 	public RamCloudVertex(byte[] rcKey, RamCloudGraph graph) {
@@ -56,7 +59,10 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 		this.id = rcKeyToId(rcKey);
 		this.rcKey = rcKey;
 		this.graph = graph;
+		PerfMon pm = PerfMon.getInstance();
+		pm.ser_start("RamCloudVertex(byte[],...)");
 		cachedAdjEdgeList = new Versioned<EdgeListProtoBuf>(EdgeListProtoBuf.newBuilder().build());
+		pm.ser_end("RamCloudVertex(byte[],...)");
 	}
 
 	/*
@@ -320,7 +326,7 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 		if(RamCloudGraph.measureSerializeTimeProp == 1) {
 		    startTime = System.nanoTime();
 		}
-		pm.ser_start("RamCloudVertex buildEdgeSetFromProtobuf()");
+		pm.deser_start("RamCloudVertex buildEdgeSetFromProtobuf()");
 		Set<RamCloudEdge> edgeSet = new HashSet<RamCloudEdge>( edgeList.getEdgeCount() );
 		for (EdgeProtoBuf edge : edgeList.getEdgeList()) {
 			if ((direction.equals(Direction.BOTH) || (edge.getOutgoing() ^ direction.equals(Direction.IN)))
@@ -333,7 +339,7 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 				}
 			}
 		}
-		pm.ser_end("RamCloudVertex buildEdgeSetFromProtobuf()");
+		pm.deser_end("RamCloudVertex buildEdgeSetFromProtobuf()");
 		if(RamCloudGraph.measureSerializeTimeProp == 1) {
                  	long endTime = System.nanoTime();
                 	log.error("Performance buildEdgeSetFromProtobuf key {}, {}, size={}", this, endTime - startTime, edgeList.getSerializedSize());
@@ -400,6 +406,9 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 	private List<RamCloudEdge> getEdgeList(Direction direction, String... labels) {
 
 		Versioned<EdgeListProtoBuf> cachedEdgeList = updateCachedAdjEdgeList();
+		PerfMon pm = PerfMon.getInstance();
+		pm.deser_start("RamCloudVertex getEdgeList()");
+
 		List<RamCloudEdge> edgeList = new ArrayList<RamCloudEdge>(cachedEdgeList.getValue().getEdgeCount());
 
 		for (EdgeProtoBuf edge : cachedEdgeList.getValue().getEdgeList()) {
@@ -413,6 +422,7 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 				}
 			}
 		}
+		pm.deser_end("RamCloudVertex getEdgeList()");
 
 		return edgeList;
 	}
