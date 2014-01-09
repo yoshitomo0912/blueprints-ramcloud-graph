@@ -430,7 +430,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    pm.indexdeser_start("RamCloudIndex convertRcBytesToIndexPropertyMap()");
 	    ByteBufferInput input = new ByteBufferInput(byteArray);
 	    ArrayList list = kryo.get().readObject(input, ArrayList.class);
-	    TreeMap map = new TreeMap();
+	    TreeMap<Object, List<Object>> map = new TreeMap<Object, List<Object>>();
             try {
                 String s = new String(rcKey, "UTF-8");
 	        String propVal = s.substring(s.indexOf('=')+1);

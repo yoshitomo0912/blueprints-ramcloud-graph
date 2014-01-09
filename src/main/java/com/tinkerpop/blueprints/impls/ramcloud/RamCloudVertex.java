@@ -47,10 +47,7 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 		this.id = id;
 		this.rcKey = idToRcKey(id);
 		this.graph = graph;
-		PerfMon pm = PerfMon.getInstance();
-		pm.protoser_start("RamCloudVertex(long,...)");
-		cachedAdjEdgeList = new Versioned<EdgeListProtoBuf>(EdgeListProtoBuf.newBuilder().build());
-		pm.protoser_end("RamCloudVertex(long,...)");
+		this.cachedAdjEdgeList = null;
 	}
 
 	public RamCloudVertex(byte[] rcKey, RamCloudGraph graph) {
@@ -59,10 +56,17 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 		this.id = rcKeyToId(rcKey);
 		this.rcKey = rcKey;
 		this.graph = graph;
+		this.cachedAdjEdgeList = null;
+	}
+
+	private Versioned<EdgeListProtoBuf> getLocalCachedAdjEdgeList() {
+	    if ( cachedAdjEdgeList == null ) {
 		PerfMon pm = PerfMon.getInstance();
 		pm.protoser_start("RamCloudVertex(byte[],...)");
 		cachedAdjEdgeList = new Versioned<EdgeListProtoBuf>(EdgeListProtoBuf.newBuilder().build());
 		pm.protoser_end("RamCloudVertex(byte[],...)");
+	    }
+	    return cachedAdjEdgeList;
 	}
 
 	/*
@@ -186,50 +190,53 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 		return ByteBuffer.wrap(rcKey).order(ByteOrder.LITTLE_ENDIAN).getLong();
 	}
 
-	void addEdgeToAdjList(RamCloudEdge edge) {
+	boolean addEdgeToAdjList(RamCloudEdge edge) {
 		List<RamCloudEdge> edgesToAdd = new ArrayList<RamCloudEdge>(1);
 		edgesToAdd.add(edge);
-		addEdgesToAdjList(edgesToAdd);
+		return addEdgesToAdjList(edgesToAdd);
 	}
-	void removeEdgeFromAdjList(RamCloudEdge edge) {
+	boolean removeEdgeFromAdjList(RamCloudEdge edge) {
 		List<RamCloudEdge> edgesToRemove = new ArrayList<RamCloudEdge>(1);
 		edgesToRemove.add(edge);
-		removeEdgesFromAdjList(edgesToRemove);
+		return removeEdgesFromAdjList(edgesToRemove);
 	}
 
-	private void addEdgesToAdjList(List<RamCloudEdge> edgesToAdd) {
-		updateEdgeAdjList(edgesToAdd, true);
+	private boolean addEdgesToAdjList(List<RamCloudEdge> edgesToAdd) {
+		return updateEdgeAdjList(edgesToAdd, true);
 	}
-	private void removeEdgesFromAdjList(List<RamCloudEdge> edgesToAdd) {
-		updateEdgeAdjList(edgesToAdd, false);
+	private boolean removeEdgesFromAdjList(List<RamCloudEdge> edgesToAdd) {
+		return updateEdgeAdjList(edgesToAdd, false);
 	}
 
 	/** Conditionally update Adj. Edge List
-	 * */
-	private void updateEdgeAdjList(List<RamCloudEdge> edgesToModify, boolean add) {
+	 * @return true if EdgeAdjList was logically modified.(Cache update does not imply true return)
+	 */
+	private boolean updateEdgeAdjList(List<RamCloudEdge> edgesToModify, boolean add) {
 		PerfMon pm = PerfMon.getInstance();
 		JRamCloud rcClient = graph.getRcClient();
 		final int MAX_RETRIES = 100;
 		for (int retry = 1 ; retry <= MAX_RETRIES ; ++retry ) {
+			Versioned<EdgeListProtoBuf> adjEdgeList = getLocalCachedAdjEdgeList();
 
-			long expected_version = this.cachedAdjEdgeList.getVersion();
+			long expected_version = adjEdgeList.getVersion();
 			if ( expected_version == 0L && add == false ) {
 				updateCachedAdjEdgeList();
-				expected_version = this.cachedAdjEdgeList.getVersion();
+				adjEdgeList = getLocalCachedAdjEdgeList();
+				expected_version = adjEdgeList.getVersion();
 			}
-			Set<RamCloudEdge> edges = buildEdgeSetFromProtobuf(this.cachedAdjEdgeList.getValue(), Direction.BOTH);
+			Set<RamCloudEdge> edges = buildEdgeSetFromProtobuf(adjEdgeList.getValue(), Direction.BOTH);
 			//log.debug( (add?"Adding":"Removing") + " edges to: {"+ edges+ "}");
 
 			try {
 				if ( add ) {
 					if (edges.addAll(edgesToModify) == false) {
 						log.warn("{}: There aren't any changes to edges ({})", this, edgesToModify);
-						return;
+						return false;
 					}
 				} else {
 					if (edges.removeAll(edgesToModify) == false) {
 						log.warn("{}: There aren't any changes to edges ({})", this, edgesToModify);
-						return;
+						return false;
 					}
 				}
 
@@ -244,37 +251,39 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 				long updated_version = rcClient.writeRule(graph.vertTableId, rcKey, edgeList.toByteArray(), rules);
 				pm.write_end("RAMCloudVertex updateEdgeAdjList()");
 				this.cachedAdjEdgeList.setValue(edgeList, updated_version);
-				return;
+				return true;
 			} catch (UnsupportedOperationException e) {
 				pm.write_end("RAMCloudVertex updateEdgeAdjList()");
 				pm.write_condfail("RAMCloudVertex updateEdgeAdjList()");
-				log.error("{" + toString() + "}: Failed to modify a set of edges ({" + edgesToModify.toString() + "}): ", e);
-				return;
+				log.error("{" + toString() + "}: Failed to modify a set of edges ({" + edgesToModify + "}): ", e);
+				return false;
 			} catch (ClassCastException e) {
 				pm.write_end("RAMCloudVertex updateEdgeAdjList()");
 				pm.write_condfail("RAMCloudVertex updateEdgeAdjList()");
-				log.error("{" + toString() + "}: Failed to modify a set of edges ({" + edgesToModify.toString() + "}): ", e);
-				return;
+				log.error("{" + toString() + "}: Failed to modify a set of edges ({" + edgesToModify + "}): ", e);
+				return false;
 			} catch (NullPointerException e) {
 				pm.write_end("RAMCloudVertex updateEdgeAdjList()");
 				pm.write_condfail("RAMCloudVertex updateEdgeAdjList()");
-				log.error("{" + toString() + "}: Failed to modify a set of edges ({" + edgesToModify.toString() + "}): ", e);
-				return;
+				log.error("{" + toString() + "}: Failed to modify a set of edges ({" + edgesToModify + "}): ", e);
+				return false;
 			} catch (Exception e) {
 				pm.write_end("RAMCloudVertex updateEdgeAdjList()");
 				pm.write_condfail("RAMCloudVertex updateEdgeAdjList()");
 				// FIXME Workaround for native method exception declaration bug
 				if ( e instanceof WrongVersionException ) {
 					// FIXME loglevel raised for measurement. Was debug
-					log.error("Conditional Updating EdgeList failed for {} RETRYING [{}]", this, retry);
+					log.error("Conditional Updating EdgeList failed for {} RETRYING {}", this, retry);
 					//log.debug("Conditional Updating EdgeList failed for {} modifing {} RETRYING [{}]", this, edgesToModify, retry);
 					updateCachedAdjEdgeList();
 				} else {
-					log.debug("Cond. Write to modify adj edge list failed, exception thrown {}", e);
+					log.debug("Cond. Write to modify adj edge list failed, exception thrown", e);
 					updateCachedAdjEdgeList();
 				}
 			}
 		}
+		log.error("Conditional Updating EdgeList failed for {} gave up RETRYING", this);
+		return false;
 	}
 
 	/** Get all adj.edge list
