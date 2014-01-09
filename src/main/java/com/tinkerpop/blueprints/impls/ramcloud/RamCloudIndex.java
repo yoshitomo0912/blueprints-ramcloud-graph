@@ -202,10 +202,9 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 		if (writeWithRules(rcValue)) {
 		    break;
 		} else {
-		    // FIXME loglevel raised for measurement. Was debug
-		    log.error("getSetProperty(String {}, Object {}) cond. write failure RETRYING {}", propValue, elmId, i+1);
+		    log.debug("getSetProperty(String {}, Object {}) cond. write failure RETRYING {}", propValue, elmId, i+1);
 		    if (i == 100) {
-			log.error("getSetProperty(String key, Object value) cond. write failure Gaveup RETRYING");
+			log.error("getSetProperty(String {}, Object {}) cond. write failure Gaveup RETRYING", propValue, elmId);
 		    }
 		}
 	    }
@@ -260,7 +259,8 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	}
 
 	// FIXME better loop variable name
-	for (int i = 0; i < 100; ++i) {
+	final int MAX_RETRYS = 100;
+	for (int i = 0; i < MAX_RETRYS; ++i) {
 	    Map<Object, List<Object>> map = readIndexPropertyMapFromDB();
 
 	    if (map.containsKey(propValue)) {
@@ -297,9 +297,8 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    if (writeWithRules(rcValue)) {
 		break;
 	    } else {
-		// FIXME loglevel raised for measurement. Was debug
-		log.error("remove({}, {}, T element) write failure RETRYING {}", propName, propValue, (i + 1));
-		if (i + 1 == 100) {
+		log.debug("remove({}, {}, T element) write failure RETRYING {}", propName, propValue, (i + 1));
+		if (i + 1 == MAX_RETRYS) {
 		    log.error("remove({}, {}, T element) write failed completely. gave up RETRYING", propName, propValue);
 		}
 	    }
@@ -344,8 +343,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 		continue;
 	    } else {
 		// cond. write failure
-		// FIXME loglevel raised for measurement. Was warn
-		log.error("removeElement({}, {}, ...) cond. key/value write failure RETRYING", tableId, element );
+		log.debug("removeElement({}, {}, ...) cond. key/value write failure RETRYING", tableId, element );
 		// FIXME Dirty hack
 		final int RETRY_MAX = 100;
 		for (int retry = RETRY_MAX; retry >= 0; --retry) {
@@ -369,14 +367,13 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 		    }
 
 		    if (idx.writeWithRules(convertIndexPropertyMapToRcBytes(rereadMap))) {
-			// FIXME loglevel raised for measurement. Was warn
-			log.error("removeElement({}, {}, ...) cond. key/value {} write failure RETRYING {}", tableId, element, rereadMap, RETRY_MAX - retry);
+			log.debug("removeElement({}, {}, ...) cond. key/value {} write failure RETRYING {}", tableId, element, rereadMap, RETRY_MAX - retry);
 			// cond. re-write success
 			break;
 		    }
 		    if (retry == 0) {
 			log.error("removeElement({}, {}, ...) cond. write failed completely. Gave up RETRYING", tableId, element);
-			// XXX may be we should throw some king of exception here?
+			// XXX may be we should throw some kind of exception here?
 		    }
 		}
 	    }
@@ -500,7 +497,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	} catch (Exception e) {
             pm.indexwrite_end("RamCloudIndex writeWithRules()");
             pm.indexwrite_condfail("RamCloudIndex writeWithRules()");
-	    log.debug("Cond. Write index property: {} failed {} expected version: {}", new String(rcKey), e, expectedVersion);
+	    log.debug("Cond. Write index property: {} failed {} expected version: {}", rcKeyToIndexName(rcKey), e, expectedVersion);
 	    return false;
 	}
 	return true;
@@ -529,11 +526,11 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 		if (writeWithRules(rcValue)) {
 		    return retVal;
 		} else {
-		    // FIXME loglevel raised for measurement. Was info
-		    log.error("removeIndexProperty({}, {}, ...) cond. key/value write failure RETRYING {}", tableId, retVal, (i + 1));
+		    log.debug("removeIndexProperty({}) cond. key/value write failure RETRYING {}", tableId, (i + 1));
 		}
 	    }
 	}
+	log.error("removeIndexProperty({}) cond. key/value write failure gave up RETRYING", tableId);
 	// XXX ?Is this correct
 	return null;
     }

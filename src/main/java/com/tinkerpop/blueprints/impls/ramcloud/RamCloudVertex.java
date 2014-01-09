@@ -59,15 +59,6 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 		this.cachedAdjEdgeList = null;
 	}
 
-	private Versioned<EdgeListProtoBuf> getLocalCachedAdjEdgeList() {
-	    if ( cachedAdjEdgeList == null ) {
-		PerfMon pm = PerfMon.getInstance();
-		pm.protoser_start("RamCloudVertex(byte[],...)");
-		cachedAdjEdgeList = new Versioned<EdgeListProtoBuf>(EdgeListProtoBuf.newBuilder().build());
-		pm.protoser_end("RamCloudVertex(byte[],...)");
-	    }
-	    return cachedAdjEdgeList;
-	}
 
 	/*
 	 * Vertex interface implementation
@@ -216,15 +207,23 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 		JRamCloud rcClient = graph.getRcClient();
 		final int MAX_RETRIES = 100;
 		for (int retry = 1 ; retry <= MAX_RETRIES ; ++retry ) {
-			Versioned<EdgeListProtoBuf> adjEdgeList = getLocalCachedAdjEdgeList();
-
-			long expected_version = adjEdgeList.getVersion();
+			Set<RamCloudEdge> edges;
+			long expected_version = 0L;
+			if ( this.cachedAdjEdgeList == null ) {
+				edges = new HashSet<RamCloudEdge>();
+			} else {
+				expected_version = this.cachedAdjEdgeList.getVersion();
+				if ( expected_version == 0L && add == false ) {
+					updateCachedAdjEdgeList();
+					expected_version = this.cachedAdjEdgeList.getVersion();
+				}
+				edges = buildEdgeSetFromProtobuf(this.cachedAdjEdgeList.getValue(), Direction.BOTH);
+			}
 			if ( expected_version == 0L && add == false ) {
 				updateCachedAdjEdgeList();
-				adjEdgeList = getLocalCachedAdjEdgeList();
-				expected_version = adjEdgeList.getVersion();
+				expected_version = this.cachedAdjEdgeList.getVersion();
+				edges = buildEdgeSetFromProtobuf(this.cachedAdjEdgeList.getValue(), Direction.BOTH);
 			}
-			Set<RamCloudEdge> edges = buildEdgeSetFromProtobuf(adjEdgeList.getValue(), Direction.BOTH);
 			//log.debug( (add?"Adding":"Removing") + " edges to: {"+ edges+ "}");
 
 			try {
@@ -272,8 +271,7 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 				pm.write_condfail("RAMCloudVertex updateEdgeAdjList()");
 				// FIXME Workaround for native method exception declaration bug
 				if ( e instanceof WrongVersionException ) {
-					// FIXME loglevel raised for measurement. Was debug
-					log.error("Conditional Updating EdgeList failed for {} RETRYING {}", this, retry);
+					log.debug("Conditional Updating EdgeList failed for {} RETRYING {}", this, retry);
 					//log.debug("Conditional Updating EdgeList failed for {} modifing {} RETRYING [{}]", this, edgesToModify, retry);
 					updateCachedAdjEdgeList();
 				} else {

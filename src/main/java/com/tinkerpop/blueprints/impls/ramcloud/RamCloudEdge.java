@@ -120,17 +120,13 @@ public class RamCloudEdge extends RamCloudElement implements Edge {
 	    edgePropTableEntryExists = false;
 	}
 
-	// Assume they do not exist on Adj. list.
-	// (Defer the check until Cond. Write)
-	outVertexEntryExists = inVertexEntryExists = false;
+	outVertexEntryExists = outVertex.getEdgeSet().contains(this);
 
-//	outVertexEntryExists = outVertex.getEdgeSet().contains(this);
-//
-//	if (!outVertex.equals(inVertex)) {
-//	    inVertexEntryExists = inVertex.getEdgeSet().contains(this);
-//	} else {
-//	    inVertexEntryExists = outVertexEntryExists;
-//	}
+	if (!outVertex.equals(inVertex)) {
+	    inVertexEntryExists = inVertex.getEdgeSet().contains(this);
+	} else {
+	    inVertexEntryExists = outVertexEntryExists;
+	}
 
 	if (edgePropTableEntryExists && outVertexEntryExists && inVertexEntryExists) {
 	    return true;
