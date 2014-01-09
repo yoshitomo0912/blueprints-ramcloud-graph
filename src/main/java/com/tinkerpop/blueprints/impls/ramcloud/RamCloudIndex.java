@@ -13,15 +13,14 @@ import java.util.TreeMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.esotericsoftware.kryo2.Kryo;
-import com.esotericsoftware.kryo2.io.ByteBufferInput;
-import com.esotericsoftware.kryo2.io.ByteBufferOutput;
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.tinkerpop.blueprints.CloseableIterable;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Index;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
-
 import com.tinkerpop.blueprints.impls.ramcloud.PerfMon;
+import com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.IndexBlob;
+import com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.IndexBlob.Builder;
 
 import edu.stanford.ramcloud.JRamCloud;
 
@@ -37,19 +36,19 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
     // FIXME this should not be defined here
     private long indexVersion;
 
-    private static final ThreadLocal<Kryo> kryo = new ThreadLocal<Kryo>() {
-        @Override
-        protected Kryo initialValue() {
-                 Kryo kryo = new Kryo();
-                 kryo.setRegistrationRequired(true);
-                 kryo.register(Long.class);
-                 kryo.register(String.class);
-                 kryo.register(TreeMap.class);
-                 kryo.register(ArrayList.class);
-                 kryo.setReferences(false);
-                 return kryo;
-        }
-    };
+//    private static final ThreadLocal<Kryo> kryo = new ThreadLocal<Kryo>() {
+//        @Override
+//        protected Kryo initialValue() {
+//                 Kryo kryo = new Kryo();
+//                 kryo.setRegistrationRequired(true);
+//                 kryo.register(Long.class);
+//                 kryo.register(String.class);
+//                 kryo.register(TreeMap.class);
+//                 kryo.register(ArrayList.class);
+//                 kryo.setReferences(false);
+//                 return kryo;
+//        }
+//    };
 
 
     public RamCloudIndex(long tableId, String indexName, Object propValue, RamCloudGraph graph, Class<T> indexClass) {
@@ -143,6 +142,15 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    return s.substring(0, s.indexOf('='));
 	} catch (UnsupportedEncodingException ex) {
 	    log.error("rcKeyToIndexName({}) failed with exception {}", rcKey, ex);
+	}
+	return null;
+    }
+    public static String rcKeyToPropName(byte[] rcKey) {
+	try {
+	    String s = new String(rcKey, "UTF-8");
+	    return s.substring(s.indexOf('=')+1);
+	} catch (UnsupportedEncodingException ex) {
+	    log.error("rcKeyToPropName({}) failed with exception {}", rcKey, ex);
 	}
 	return null;
     }
@@ -425,16 +433,19 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
         	startTime = System.nanoTime();
             }
 	    pm.indexdeser_start("RamCloudIndex convertRcBytesToIndexPropertyMap()");
-	    ByteBufferInput input = new ByteBufferInput(byteArray);
-	    ArrayList list = kryo.get().readObject(input, ArrayList.class);
+	    IndexBlob blob;
 	    TreeMap<Object, List<Object>> map = new TreeMap<Object, List<Object>>();
-            try {
-                String s = new String(rcKey, "UTF-8");
-	        String propVal = s.substring(s.indexOf('=')+1);
-	        map.put(propVal, list);
-            } catch (UnsupportedEncodingException ex) {
-            }
-	    pm.indexdeser_end("RamCloudIndex convertRcBytesToIndexPropertyMap()");
+	    try {
+		blob = IndexBlob.parseFrom(byteArray);
+		List list = blob.getVertexIdList();
+//		ByteBufferInput input = new ByteBufferInput(byteArray);
+//		ArrayList list = kryo.get().readObject(input, ArrayList.class);
+		map.put(rcKeyToPropName(rcKey), list);
+	    } catch (InvalidProtocolBufferException e) {
+		log.error("{" + toString() + "}: Read malformed edge list: ", e);
+	    } finally {
+		pm.indexdeser_end("RamCloudIndex convertRcBytesToIndexPropertyMap()");
+	    }
             if(RamCloudGraph.measureSerializeTimeProp == 1) {
             	long endTime = System.nanoTime();
                 log.error("Performance index kryo deserialization [id=N/A] {} size {}", endTime - startTime, byteArray.length);
@@ -451,14 +462,21 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	if(RamCloudGraph.measureSerializeTimeProp == 1) {
 	    startTime = System.nanoTime();
 	}
+	byte[] bytes;
+
 	pm.indexser_start("RamCloudIndex convertIndexPropertyMapToRcBytes()");
-	ByteBufferOutput output = new ByteBufferOutput(1024*1024);
-	if ( map.values().size() == 0 ) {
-	    kryo.get().writeObject(output, new ArrayList<Object>());
-	} else {
-	    kryo.get().writeObject(output, map.values().iterator().next());
-	}
-	byte[] bytes = output.toBytes();
+	Builder builder = IndexBlob.newBuilder();
+	List<Long> vtxIds = (List)map.values().iterator().next();
+	builder.addAllVertexId(vtxIds);
+	IndexBlob blob = builder.build();
+	bytes = blob.toByteArray();
+//	ByteBufferOutput output = new ByteBufferOutput(1024*1024);
+//	if ( map.values().size() == 0 ) {
+//	    kryo.get().writeObject(output, new ArrayList<Object>());
+//	} else {
+//	    kryo.get().writeObject(output, vtxIds);
+//	}
+//	bytes = output.toBytes();
         pm.indexser_end("RamCloudIndex convertIndexPropertyMapToRcBytes()");
 	if(RamCloudGraph.measureSerializeTimeProp == 1) {
         	long endTime = System.nanoTime();

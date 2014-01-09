@@ -453,11 +453,10 @@ public final class PerfMon {
             log.error("indexread_start {}", key);
         if ( indexread_flag != 0){
             log.error("indexread_start called twice");
+	}
+	indexread_flag = 1;
 
     	indexread_time=System.nanoTime();
-	}
-
-	indexread_flag = 1;
    }
    public void indexread_end(String key){
         if(measureAllTimeProp==0)

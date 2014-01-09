@@ -10,66 +10,169 @@ public final class RamCloudGraphProtos {
   }
   public interface EdgeListProtoBufOrBuilder
       extends com.google.protobuf.MessageOrBuilder {
-    
+
     // repeated .RamCloudGraph.EdgeProtoBuf edge = 1;
+    /**
+     * <code>repeated .RamCloudGraph.EdgeProtoBuf edge = 1;</code>
+     */
     java.util.List<com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf> 
         getEdgeList();
+    /**
+     * <code>repeated .RamCloudGraph.EdgeProtoBuf edge = 1;</code>
+     */
     com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf getEdge(int index);
+    /**
+     * <code>repeated .RamCloudGraph.EdgeProtoBuf edge = 1;</code>
+     */
     int getEdgeCount();
+    /**
+     * <code>repeated .RamCloudGraph.EdgeProtoBuf edge = 1;</code>
+     */
     java.util.List<? extends com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBufOrBuilder> 
         getEdgeOrBuilderList();
+    /**
+     * <code>repeated .RamCloudGraph.EdgeProtoBuf edge = 1;</code>
+     */
     com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBufOrBuilder getEdgeOrBuilder(
         int index);
   }
+  /**
+   * Protobuf type {@code RamCloudGraph.EdgeListProtoBuf}
+   */
   public static final class EdgeListProtoBuf extends
       com.google.protobuf.GeneratedMessage
       implements EdgeListProtoBufOrBuilder {
     // Use EdgeListProtoBuf.newBuilder() to construct.
-    private EdgeListProtoBuf(Builder builder) {
+    private EdgeListProtoBuf(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
+      this.unknownFields = builder.getUnknownFields();
     }
-    private EdgeListProtoBuf(boolean noInit) {}
-    
+    private EdgeListProtoBuf(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
     private static final EdgeListProtoBuf defaultInstance;
     public static EdgeListProtoBuf getDefaultInstance() {
       return defaultInstance;
     }
-    
+
     public EdgeListProtoBuf getDefaultInstanceForType() {
       return defaultInstance;
     }
-    
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
+    }
+    private EdgeListProtoBuf(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 10: {
+              if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
+                edge_ = new java.util.ArrayList<com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf>();
+                mutable_bitField0_ |= 0x00000001;
+              }
+              edge_.add(input.readMessage(com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf.PARSER, extensionRegistry));
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        if (((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
+          edge_ = java.util.Collections.unmodifiableList(edge_);
+        }
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.internal_static_RamCloudGraph_EdgeListProtoBuf_descriptor;
     }
-    
+
     protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.internal_static_RamCloudGraph_EdgeListProtoBuf_fieldAccessorTable;
+      return com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.internal_static_RamCloudGraph_EdgeListProtoBuf_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeListProtoBuf.class, com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeListProtoBuf.Builder.class);
     }
-    
+
+    public static com.google.protobuf.Parser<EdgeListProtoBuf> PARSER =
+        new com.google.protobuf.AbstractParser<EdgeListProtoBuf>() {
+      public EdgeListProtoBuf parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new EdgeListProtoBuf(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<EdgeListProtoBuf> getParserForType() {
+      return PARSER;
+    }
+
     // repeated .RamCloudGraph.EdgeProtoBuf edge = 1;
     public static final int EDGE_FIELD_NUMBER = 1;
     private java.util.List<com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf> edge_;
+    /**
+     * <code>repeated .RamCloudGraph.EdgeProtoBuf edge = 1;</code>
+     */
     public java.util.List<com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf> getEdgeList() {
       return edge_;
     }
+    /**
+     * <code>repeated .RamCloudGraph.EdgeProtoBuf edge = 1;</code>
+     */
     public java.util.List<? extends com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBufOrBuilder> 
         getEdgeOrBuilderList() {
       return edge_;
     }
+    /**
+     * <code>repeated .RamCloudGraph.EdgeProtoBuf edge = 1;</code>
+     */
     public int getEdgeCount() {
       return edge_.size();
     }
+    /**
+     * <code>repeated .RamCloudGraph.EdgeProtoBuf edge = 1;</code>
+     */
     public com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf getEdge(int index) {
       return edge_.get(index);
     }
+    /**
+     * <code>repeated .RamCloudGraph.EdgeProtoBuf edge = 1;</code>
+     */
     public com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBufOrBuilder getEdgeOrBuilder(
         int index) {
       return edge_.get(index);
     }
-    
+
     private void initFields() {
       edge_ = java.util.Collections.emptyList();
     }
@@ -77,7 +180,7 @@ public final class RamCloudGraphProtos {
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized != -1) return isInitialized == 1;
-      
+
       for (int i = 0; i < getEdgeCount(); i++) {
         if (!getEdge(i).isInitialized()) {
           memoizedIsInitialized = 0;
@@ -87,7 +190,7 @@ public final class RamCloudGraphProtos {
       memoizedIsInitialized = 1;
       return true;
     }
-    
+
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       getSerializedSize();
@@ -96,12 +199,12 @@ public final class RamCloudGraphProtos {
       }
       getUnknownFields().writeTo(output);
     }
-    
+
     private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
       int size = memoizedSerializedSize;
       if (size != -1) return size;
-    
+
       size = 0;
       for (int i = 0; i < edge_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
@@ -111,94 +214,83 @@ public final class RamCloudGraphProtos {
       memoizedSerializedSize = size;
       return size;
     }
-    
+
     private static final long serialVersionUID = 0L;
     @java.lang.Override
     protected java.lang.Object writeReplace()
         throws java.io.ObjectStreamException {
       return super.writeReplace();
     }
-    
+
     public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeListProtoBuf parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data).buildParsed();
+      return PARSER.parseFrom(data);
     }
     public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeListProtoBuf parseFrom(
         com.google.protobuf.ByteString data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data, extensionRegistry)
-               .buildParsed();
+      return PARSER.parseFrom(data, extensionRegistry);
     }
     public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeListProtoBuf parseFrom(byte[] data)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data).buildParsed();
+      return PARSER.parseFrom(data);
     }
     public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeListProtoBuf parseFrom(
         byte[] data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data, extensionRegistry)
-               .buildParsed();
+      return PARSER.parseFrom(data, extensionRegistry);
     }
     public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeListProtoBuf parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return newBuilder().mergeFrom(input).buildParsed();
+      return PARSER.parseFrom(input);
     }
     public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeListProtoBuf parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return newBuilder().mergeFrom(input, extensionRegistry)
-               .buildParsed();
+      return PARSER.parseFrom(input, extensionRegistry);
     }
     public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeListProtoBuf parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      Builder builder = newBuilder();
-      if (builder.mergeDelimitedFrom(input)) {
-        return builder.buildParsed();
-      } else {
-        return null;
-      }
+      return PARSER.parseDelimitedFrom(input);
     }
     public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeListProtoBuf parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      Builder builder = newBuilder();
-      if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
-        return builder.buildParsed();
-      } else {
-        return null;
-      }
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
     }
     public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeListProtoBuf parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return newBuilder().mergeFrom(input).buildParsed();
+      return PARSER.parseFrom(input);
     }
     public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeListProtoBuf parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return newBuilder().mergeFrom(input, extensionRegistry)
-               .buildParsed();
+      return PARSER.parseFrom(input, extensionRegistry);
     }
-    
+
     public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder(com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeListProtoBuf prototype) {
       return newBuilder().mergeFrom(prototype);
     }
     public Builder toBuilder() { return newBuilder(this); }
-    
+
     @java.lang.Override
     protected Builder newBuilderForType(
         com.google.protobuf.GeneratedMessage.BuilderParent parent) {
       Builder builder = new Builder(parent);
       return builder;
     }
+    /**
+     * Protobuf type {@code RamCloudGraph.EdgeListProtoBuf}
+     */
     public static final class Builder extends
         com.google.protobuf.GeneratedMessage.Builder<Builder>
        implements com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeListProtoBufOrBuilder {
@@ -206,18 +298,21 @@ public final class RamCloudGraphProtos {
           getDescriptor() {
         return com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.internal_static_RamCloudGraph_EdgeListProtoBuf_descriptor;
       }
-      
+
       protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
           internalGetFieldAccessorTable() {
-        return com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.internal_static_RamCloudGraph_EdgeListProtoBuf_fieldAccessorTable;
+        return com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.internal_static_RamCloudGraph_EdgeListProtoBuf_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeListProtoBuf.class, com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeListProtoBuf.Builder.class);
       }
-      
+
       // Construct using com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeListProtoBuf.newBuilder()
       private Builder() {
         maybeForceBuilderInitialization();
       }
-      
-      private Builder(BuilderParent parent) {
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
         super(parent);
         maybeForceBuilderInitialization();
       }
@@ -229,7 +324,7 @@ public final class RamCloudGraphProtos {
       private static Builder create() {
         return new Builder();
       }
-      
+
       public Builder clear() {
         super.clear();
         if (edgeBuilder_ == null) {
@@ -240,20 +335,20 @@ public final class RamCloudGraphProtos {
         }
         return this;
       }
-      
+
       public Builder clone() {
         return create().mergeFrom(buildPartial());
       }
-      
+
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
-        return com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeListProtoBuf.getDescriptor();
+        return com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.internal_static_RamCloudGraph_EdgeListProtoBuf_descriptor;
       }
-      
+
       public com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeListProtoBuf getDefaultInstanceForType() {
         return com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeListProtoBuf.getDefaultInstance();
       }
-      
+
       public com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeListProtoBuf build() {
         com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeListProtoBuf result = buildPartial();
         if (!result.isInitialized()) {
@@ -261,17 +356,7 @@ public final class RamCloudGraphProtos {
         }
         return result;
       }
-      
-      private com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeListProtoBuf buildParsed()
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeListProtoBuf result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(
-            result).asInvalidProtocolBufferException();
-        }
-        return result;
-      }
-      
+
       public com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeListProtoBuf buildPartial() {
         com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeListProtoBuf result = new com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeListProtoBuf(this);
         int from_bitField0_ = bitField0_;
@@ -287,7 +372,7 @@ public final class RamCloudGraphProtos {
         onBuilt();
         return result;
       }
-      
+
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeListProtoBuf) {
           return mergeFrom((com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeListProtoBuf)other);
@@ -296,7 +381,7 @@ public final class RamCloudGraphProtos {
           return this;
         }
       }
-      
+
       public Builder mergeFrom(com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeListProtoBuf other) {
         if (other == com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeListProtoBuf.getDefaultInstance()) return this;
         if (edgeBuilder_ == null) {
@@ -328,7 +413,7 @@ public final class RamCloudGraphProtos {
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
       }
-      
+
       public final boolean isInitialized() {
         for (int i = 0; i < getEdgeCount(); i++) {
           if (!getEdge(i).isInitialized()) {
@@ -338,42 +423,26 @@ public final class RamCloudGraphProtos {
         }
         return true;
       }
-      
+
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder(
-            this.getUnknownFields());
-        while (true) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              this.setUnknownFields(unknownFields.build());
-              onChanged();
-              return this;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                this.setUnknownFields(unknownFields.build());
-                onChanged();
-                return this;
-              }
-              break;
-            }
-            case 10: {
-              com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf.Builder subBuilder = com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf.newBuilder();
-              input.readMessage(subBuilder, extensionRegistry);
-              addEdge(subBuilder.buildPartial());
-              break;
-            }
+        com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeListProtoBuf parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeListProtoBuf) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
           }
         }
+        return this;
       }
-      
       private int bitField0_;
-      
+
       // repeated .RamCloudGraph.EdgeProtoBuf edge = 1;
       private java.util.List<com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf> edge_ =
         java.util.Collections.emptyList();
@@ -383,10 +452,13 @@ public final class RamCloudGraphProtos {
           bitField0_ |= 0x00000001;
          }
       }
-      
+
       private com.google.protobuf.RepeatedFieldBuilder<
           com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf, com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf.Builder, com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBufOrBuilder> edgeBuilder_;
-      
+
+      /**
+       * <code>repeated .RamCloudGraph.EdgeProtoBuf edge = 1;</code>
+       */
       public java.util.List<com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf> getEdgeList() {
         if (edgeBuilder_ == null) {
           return java.util.Collections.unmodifiableList(edge_);
@@ -394,6 +466,9 @@ public final class RamCloudGraphProtos {
           return edgeBuilder_.getMessageList();
         }
       }
+      /**
+       * <code>repeated .RamCloudGraph.EdgeProtoBuf edge = 1;</code>
+       */
       public int getEdgeCount() {
         if (edgeBuilder_ == null) {
           return edge_.size();
@@ -401,6 +476,9 @@ public final class RamCloudGraphProtos {
           return edgeBuilder_.getCount();
         }
       }
+      /**
+       * <code>repeated .RamCloudGraph.EdgeProtoBuf edge = 1;</code>
+       */
       public com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf getEdge(int index) {
         if (edgeBuilder_ == null) {
           return edge_.get(index);
@@ -408,6 +486,9 @@ public final class RamCloudGraphProtos {
           return edgeBuilder_.getMessage(index);
         }
       }
+      /**
+       * <code>repeated .RamCloudGraph.EdgeProtoBuf edge = 1;</code>
+       */
       public Builder setEdge(
           int index, com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf value) {
         if (edgeBuilder_ == null) {
@@ -422,6 +503,9 @@ public final class RamCloudGraphProtos {
         }
         return this;
       }
+      /**
+       * <code>repeated .RamCloudGraph.EdgeProtoBuf edge = 1;</code>
+       */
       public Builder setEdge(
           int index, com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf.Builder builderForValue) {
         if (edgeBuilder_ == null) {
@@ -433,6 +517,9 @@ public final class RamCloudGraphProtos {
         }
         return this;
       }
+      /**
+       * <code>repeated .RamCloudGraph.EdgeProtoBuf edge = 1;</code>
+       */
       public Builder addEdge(com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf value) {
         if (edgeBuilder_ == null) {
           if (value == null) {
@@ -446,6 +533,9 @@ public final class RamCloudGraphProtos {
         }
         return this;
       }
+      /**
+       * <code>repeated .RamCloudGraph.EdgeProtoBuf edge = 1;</code>
+       */
       public Builder addEdge(
           int index, com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf value) {
         if (edgeBuilder_ == null) {
@@ -460,6 +550,9 @@ public final class RamCloudGraphProtos {
         }
         return this;
       }
+      /**
+       * <code>repeated .RamCloudGraph.EdgeProtoBuf edge = 1;</code>
+       */
       public Builder addEdge(
           com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf.Builder builderForValue) {
         if (edgeBuilder_ == null) {
@@ -471,6 +564,9 @@ public final class RamCloudGraphProtos {
         }
         return this;
       }
+      /**
+       * <code>repeated .RamCloudGraph.EdgeProtoBuf edge = 1;</code>
+       */
       public Builder addEdge(
           int index, com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf.Builder builderForValue) {
         if (edgeBuilder_ == null) {
@@ -482,6 +578,9 @@ public final class RamCloudGraphProtos {
         }
         return this;
       }
+      /**
+       * <code>repeated .RamCloudGraph.EdgeProtoBuf edge = 1;</code>
+       */
       public Builder addAllEdge(
           java.lang.Iterable<? extends com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf> values) {
         if (edgeBuilder_ == null) {
@@ -493,6 +592,9 @@ public final class RamCloudGraphProtos {
         }
         return this;
       }
+      /**
+       * <code>repeated .RamCloudGraph.EdgeProtoBuf edge = 1;</code>
+       */
       public Builder clearEdge() {
         if (edgeBuilder_ == null) {
           edge_ = java.util.Collections.emptyList();
@@ -503,6 +605,9 @@ public final class RamCloudGraphProtos {
         }
         return this;
       }
+      /**
+       * <code>repeated .RamCloudGraph.EdgeProtoBuf edge = 1;</code>
+       */
       public Builder removeEdge(int index) {
         if (edgeBuilder_ == null) {
           ensureEdgeIsMutable();
@@ -513,10 +618,16 @@ public final class RamCloudGraphProtos {
         }
         return this;
       }
+      /**
+       * <code>repeated .RamCloudGraph.EdgeProtoBuf edge = 1;</code>
+       */
       public com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf.Builder getEdgeBuilder(
           int index) {
         return getEdgeFieldBuilder().getBuilder(index);
       }
+      /**
+       * <code>repeated .RamCloudGraph.EdgeProtoBuf edge = 1;</code>
+       */
       public com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBufOrBuilder getEdgeOrBuilder(
           int index) {
         if (edgeBuilder_ == null) {
@@ -524,6 +635,9 @@ public final class RamCloudGraphProtos {
           return edgeBuilder_.getMessageOrBuilder(index);
         }
       }
+      /**
+       * <code>repeated .RamCloudGraph.EdgeProtoBuf edge = 1;</code>
+       */
       public java.util.List<? extends com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBufOrBuilder> 
            getEdgeOrBuilderList() {
         if (edgeBuilder_ != null) {
@@ -532,15 +646,24 @@ public final class RamCloudGraphProtos {
           return java.util.Collections.unmodifiableList(edge_);
         }
       }
+      /**
+       * <code>repeated .RamCloudGraph.EdgeProtoBuf edge = 1;</code>
+       */
       public com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf.Builder addEdgeBuilder() {
         return getEdgeFieldBuilder().addBuilder(
             com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf.getDefaultInstance());
       }
+      /**
+       * <code>repeated .RamCloudGraph.EdgeProtoBuf edge = 1;</code>
+       */
       public com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf.Builder addEdgeBuilder(
           int index) {
         return getEdgeFieldBuilder().addBuilder(
             index, com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf.getDefaultInstance());
       }
+      /**
+       * <code>repeated .RamCloudGraph.EdgeProtoBuf edge = 1;</code>
+       */
       public java.util.List<com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf.Builder> 
            getEdgeBuilderList() {
         return getEdgeFieldBuilder().getBuilderList();
@@ -559,418 +682,104 @@ public final class RamCloudGraphProtos {
         }
         return edgeBuilder_;
       }
-      
+
       // @@protoc_insertion_point(builder_scope:RamCloudGraph.EdgeListProtoBuf)
     }
-    
+
     static {
       defaultInstance = new EdgeListProtoBuf(true);
       defaultInstance.initFields();
     }
-    
+
     // @@protoc_insertion_point(class_scope:RamCloudGraph.EdgeListProtoBuf)
   }
-  
+
   public interface EdgeProtoBufOrBuilder
       extends com.google.protobuf.MessageOrBuilder {
-    
+
     // required uint64 neighborId = 1;
+    /**
+     * <code>required uint64 neighborId = 1;</code>
+     */
     boolean hasNeighborId();
+    /**
+     * <code>required uint64 neighborId = 1;</code>
+     */
     long getNeighborId();
-    
+
     // required bool outgoing = 2;
+    /**
+     * <code>required bool outgoing = 2;</code>
+     */
     boolean hasOutgoing();
+    /**
+     * <code>required bool outgoing = 2;</code>
+     */
     boolean getOutgoing();
-    
+
     // required string label = 3;
+    /**
+     * <code>required string label = 3;</code>
+     */
     boolean hasLabel();
-    String getLabel();
+    /**
+     * <code>required string label = 3;</code>
+     */
+    java.lang.String getLabel();
+    /**
+     * <code>required string label = 3;</code>
+     */
+    com.google.protobuf.ByteString
+        getLabelBytes();
   }
+  /**
+   * Protobuf type {@code RamCloudGraph.EdgeProtoBuf}
+   */
   public static final class EdgeProtoBuf extends
       com.google.protobuf.GeneratedMessage
       implements EdgeProtoBufOrBuilder {
     // Use EdgeProtoBuf.newBuilder() to construct.
-    private EdgeProtoBuf(Builder builder) {
+    private EdgeProtoBuf(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
+      this.unknownFields = builder.getUnknownFields();
     }
-    private EdgeProtoBuf(boolean noInit) {}
-    
+    private EdgeProtoBuf(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
     private static final EdgeProtoBuf defaultInstance;
     public static EdgeProtoBuf getDefaultInstance() {
       return defaultInstance;
     }
-    
+
     public EdgeProtoBuf getDefaultInstanceForType() {
       return defaultInstance;
     }
-    
-    public static final com.google.protobuf.Descriptors.Descriptor
-        getDescriptor() {
-      return com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.internal_static_RamCloudGraph_EdgeProtoBuf_descriptor;
-    }
-    
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-        internalGetFieldAccessorTable() {
-      return com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.internal_static_RamCloudGraph_EdgeProtoBuf_fieldAccessorTable;
-    }
-    
-    private int bitField0_;
-    // required uint64 neighborId = 1;
-    public static final int NEIGHBORID_FIELD_NUMBER = 1;
-    private long neighborId_;
-    public boolean hasNeighborId() {
-      return ((bitField0_ & 0x00000001) == 0x00000001);
-    }
-    public long getNeighborId() {
-      return neighborId_;
-    }
-    
-    // required bool outgoing = 2;
-    public static final int OUTGOING_FIELD_NUMBER = 2;
-    private boolean outgoing_;
-    public boolean hasOutgoing() {
-      return ((bitField0_ & 0x00000002) == 0x00000002);
-    }
-    public boolean getOutgoing() {
-      return outgoing_;
-    }
-    
-    // required string label = 3;
-    public static final int LABEL_FIELD_NUMBER = 3;
-    private java.lang.Object label_;
-    public boolean hasLabel() {
-      return ((bitField0_ & 0x00000004) == 0x00000004);
-    }
-    public String getLabel() {
-      java.lang.Object ref = label_;
-      if (ref instanceof String) {
-        return (String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        String s = bs.toStringUtf8();
-        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-          label_ = s;
-        }
-        return s;
-      }
-    }
-    private com.google.protobuf.ByteString getLabelBytes() {
-      java.lang.Object ref = label_;
-      if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-        label_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-    
-    private void initFields() {
-      neighborId_ = 0L;
-      outgoing_ = false;
-      label_ = "";
-    }
-    private byte memoizedIsInitialized = -1;
-    public final boolean isInitialized() {
-      byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
-      
-      if (!hasNeighborId()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!hasOutgoing()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!hasLabel()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      memoizedIsInitialized = 1;
-      return true;
-    }
-    
-    public void writeTo(com.google.protobuf.CodedOutputStream output)
-                        throws java.io.IOException {
-      getSerializedSize();
-      if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeUInt64(1, neighborId_);
-      }
-      if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeBool(2, outgoing_);
-      }
-      if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeBytes(3, getLabelBytes());
-      }
-      getUnknownFields().writeTo(output);
-    }
-    
-    private int memoizedSerializedSize = -1;
-    public int getSerializedSize() {
-      int size = memoizedSerializedSize;
-      if (size != -1) return size;
-    
-      size = 0;
-      if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeUInt64Size(1, neighborId_);
-      }
-      if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBoolSize(2, outgoing_);
-      }
-      if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(3, getLabelBytes());
-      }
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
-      return size;
-    }
-    
-    private static final long serialVersionUID = 0L;
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
     }
-    
-    public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf parseFrom(
-        com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data).buildParsed();
-    }
-    public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf parseFrom(
-        com.google.protobuf.ByteString data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data, extensionRegistry)
-               .buildParsed();
-    }
-    public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf parseFrom(byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data).buildParsed();
-    }
-    public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf parseFrom(
-        byte[] data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data, extensionRegistry)
-               .buildParsed();
-    }
-    public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf parseFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return newBuilder().mergeFrom(input).buildParsed();
-    }
-    public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf parseFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return newBuilder().mergeFrom(input, extensionRegistry)
-               .buildParsed();
-    }
-    public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf parseDelimitedFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      Builder builder = newBuilder();
-      if (builder.mergeDelimitedFrom(input)) {
-        return builder.buildParsed();
-      } else {
-        return null;
-      }
-    }
-    public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf parseDelimitedFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      Builder builder = newBuilder();
-      if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
-        return builder.buildParsed();
-      } else {
-        return null;
-      }
-    }
-    public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf parseFrom(
-        com.google.protobuf.CodedInputStream input)
-        throws java.io.IOException {
-      return newBuilder().mergeFrom(input).buildParsed();
-    }
-    public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf parseFrom(
+    private EdgeProtoBuf(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return newBuilder().mergeFrom(input, extensionRegistry)
-               .buildParsed();
-    }
-    
-    public static Builder newBuilder() { return Builder.create(); }
-    public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf prototype) {
-      return newBuilder().mergeFrom(prototype);
-    }
-    public Builder toBuilder() { return newBuilder(this); }
-    
-    @java.lang.Override
-    protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
-      Builder builder = new Builder(parent);
-      return builder;
-    }
-    public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBufOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
-          getDescriptor() {
-        return com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.internal_static_RamCloudGraph_EdgeProtoBuf_descriptor;
-      }
-      
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-          internalGetFieldAccessorTable() {
-        return com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.internal_static_RamCloudGraph_EdgeProtoBuf_fieldAccessorTable;
-      }
-      
-      // Construct using com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf.newBuilder()
-      private Builder() {
-        maybeForceBuilderInitialization();
-      }
-      
-      private Builder(BuilderParent parent) {
-        super(parent);
-        maybeForceBuilderInitialization();
-      }
-      private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
-        }
-      }
-      private static Builder create() {
-        return new Builder();
-      }
-      
-      public Builder clear() {
-        super.clear();
-        neighborId_ = 0L;
-        bitField0_ = (bitField0_ & ~0x00000001);
-        outgoing_ = false;
-        bitField0_ = (bitField0_ & ~0x00000002);
-        label_ = "";
-        bitField0_ = (bitField0_ & ~0x00000004);
-        return this;
-      }
-      
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
-      }
-      
-      public com.google.protobuf.Descriptors.Descriptor
-          getDescriptorForType() {
-        return com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf.getDescriptor();
-      }
-      
-      public com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf getDefaultInstanceForType() {
-        return com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf.getDefaultInstance();
-      }
-      
-      public com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf build() {
-        com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(result);
-        }
-        return result;
-      }
-      
-      private com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf buildParsed()
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(
-            result).asInvalidProtocolBufferException();
-        }
-        return result;
-      }
-      
-      public com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf buildPartial() {
-        com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf result = new com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf(this);
-        int from_bitField0_ = bitField0_;
-        int to_bitField0_ = 0;
-        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
-          to_bitField0_ |= 0x00000001;
-        }
-        result.neighborId_ = neighborId_;
-        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
-          to_bitField0_ |= 0x00000002;
-        }
-        result.outgoing_ = outgoing_;
-        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
-          to_bitField0_ |= 0x00000004;
-        }
-        result.label_ = label_;
-        result.bitField0_ = to_bitField0_;
-        onBuilt();
-        return result;
-      }
-      
-      public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf) {
-          return mergeFrom((com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf)other);
-        } else {
-          super.mergeFrom(other);
-          return this;
-        }
-      }
-      
-      public Builder mergeFrom(com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf other) {
-        if (other == com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf.getDefaultInstance()) return this;
-        if (other.hasNeighborId()) {
-          setNeighborId(other.getNeighborId());
-        }
-        if (other.hasOutgoing()) {
-          setOutgoing(other.getOutgoing());
-        }
-        if (other.hasLabel()) {
-          setLabel(other.getLabel());
-        }
-        this.mergeUnknownFields(other.getUnknownFields());
-        return this;
-      }
-      
-      public final boolean isInitialized() {
-        if (!hasNeighborId()) {
-          
-          return false;
-        }
-        if (!hasOutgoing()) {
-          
-          return false;
-        }
-        if (!hasLabel()) {
-          
-          return false;
-        }
-        return true;
-      }
-      
-      public Builder mergeFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
-        com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder(
-            this.getUnknownFields());
-        while (true) {
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
           int tag = input.readTag();
           switch (tag) {
             case 0:
-              this.setUnknownFields(unknownFields.build());
-              onChanged();
-              return this;
+              done = true;
+              break;
             default: {
               if (!parseUnknownField(input, unknownFields,
                                      extensionRegistry, tag)) {
-                this.setUnknownFields(unknownFields.build());
-                onChanged();
-                return this;
+                done = true;
               }
               break;
             }
@@ -991,68 +800,515 @@ public final class RamCloudGraphProtos {
             }
           }
         }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
       }
-      
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.internal_static_RamCloudGraph_EdgeProtoBuf_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.internal_static_RamCloudGraph_EdgeProtoBuf_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf.class, com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf.Builder.class);
+    }
+
+    public static com.google.protobuf.Parser<EdgeProtoBuf> PARSER =
+        new com.google.protobuf.AbstractParser<EdgeProtoBuf>() {
+      public EdgeProtoBuf parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new EdgeProtoBuf(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<EdgeProtoBuf> getParserForType() {
+      return PARSER;
+    }
+
+    private int bitField0_;
+    // required uint64 neighborId = 1;
+    public static final int NEIGHBORID_FIELD_NUMBER = 1;
+    private long neighborId_;
+    /**
+     * <code>required uint64 neighborId = 1;</code>
+     */
+    public boolean hasNeighborId() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    /**
+     * <code>required uint64 neighborId = 1;</code>
+     */
+    public long getNeighborId() {
+      return neighborId_;
+    }
+
+    // required bool outgoing = 2;
+    public static final int OUTGOING_FIELD_NUMBER = 2;
+    private boolean outgoing_;
+    /**
+     * <code>required bool outgoing = 2;</code>
+     */
+    public boolean hasOutgoing() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    /**
+     * <code>required bool outgoing = 2;</code>
+     */
+    public boolean getOutgoing() {
+      return outgoing_;
+    }
+
+    // required string label = 3;
+    public static final int LABEL_FIELD_NUMBER = 3;
+    private java.lang.Object label_;
+    /**
+     * <code>required string label = 3;</code>
+     */
+    public boolean hasLabel() {
+      return ((bitField0_ & 0x00000004) == 0x00000004);
+    }
+    /**
+     * <code>required string label = 3;</code>
+     */
+    public java.lang.String getLabel() {
+      java.lang.Object ref = label_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          label_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>required string label = 3;</code>
+     */
+    public com.google.protobuf.ByteString
+        getLabelBytes() {
+      java.lang.Object ref = label_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        label_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    private void initFields() {
+      neighborId_ = 0L;
+      outgoing_ = false;
+      label_ = "";
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized != -1) return isInitialized == 1;
+
+      if (!hasNeighborId()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasOutgoing()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasLabel()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeUInt64(1, neighborId_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        output.writeBool(2, outgoing_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        output.writeBytes(3, getLabelBytes());
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeUInt64Size(1, neighborId_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(2, outgoing_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(3, getLabelBytes());
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
+    public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+    public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+    public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+    public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code RamCloudGraph.EdgeProtoBuf}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder>
+       implements com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBufOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.internal_static_RamCloudGraph_EdgeProtoBuf_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.internal_static_RamCloudGraph_EdgeProtoBuf_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf.class, com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf.Builder.class);
+      }
+
+      // Construct using com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+
+      public Builder clear() {
+        super.clear();
+        neighborId_ = 0L;
+        bitField0_ = (bitField0_ & ~0x00000001);
+        outgoing_ = false;
+        bitField0_ = (bitField0_ & ~0x00000002);
+        label_ = "";
+        bitField0_ = (bitField0_ & ~0x00000004);
+        return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.internal_static_RamCloudGraph_EdgeProtoBuf_descriptor;
+      }
+
+      public com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf getDefaultInstanceForType() {
+        return com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf.getDefaultInstance();
+      }
+
+      public com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf build() {
+        com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf buildPartial() {
+        com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf result = new com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        result.neighborId_ = neighborId_;
+        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+          to_bitField0_ |= 0x00000002;
+        }
+        result.outgoing_ = outgoing_;
+        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
+          to_bitField0_ |= 0x00000004;
+        }
+        result.label_ = label_;
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf) {
+          return mergeFrom((com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf other) {
+        if (other == com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf.getDefaultInstance()) return this;
+        if (other.hasNeighborId()) {
+          setNeighborId(other.getNeighborId());
+        }
+        if (other.hasOutgoing()) {
+          setOutgoing(other.getOutgoing());
+        }
+        if (other.hasLabel()) {
+          bitField0_ |= 0x00000004;
+          label_ = other.label_;
+          onChanged();
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        if (!hasNeighborId()) {
+          
+          return false;
+        }
+        if (!hasOutgoing()) {
+          
+          return false;
+        }
+        if (!hasLabel()) {
+          
+          return false;
+        }
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
       private int bitField0_;
-      
+
       // required uint64 neighborId = 1;
       private long neighborId_ ;
+      /**
+       * <code>required uint64 neighborId = 1;</code>
+       */
       public boolean hasNeighborId() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
+      /**
+       * <code>required uint64 neighborId = 1;</code>
+       */
       public long getNeighborId() {
         return neighborId_;
       }
+      /**
+       * <code>required uint64 neighborId = 1;</code>
+       */
       public Builder setNeighborId(long value) {
         bitField0_ |= 0x00000001;
         neighborId_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>required uint64 neighborId = 1;</code>
+       */
       public Builder clearNeighborId() {
         bitField0_ = (bitField0_ & ~0x00000001);
         neighborId_ = 0L;
         onChanged();
         return this;
       }
-      
+
       // required bool outgoing = 2;
       private boolean outgoing_ ;
+      /**
+       * <code>required bool outgoing = 2;</code>
+       */
       public boolean hasOutgoing() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
+      /**
+       * <code>required bool outgoing = 2;</code>
+       */
       public boolean getOutgoing() {
         return outgoing_;
       }
+      /**
+       * <code>required bool outgoing = 2;</code>
+       */
       public Builder setOutgoing(boolean value) {
         bitField0_ |= 0x00000002;
         outgoing_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>required bool outgoing = 2;</code>
+       */
       public Builder clearOutgoing() {
         bitField0_ = (bitField0_ & ~0x00000002);
         outgoing_ = false;
         onChanged();
         return this;
       }
-      
+
       // required string label = 3;
       private java.lang.Object label_ = "";
+      /**
+       * <code>required string label = 3;</code>
+       */
       public boolean hasLabel() {
         return ((bitField0_ & 0x00000004) == 0x00000004);
       }
-      public String getLabel() {
+      /**
+       * <code>required string label = 3;</code>
+       */
+      public java.lang.String getLabel() {
         java.lang.Object ref = label_;
-        if (!(ref instanceof String)) {
-          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
+        if (!(ref instanceof java.lang.String)) {
+          java.lang.String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
           label_ = s;
           return s;
         } else {
-          return (String) ref;
+          return (java.lang.String) ref;
         }
       }
-      public Builder setLabel(String value) {
+      /**
+       * <code>required string label = 3;</code>
+       */
+      public com.google.protobuf.ByteString
+          getLabelBytes() {
+        java.lang.Object ref = label_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          label_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>required string label = 3;</code>
+       */
+      public Builder setLabel(
+          java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
@@ -1061,91 +1317,205 @@ public final class RamCloudGraphProtos {
         onChanged();
         return this;
       }
+      /**
+       * <code>required string label = 3;</code>
+       */
       public Builder clearLabel() {
         bitField0_ = (bitField0_ & ~0x00000004);
         label_ = getDefaultInstance().getLabel();
         onChanged();
         return this;
       }
-      void setLabel(com.google.protobuf.ByteString value) {
-        bitField0_ |= 0x00000004;
+      /**
+       * <code>required string label = 3;</code>
+       */
+      public Builder setLabelBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000004;
         label_ = value;
         onChanged();
+        return this;
       }
-      
+
       // @@protoc_insertion_point(builder_scope:RamCloudGraph.EdgeProtoBuf)
     }
-    
+
     static {
       defaultInstance = new EdgeProtoBuf(true);
       defaultInstance.initFields();
     }
-    
+
     // @@protoc_insertion_point(class_scope:RamCloudGraph.EdgeProtoBuf)
   }
-  
+
   public interface PropertyListProtoBufOrBuilder
       extends com.google.protobuf.MessageOrBuilder {
-    
+
     // repeated .RamCloudGraph.PropertyProtoBuf property = 1;
+    /**
+     * <code>repeated .RamCloudGraph.PropertyProtoBuf property = 1;</code>
+     */
     java.util.List<com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf> 
         getPropertyList();
+    /**
+     * <code>repeated .RamCloudGraph.PropertyProtoBuf property = 1;</code>
+     */
     com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf getProperty(int index);
+    /**
+     * <code>repeated .RamCloudGraph.PropertyProtoBuf property = 1;</code>
+     */
     int getPropertyCount();
+    /**
+     * <code>repeated .RamCloudGraph.PropertyProtoBuf property = 1;</code>
+     */
     java.util.List<? extends com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBufOrBuilder> 
         getPropertyOrBuilderList();
+    /**
+     * <code>repeated .RamCloudGraph.PropertyProtoBuf property = 1;</code>
+     */
     com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBufOrBuilder getPropertyOrBuilder(
         int index);
   }
+  /**
+   * Protobuf type {@code RamCloudGraph.PropertyListProtoBuf}
+   */
   public static final class PropertyListProtoBuf extends
       com.google.protobuf.GeneratedMessage
       implements PropertyListProtoBufOrBuilder {
     // Use PropertyListProtoBuf.newBuilder() to construct.
-    private PropertyListProtoBuf(Builder builder) {
+    private PropertyListProtoBuf(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
+      this.unknownFields = builder.getUnknownFields();
     }
-    private PropertyListProtoBuf(boolean noInit) {}
-    
+    private PropertyListProtoBuf(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
     private static final PropertyListProtoBuf defaultInstance;
     public static PropertyListProtoBuf getDefaultInstance() {
       return defaultInstance;
     }
-    
+
     public PropertyListProtoBuf getDefaultInstanceForType() {
       return defaultInstance;
     }
-    
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
+    }
+    private PropertyListProtoBuf(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 10: {
+              if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
+                property_ = new java.util.ArrayList<com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf>();
+                mutable_bitField0_ |= 0x00000001;
+              }
+              property_.add(input.readMessage(com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf.PARSER, extensionRegistry));
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        if (((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
+          property_ = java.util.Collections.unmodifiableList(property_);
+        }
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.internal_static_RamCloudGraph_PropertyListProtoBuf_descriptor;
     }
-    
+
     protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.internal_static_RamCloudGraph_PropertyListProtoBuf_fieldAccessorTable;
+      return com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.internal_static_RamCloudGraph_PropertyListProtoBuf_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyListProtoBuf.class, com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyListProtoBuf.Builder.class);
     }
-    
+
+    public static com.google.protobuf.Parser<PropertyListProtoBuf> PARSER =
+        new com.google.protobuf.AbstractParser<PropertyListProtoBuf>() {
+      public PropertyListProtoBuf parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new PropertyListProtoBuf(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<PropertyListProtoBuf> getParserForType() {
+      return PARSER;
+    }
+
     // repeated .RamCloudGraph.PropertyProtoBuf property = 1;
     public static final int PROPERTY_FIELD_NUMBER = 1;
     private java.util.List<com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf> property_;
+    /**
+     * <code>repeated .RamCloudGraph.PropertyProtoBuf property = 1;</code>
+     */
     public java.util.List<com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf> getPropertyList() {
       return property_;
     }
+    /**
+     * <code>repeated .RamCloudGraph.PropertyProtoBuf property = 1;</code>
+     */
     public java.util.List<? extends com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBufOrBuilder> 
         getPropertyOrBuilderList() {
       return property_;
     }
+    /**
+     * <code>repeated .RamCloudGraph.PropertyProtoBuf property = 1;</code>
+     */
     public int getPropertyCount() {
       return property_.size();
     }
+    /**
+     * <code>repeated .RamCloudGraph.PropertyProtoBuf property = 1;</code>
+     */
     public com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf getProperty(int index) {
       return property_.get(index);
     }
+    /**
+     * <code>repeated .RamCloudGraph.PropertyProtoBuf property = 1;</code>
+     */
     public com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBufOrBuilder getPropertyOrBuilder(
         int index) {
       return property_.get(index);
     }
-    
+
     private void initFields() {
       property_ = java.util.Collections.emptyList();
     }
@@ -1153,7 +1523,7 @@ public final class RamCloudGraphProtos {
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized != -1) return isInitialized == 1;
-      
+
       for (int i = 0; i < getPropertyCount(); i++) {
         if (!getProperty(i).isInitialized()) {
           memoizedIsInitialized = 0;
@@ -1163,7 +1533,7 @@ public final class RamCloudGraphProtos {
       memoizedIsInitialized = 1;
       return true;
     }
-    
+
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       getSerializedSize();
@@ -1172,12 +1542,12 @@ public final class RamCloudGraphProtos {
       }
       getUnknownFields().writeTo(output);
     }
-    
+
     private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
       int size = memoizedSerializedSize;
       if (size != -1) return size;
-    
+
       size = 0;
       for (int i = 0; i < property_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
@@ -1187,94 +1557,83 @@ public final class RamCloudGraphProtos {
       memoizedSerializedSize = size;
       return size;
     }
-    
+
     private static final long serialVersionUID = 0L;
     @java.lang.Override
     protected java.lang.Object writeReplace()
         throws java.io.ObjectStreamException {
       return super.writeReplace();
     }
-    
+
     public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyListProtoBuf parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data).buildParsed();
+      return PARSER.parseFrom(data);
     }
     public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyListProtoBuf parseFrom(
         com.google.protobuf.ByteString data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data, extensionRegistry)
-               .buildParsed();
+      return PARSER.parseFrom(data, extensionRegistry);
     }
     public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyListProtoBuf parseFrom(byte[] data)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data).buildParsed();
+      return PARSER.parseFrom(data);
     }
     public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyListProtoBuf parseFrom(
         byte[] data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data, extensionRegistry)
-               .buildParsed();
+      return PARSER.parseFrom(data, extensionRegistry);
     }
     public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyListProtoBuf parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return newBuilder().mergeFrom(input).buildParsed();
+      return PARSER.parseFrom(input);
     }
     public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyListProtoBuf parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return newBuilder().mergeFrom(input, extensionRegistry)
-               .buildParsed();
+      return PARSER.parseFrom(input, extensionRegistry);
     }
     public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyListProtoBuf parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      Builder builder = newBuilder();
-      if (builder.mergeDelimitedFrom(input)) {
-        return builder.buildParsed();
-      } else {
-        return null;
-      }
+      return PARSER.parseDelimitedFrom(input);
     }
     public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyListProtoBuf parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      Builder builder = newBuilder();
-      if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
-        return builder.buildParsed();
-      } else {
-        return null;
-      }
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
     }
     public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyListProtoBuf parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return newBuilder().mergeFrom(input).buildParsed();
+      return PARSER.parseFrom(input);
     }
     public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyListProtoBuf parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return newBuilder().mergeFrom(input, extensionRegistry)
-               .buildParsed();
+      return PARSER.parseFrom(input, extensionRegistry);
     }
-    
+
     public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder(com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyListProtoBuf prototype) {
       return newBuilder().mergeFrom(prototype);
     }
     public Builder toBuilder() { return newBuilder(this); }
-    
+
     @java.lang.Override
     protected Builder newBuilderForType(
         com.google.protobuf.GeneratedMessage.BuilderParent parent) {
       Builder builder = new Builder(parent);
       return builder;
     }
+    /**
+     * Protobuf type {@code RamCloudGraph.PropertyListProtoBuf}
+     */
     public static final class Builder extends
         com.google.protobuf.GeneratedMessage.Builder<Builder>
        implements com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyListProtoBufOrBuilder {
@@ -1282,18 +1641,21 @@ public final class RamCloudGraphProtos {
           getDescriptor() {
         return com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.internal_static_RamCloudGraph_PropertyListProtoBuf_descriptor;
       }
-      
+
       protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
           internalGetFieldAccessorTable() {
-        return com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.internal_static_RamCloudGraph_PropertyListProtoBuf_fieldAccessorTable;
+        return com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.internal_static_RamCloudGraph_PropertyListProtoBuf_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyListProtoBuf.class, com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyListProtoBuf.Builder.class);
       }
-      
+
       // Construct using com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyListProtoBuf.newBuilder()
       private Builder() {
         maybeForceBuilderInitialization();
       }
-      
-      private Builder(BuilderParent parent) {
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
         super(parent);
         maybeForceBuilderInitialization();
       }
@@ -1305,7 +1667,7 @@ public final class RamCloudGraphProtos {
       private static Builder create() {
         return new Builder();
       }
-      
+
       public Builder clear() {
         super.clear();
         if (propertyBuilder_ == null) {
@@ -1316,20 +1678,20 @@ public final class RamCloudGraphProtos {
         }
         return this;
       }
-      
+
       public Builder clone() {
         return create().mergeFrom(buildPartial());
       }
-      
+
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
-        return com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyListProtoBuf.getDescriptor();
+        return com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.internal_static_RamCloudGraph_PropertyListProtoBuf_descriptor;
       }
-      
+
       public com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyListProtoBuf getDefaultInstanceForType() {
         return com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyListProtoBuf.getDefaultInstance();
       }
-      
+
       public com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyListProtoBuf build() {
         com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyListProtoBuf result = buildPartial();
         if (!result.isInitialized()) {
@@ -1337,17 +1699,7 @@ public final class RamCloudGraphProtos {
         }
         return result;
       }
-      
-      private com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyListProtoBuf buildParsed()
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyListProtoBuf result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(
-            result).asInvalidProtocolBufferException();
-        }
-        return result;
-      }
-      
+
       public com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyListProtoBuf buildPartial() {
         com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyListProtoBuf result = new com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyListProtoBuf(this);
         int from_bitField0_ = bitField0_;
@@ -1363,7 +1715,7 @@ public final class RamCloudGraphProtos {
         onBuilt();
         return result;
       }
-      
+
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyListProtoBuf) {
           return mergeFrom((com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyListProtoBuf)other);
@@ -1372,7 +1724,7 @@ public final class RamCloudGraphProtos {
           return this;
         }
       }
-      
+
       public Builder mergeFrom(com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyListProtoBuf other) {
         if (other == com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyListProtoBuf.getDefaultInstance()) return this;
         if (propertyBuilder_ == null) {
@@ -1404,7 +1756,7 @@ public final class RamCloudGraphProtos {
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
       }
-      
+
       public final boolean isInitialized() {
         for (int i = 0; i < getPropertyCount(); i++) {
           if (!getProperty(i).isInitialized()) {
@@ -1414,42 +1766,26 @@ public final class RamCloudGraphProtos {
         }
         return true;
       }
-      
+
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder(
-            this.getUnknownFields());
-        while (true) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              this.setUnknownFields(unknownFields.build());
-              onChanged();
-              return this;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                this.setUnknownFields(unknownFields.build());
-                onChanged();
-                return this;
-              }
-              break;
-            }
-            case 10: {
-              com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf.Builder subBuilder = com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf.newBuilder();
-              input.readMessage(subBuilder, extensionRegistry);
-              addProperty(subBuilder.buildPartial());
-              break;
-            }
+        com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyListProtoBuf parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyListProtoBuf) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
           }
         }
+        return this;
       }
-      
       private int bitField0_;
-      
+
       // repeated .RamCloudGraph.PropertyProtoBuf property = 1;
       private java.util.List<com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf> property_ =
         java.util.Collections.emptyList();
@@ -1459,10 +1795,13 @@ public final class RamCloudGraphProtos {
           bitField0_ |= 0x00000001;
          }
       }
-      
+
       private com.google.protobuf.RepeatedFieldBuilder<
           com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf, com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf.Builder, com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBufOrBuilder> propertyBuilder_;
-      
+
+      /**
+       * <code>repeated .RamCloudGraph.PropertyProtoBuf property = 1;</code>
+       */
       public java.util.List<com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf> getPropertyList() {
         if (propertyBuilder_ == null) {
           return java.util.Collections.unmodifiableList(property_);
@@ -1470,6 +1809,9 @@ public final class RamCloudGraphProtos {
           return propertyBuilder_.getMessageList();
         }
       }
+      /**
+       * <code>repeated .RamCloudGraph.PropertyProtoBuf property = 1;</code>
+       */
       public int getPropertyCount() {
         if (propertyBuilder_ == null) {
           return property_.size();
@@ -1477,6 +1819,9 @@ public final class RamCloudGraphProtos {
           return propertyBuilder_.getCount();
         }
       }
+      /**
+       * <code>repeated .RamCloudGraph.PropertyProtoBuf property = 1;</code>
+       */
       public com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf getProperty(int index) {
         if (propertyBuilder_ == null) {
           return property_.get(index);
@@ -1484,6 +1829,9 @@ public final class RamCloudGraphProtos {
           return propertyBuilder_.getMessage(index);
         }
       }
+      /**
+       * <code>repeated .RamCloudGraph.PropertyProtoBuf property = 1;</code>
+       */
       public Builder setProperty(
           int index, com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf value) {
         if (propertyBuilder_ == null) {
@@ -1498,6 +1846,9 @@ public final class RamCloudGraphProtos {
         }
         return this;
       }
+      /**
+       * <code>repeated .RamCloudGraph.PropertyProtoBuf property = 1;</code>
+       */
       public Builder setProperty(
           int index, com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf.Builder builderForValue) {
         if (propertyBuilder_ == null) {
@@ -1509,6 +1860,9 @@ public final class RamCloudGraphProtos {
         }
         return this;
       }
+      /**
+       * <code>repeated .RamCloudGraph.PropertyProtoBuf property = 1;</code>
+       */
       public Builder addProperty(com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf value) {
         if (propertyBuilder_ == null) {
           if (value == null) {
@@ -1522,6 +1876,9 @@ public final class RamCloudGraphProtos {
         }
         return this;
       }
+      /**
+       * <code>repeated .RamCloudGraph.PropertyProtoBuf property = 1;</code>
+       */
       public Builder addProperty(
           int index, com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf value) {
         if (propertyBuilder_ == null) {
@@ -1536,6 +1893,9 @@ public final class RamCloudGraphProtos {
         }
         return this;
       }
+      /**
+       * <code>repeated .RamCloudGraph.PropertyProtoBuf property = 1;</code>
+       */
       public Builder addProperty(
           com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf.Builder builderForValue) {
         if (propertyBuilder_ == null) {
@@ -1547,6 +1907,9 @@ public final class RamCloudGraphProtos {
         }
         return this;
       }
+      /**
+       * <code>repeated .RamCloudGraph.PropertyProtoBuf property = 1;</code>
+       */
       public Builder addProperty(
           int index, com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf.Builder builderForValue) {
         if (propertyBuilder_ == null) {
@@ -1558,6 +1921,9 @@ public final class RamCloudGraphProtos {
         }
         return this;
       }
+      /**
+       * <code>repeated .RamCloudGraph.PropertyProtoBuf property = 1;</code>
+       */
       public Builder addAllProperty(
           java.lang.Iterable<? extends com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf> values) {
         if (propertyBuilder_ == null) {
@@ -1569,6 +1935,9 @@ public final class RamCloudGraphProtos {
         }
         return this;
       }
+      /**
+       * <code>repeated .RamCloudGraph.PropertyProtoBuf property = 1;</code>
+       */
       public Builder clearProperty() {
         if (propertyBuilder_ == null) {
           property_ = java.util.Collections.emptyList();
@@ -1579,6 +1948,9 @@ public final class RamCloudGraphProtos {
         }
         return this;
       }
+      /**
+       * <code>repeated .RamCloudGraph.PropertyProtoBuf property = 1;</code>
+       */
       public Builder removeProperty(int index) {
         if (propertyBuilder_ == null) {
           ensurePropertyIsMutable();
@@ -1589,10 +1961,16 @@ public final class RamCloudGraphProtos {
         }
         return this;
       }
+      /**
+       * <code>repeated .RamCloudGraph.PropertyProtoBuf property = 1;</code>
+       */
       public com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf.Builder getPropertyBuilder(
           int index) {
         return getPropertyFieldBuilder().getBuilder(index);
       }
+      /**
+       * <code>repeated .RamCloudGraph.PropertyProtoBuf property = 1;</code>
+       */
       public com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBufOrBuilder getPropertyOrBuilder(
           int index) {
         if (propertyBuilder_ == null) {
@@ -1600,6 +1978,9 @@ public final class RamCloudGraphProtos {
           return propertyBuilder_.getMessageOrBuilder(index);
         }
       }
+      /**
+       * <code>repeated .RamCloudGraph.PropertyProtoBuf property = 1;</code>
+       */
       public java.util.List<? extends com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBufOrBuilder> 
            getPropertyOrBuilderList() {
         if (propertyBuilder_ != null) {
@@ -1608,15 +1989,24 @@ public final class RamCloudGraphProtos {
           return java.util.Collections.unmodifiableList(property_);
         }
       }
+      /**
+       * <code>repeated .RamCloudGraph.PropertyProtoBuf property = 1;</code>
+       */
       public com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf.Builder addPropertyBuilder() {
         return getPropertyFieldBuilder().addBuilder(
             com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf.getDefaultInstance());
       }
+      /**
+       * <code>repeated .RamCloudGraph.PropertyProtoBuf property = 1;</code>
+       */
       public com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf.Builder addPropertyBuilder(
           int index) {
         return getPropertyFieldBuilder().addBuilder(
             index, com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf.getDefaultInstance());
       }
+      /**
+       * <code>repeated .RamCloudGraph.PropertyProtoBuf property = 1;</code>
+       */
       public java.util.List<com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf.Builder> 
            getPropertyBuilderList() {
         return getPropertyFieldBuilder().getBuilderList();
@@ -1635,668 +2025,159 @@ public final class RamCloudGraphProtos {
         }
         return propertyBuilder_;
       }
-      
+
       // @@protoc_insertion_point(builder_scope:RamCloudGraph.PropertyListProtoBuf)
     }
-    
+
     static {
       defaultInstance = new PropertyListProtoBuf(true);
       defaultInstance.initFields();
     }
-    
+
     // @@protoc_insertion_point(class_scope:RamCloudGraph.PropertyListProtoBuf)
   }
-  
+
   public interface PropertyProtoBufOrBuilder
       extends com.google.protobuf.MessageOrBuilder {
-    
+
     // required string key = 1;
+    /**
+     * <code>required string key = 1;</code>
+     */
     boolean hasKey();
-    String getKey();
-    
+    /**
+     * <code>required string key = 1;</code>
+     */
+    java.lang.String getKey();
+    /**
+     * <code>required string key = 1;</code>
+     */
+    com.google.protobuf.ByteString
+        getKeyBytes();
+
     // required .RamCloudGraph.PropertyProtoBuf.Type value_type = 2;
+    /**
+     * <code>required .RamCloudGraph.PropertyProtoBuf.Type value_type = 2;</code>
+     */
     boolean hasValueType();
+    /**
+     * <code>required .RamCloudGraph.PropertyProtoBuf.Type value_type = 2;</code>
+     */
     com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf.Type getValueType();
-    
+
     // optional string string_value = 3;
+    /**
+     * <code>optional string string_value = 3;</code>
+     */
     boolean hasStringValue();
-    String getStringValue();
-    
+    /**
+     * <code>optional string string_value = 3;</code>
+     */
+    java.lang.String getStringValue();
+    /**
+     * <code>optional string string_value = 3;</code>
+     */
+    com.google.protobuf.ByteString
+        getStringValueBytes();
+
     // optional int32 int32_value = 4;
+    /**
+     * <code>optional int32 int32_value = 4;</code>
+     */
     boolean hasInt32Value();
+    /**
+     * <code>optional int32 int32_value = 4;</code>
+     */
     int getInt32Value();
-    
+
     // optional int64 int64_value = 5;
+    /**
+     * <code>optional int64 int64_value = 5;</code>
+     */
     boolean hasInt64Value();
+    /**
+     * <code>optional int64 int64_value = 5;</code>
+     */
     long getInt64Value();
-    
+
     // optional double double_value = 6;
+    /**
+     * <code>optional double double_value = 6;</code>
+     */
     boolean hasDoubleValue();
+    /**
+     * <code>optional double double_value = 6;</code>
+     */
     double getDoubleValue();
-    
+
     // optional float float_value = 7;
+    /**
+     * <code>optional float float_value = 7;</code>
+     */
     boolean hasFloatValue();
+    /**
+     * <code>optional float float_value = 7;</code>
+     */
     float getFloatValue();
-    
+
     // optional bool bool_value = 8;
+    /**
+     * <code>optional bool bool_value = 8;</code>
+     */
     boolean hasBoolValue();
+    /**
+     * <code>optional bool bool_value = 8;</code>
+     */
     boolean getBoolValue();
   }
+  /**
+   * Protobuf type {@code RamCloudGraph.PropertyProtoBuf}
+   */
   public static final class PropertyProtoBuf extends
       com.google.protobuf.GeneratedMessage
       implements PropertyProtoBufOrBuilder {
     // Use PropertyProtoBuf.newBuilder() to construct.
-    private PropertyProtoBuf(Builder builder) {
+    private PropertyProtoBuf(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
+      this.unknownFields = builder.getUnknownFields();
     }
-    private PropertyProtoBuf(boolean noInit) {}
-    
+    private PropertyProtoBuf(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
     private static final PropertyProtoBuf defaultInstance;
     public static PropertyProtoBuf getDefaultInstance() {
       return defaultInstance;
     }
-    
+
     public PropertyProtoBuf getDefaultInstanceForType() {
       return defaultInstance;
     }
-    
-    public static final com.google.protobuf.Descriptors.Descriptor
-        getDescriptor() {
-      return com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.internal_static_RamCloudGraph_PropertyProtoBuf_descriptor;
-    }
-    
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-        internalGetFieldAccessorTable() {
-      return com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.internal_static_RamCloudGraph_PropertyProtoBuf_fieldAccessorTable;
-    }
-    
-    public enum Type
-        implements com.google.protobuf.ProtocolMessageEnum {
-      STRING(0, 1),
-      INT32(1, 2),
-      INT64(2, 3),
-      DOUBLE(3, 4),
-      FLOAT(4, 5),
-      BOOL(5, 6),
-      ;
-      
-      public static final int STRING_VALUE = 1;
-      public static final int INT32_VALUE = 2;
-      public static final int INT64_VALUE = 3;
-      public static final int DOUBLE_VALUE = 4;
-      public static final int FLOAT_VALUE = 5;
-      public static final int BOOL_VALUE = 6;
-      
-      
-      public final int getNumber() { return value; }
-      
-      public static Type valueOf(int value) {
-        switch (value) {
-          case 1: return STRING;
-          case 2: return INT32;
-          case 3: return INT64;
-          case 4: return DOUBLE;
-          case 5: return FLOAT;
-          case 6: return BOOL;
-          default: return null;
-        }
-      }
-      
-      public static com.google.protobuf.Internal.EnumLiteMap<Type>
-          internalGetValueMap() {
-        return internalValueMap;
-      }
-      private static com.google.protobuf.Internal.EnumLiteMap<Type>
-          internalValueMap =
-            new com.google.protobuf.Internal.EnumLiteMap<Type>() {
-              public Type findValueByNumber(int number) {
-                return Type.valueOf(number);
-              }
-            };
-      
-      public final com.google.protobuf.Descriptors.EnumValueDescriptor
-          getValueDescriptor() {
-        return getDescriptor().getValues().get(index);
-      }
-      public final com.google.protobuf.Descriptors.EnumDescriptor
-          getDescriptorForType() {
-        return getDescriptor();
-      }
-      public static final com.google.protobuf.Descriptors.EnumDescriptor
-          getDescriptor() {
-        return com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf.getDescriptor().getEnumTypes().get(0);
-      }
-      
-      private static final Type[] VALUES = {
-        STRING, INT32, INT64, DOUBLE, FLOAT, BOOL, 
-      };
-      
-      public static Type valueOf(
-          com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
-        if (desc.getType() != getDescriptor()) {
-          throw new java.lang.IllegalArgumentException(
-            "EnumValueDescriptor is not for this type.");
-        }
-        return VALUES[desc.getIndex()];
-      }
-      
-      private final int index;
-      private final int value;
-      
-      private Type(int index, int value) {
-        this.index = index;
-        this.value = value;
-      }
-      
-      // @@protoc_insertion_point(enum_scope:RamCloudGraph.PropertyProtoBuf.Type)
-    }
-    
-    private int bitField0_;
-    // required string key = 1;
-    public static final int KEY_FIELD_NUMBER = 1;
-    private java.lang.Object key_;
-    public boolean hasKey() {
-      return ((bitField0_ & 0x00000001) == 0x00000001);
-    }
-    public String getKey() {
-      java.lang.Object ref = key_;
-      if (ref instanceof String) {
-        return (String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        String s = bs.toStringUtf8();
-        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-          key_ = s;
-        }
-        return s;
-      }
-    }
-    private com.google.protobuf.ByteString getKeyBytes() {
-      java.lang.Object ref = key_;
-      if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-        key_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-    
-    // required .RamCloudGraph.PropertyProtoBuf.Type value_type = 2;
-    public static final int VALUE_TYPE_FIELD_NUMBER = 2;
-    private com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf.Type valueType_;
-    public boolean hasValueType() {
-      return ((bitField0_ & 0x00000002) == 0x00000002);
-    }
-    public com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf.Type getValueType() {
-      return valueType_;
-    }
-    
-    // optional string string_value = 3;
-    public static final int STRING_VALUE_FIELD_NUMBER = 3;
-    private java.lang.Object stringValue_;
-    public boolean hasStringValue() {
-      return ((bitField0_ & 0x00000004) == 0x00000004);
-    }
-    public String getStringValue() {
-      java.lang.Object ref = stringValue_;
-      if (ref instanceof String) {
-        return (String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        String s = bs.toStringUtf8();
-        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-          stringValue_ = s;
-        }
-        return s;
-      }
-    }
-    private com.google.protobuf.ByteString getStringValueBytes() {
-      java.lang.Object ref = stringValue_;
-      if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-        stringValue_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-    
-    // optional int32 int32_value = 4;
-    public static final int INT32_VALUE_FIELD_NUMBER = 4;
-    private int int32Value_;
-    public boolean hasInt32Value() {
-      return ((bitField0_ & 0x00000008) == 0x00000008);
-    }
-    public int getInt32Value() {
-      return int32Value_;
-    }
-    
-    // optional int64 int64_value = 5;
-    public static final int INT64_VALUE_FIELD_NUMBER = 5;
-    private long int64Value_;
-    public boolean hasInt64Value() {
-      return ((bitField0_ & 0x00000010) == 0x00000010);
-    }
-    public long getInt64Value() {
-      return int64Value_;
-    }
-    
-    // optional double double_value = 6;
-    public static final int DOUBLE_VALUE_FIELD_NUMBER = 6;
-    private double doubleValue_;
-    public boolean hasDoubleValue() {
-      return ((bitField0_ & 0x00000020) == 0x00000020);
-    }
-    public double getDoubleValue() {
-      return doubleValue_;
-    }
-    
-    // optional float float_value = 7;
-    public static final int FLOAT_VALUE_FIELD_NUMBER = 7;
-    private float floatValue_;
-    public boolean hasFloatValue() {
-      return ((bitField0_ & 0x00000040) == 0x00000040);
-    }
-    public float getFloatValue() {
-      return floatValue_;
-    }
-    
-    // optional bool bool_value = 8;
-    public static final int BOOL_VALUE_FIELD_NUMBER = 8;
-    private boolean boolValue_;
-    public boolean hasBoolValue() {
-      return ((bitField0_ & 0x00000080) == 0x00000080);
-    }
-    public boolean getBoolValue() {
-      return boolValue_;
-    }
-    
-    private void initFields() {
-      key_ = "";
-      valueType_ = com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf.Type.STRING;
-      stringValue_ = "";
-      int32Value_ = 0;
-      int64Value_ = 0L;
-      doubleValue_ = 0D;
-      floatValue_ = 0F;
-      boolValue_ = false;
-    }
-    private byte memoizedIsInitialized = -1;
-    public final boolean isInitialized() {
-      byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
-      
-      if (!hasKey()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!hasValueType()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      memoizedIsInitialized = 1;
-      return true;
-    }
-    
-    public void writeTo(com.google.protobuf.CodedOutputStream output)
-                        throws java.io.IOException {
-      getSerializedSize();
-      if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeBytes(1, getKeyBytes());
-      }
-      if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeEnum(2, valueType_.getNumber());
-      }
-      if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeBytes(3, getStringValueBytes());
-      }
-      if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        output.writeInt32(4, int32Value_);
-      }
-      if (((bitField0_ & 0x00000010) == 0x00000010)) {
-        output.writeInt64(5, int64Value_);
-      }
-      if (((bitField0_ & 0x00000020) == 0x00000020)) {
-        output.writeDouble(6, doubleValue_);
-      }
-      if (((bitField0_ & 0x00000040) == 0x00000040)) {
-        output.writeFloat(7, floatValue_);
-      }
-      if (((bitField0_ & 0x00000080) == 0x00000080)) {
-        output.writeBool(8, boolValue_);
-      }
-      getUnknownFields().writeTo(output);
-    }
-    
-    private int memoizedSerializedSize = -1;
-    public int getSerializedSize() {
-      int size = memoizedSerializedSize;
-      if (size != -1) return size;
-    
-      size = 0;
-      if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(1, getKeyBytes());
-      }
-      if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeEnumSize(2, valueType_.getNumber());
-      }
-      if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(3, getStringValueBytes());
-      }
-      if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(4, int32Value_);
-      }
-      if (((bitField0_ & 0x00000010) == 0x00000010)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt64Size(5, int64Value_);
-      }
-      if (((bitField0_ & 0x00000020) == 0x00000020)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeDoubleSize(6, doubleValue_);
-      }
-      if (((bitField0_ & 0x00000040) == 0x00000040)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeFloatSize(7, floatValue_);
-      }
-      if (((bitField0_ & 0x00000080) == 0x00000080)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBoolSize(8, boolValue_);
-      }
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
-      return size;
-    }
-    
-    private static final long serialVersionUID = 0L;
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
     }
-    
-    public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf parseFrom(
-        com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data).buildParsed();
-    }
-    public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf parseFrom(
-        com.google.protobuf.ByteString data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data, extensionRegistry)
-               .buildParsed();
-    }
-    public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf parseFrom(byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data).buildParsed();
-    }
-    public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf parseFrom(
-        byte[] data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data, extensionRegistry)
-               .buildParsed();
-    }
-    public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf parseFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return newBuilder().mergeFrom(input).buildParsed();
-    }
-    public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf parseFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return newBuilder().mergeFrom(input, extensionRegistry)
-               .buildParsed();
-    }
-    public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf parseDelimitedFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      Builder builder = newBuilder();
-      if (builder.mergeDelimitedFrom(input)) {
-        return builder.buildParsed();
-      } else {
-        return null;
-      }
-    }
-    public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf parseDelimitedFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      Builder builder = newBuilder();
-      if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
-        return builder.buildParsed();
-      } else {
-        return null;
-      }
-    }
-    public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf parseFrom(
-        com.google.protobuf.CodedInputStream input)
-        throws java.io.IOException {
-      return newBuilder().mergeFrom(input).buildParsed();
-    }
-    public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf parseFrom(
+    private PropertyProtoBuf(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return newBuilder().mergeFrom(input, extensionRegistry)
-               .buildParsed();
-    }
-    
-    public static Builder newBuilder() { return Builder.create(); }
-    public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf prototype) {
-      return newBuilder().mergeFrom(prototype);
-    }
-    public Builder toBuilder() { return newBuilder(this); }
-    
-    @java.lang.Override
-    protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
-      Builder builder = new Builder(parent);
-      return builder;
-    }
-    public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBufOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
-          getDescriptor() {
-        return com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.internal_static_RamCloudGraph_PropertyProtoBuf_descriptor;
-      }
-      
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-          internalGetFieldAccessorTable() {
-        return com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.internal_static_RamCloudGraph_PropertyProtoBuf_fieldAccessorTable;
-      }
-      
-      // Construct using com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf.newBuilder()
-      private Builder() {
-        maybeForceBuilderInitialization();
-      }
-      
-      private Builder(BuilderParent parent) {
-        super(parent);
-        maybeForceBuilderInitialization();
-      }
-      private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
-        }
-      }
-      private static Builder create() {
-        return new Builder();
-      }
-      
-      public Builder clear() {
-        super.clear();
-        key_ = "";
-        bitField0_ = (bitField0_ & ~0x00000001);
-        valueType_ = com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf.Type.STRING;
-        bitField0_ = (bitField0_ & ~0x00000002);
-        stringValue_ = "";
-        bitField0_ = (bitField0_ & ~0x00000004);
-        int32Value_ = 0;
-        bitField0_ = (bitField0_ & ~0x00000008);
-        int64Value_ = 0L;
-        bitField0_ = (bitField0_ & ~0x00000010);
-        doubleValue_ = 0D;
-        bitField0_ = (bitField0_ & ~0x00000020);
-        floatValue_ = 0F;
-        bitField0_ = (bitField0_ & ~0x00000040);
-        boolValue_ = false;
-        bitField0_ = (bitField0_ & ~0x00000080);
-        return this;
-      }
-      
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
-      }
-      
-      public com.google.protobuf.Descriptors.Descriptor
-          getDescriptorForType() {
-        return com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf.getDescriptor();
-      }
-      
-      public com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf getDefaultInstanceForType() {
-        return com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf.getDefaultInstance();
-      }
-      
-      public com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf build() {
-        com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(result);
-        }
-        return result;
-      }
-      
-      private com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf buildParsed()
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(
-            result).asInvalidProtocolBufferException();
-        }
-        return result;
-      }
-      
-      public com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf buildPartial() {
-        com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf result = new com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf(this);
-        int from_bitField0_ = bitField0_;
-        int to_bitField0_ = 0;
-        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
-          to_bitField0_ |= 0x00000001;
-        }
-        result.key_ = key_;
-        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
-          to_bitField0_ |= 0x00000002;
-        }
-        result.valueType_ = valueType_;
-        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
-          to_bitField0_ |= 0x00000004;
-        }
-        result.stringValue_ = stringValue_;
-        if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
-          to_bitField0_ |= 0x00000008;
-        }
-        result.int32Value_ = int32Value_;
-        if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
-          to_bitField0_ |= 0x00000010;
-        }
-        result.int64Value_ = int64Value_;
-        if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
-          to_bitField0_ |= 0x00000020;
-        }
-        result.doubleValue_ = doubleValue_;
-        if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
-          to_bitField0_ |= 0x00000040;
-        }
-        result.floatValue_ = floatValue_;
-        if (((from_bitField0_ & 0x00000080) == 0x00000080)) {
-          to_bitField0_ |= 0x00000080;
-        }
-        result.boolValue_ = boolValue_;
-        result.bitField0_ = to_bitField0_;
-        onBuilt();
-        return result;
-      }
-      
-      public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf) {
-          return mergeFrom((com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf)other);
-        } else {
-          super.mergeFrom(other);
-          return this;
-        }
-      }
-      
-      public Builder mergeFrom(com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf other) {
-        if (other == com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf.getDefaultInstance()) return this;
-        if (other.hasKey()) {
-          setKey(other.getKey());
-        }
-        if (other.hasValueType()) {
-          setValueType(other.getValueType());
-        }
-        if (other.hasStringValue()) {
-          setStringValue(other.getStringValue());
-        }
-        if (other.hasInt32Value()) {
-          setInt32Value(other.getInt32Value());
-        }
-        if (other.hasInt64Value()) {
-          setInt64Value(other.getInt64Value());
-        }
-        if (other.hasDoubleValue()) {
-          setDoubleValue(other.getDoubleValue());
-        }
-        if (other.hasFloatValue()) {
-          setFloatValue(other.getFloatValue());
-        }
-        if (other.hasBoolValue()) {
-          setBoolValue(other.getBoolValue());
-        }
-        this.mergeUnknownFields(other.getUnknownFields());
-        return this;
-      }
-      
-      public final boolean isInitialized() {
-        if (!hasKey()) {
-          
-          return false;
-        }
-        if (!hasValueType()) {
-          
-          return false;
-        }
-        return true;
-      }
-      
-      public Builder mergeFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
-        com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder(
-            this.getUnknownFields());
-        while (true) {
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
           int tag = input.readTag();
           switch (tag) {
             case 0:
-              this.setUnknownFields(unknownFields.build());
-              onChanged();
-              return this;
+              done = true;
+              break;
             default: {
               if (!parseUnknownField(input, unknownFields,
                                      extensionRegistry, tag)) {
-                this.setUnknownFields(unknownFields.build());
-                onChanged();
-                return this;
+                done = true;
               }
               break;
             }
@@ -2348,26 +2229,753 @@ public final class RamCloudGraphProtos {
             }
           }
         }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
       }
-      
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.internal_static_RamCloudGraph_PropertyProtoBuf_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.internal_static_RamCloudGraph_PropertyProtoBuf_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf.class, com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf.Builder.class);
+    }
+
+    public static com.google.protobuf.Parser<PropertyProtoBuf> PARSER =
+        new com.google.protobuf.AbstractParser<PropertyProtoBuf>() {
+      public PropertyProtoBuf parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new PropertyProtoBuf(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<PropertyProtoBuf> getParserForType() {
+      return PARSER;
+    }
+
+    /**
+     * Protobuf enum {@code RamCloudGraph.PropertyProtoBuf.Type}
+     */
+    public enum Type
+        implements com.google.protobuf.ProtocolMessageEnum {
+      /**
+       * <code>STRING = 1;</code>
+       */
+      STRING(0, 1),
+      /**
+       * <code>INT32 = 2;</code>
+       */
+      INT32(1, 2),
+      /**
+       * <code>INT64 = 3;</code>
+       */
+      INT64(2, 3),
+      /**
+       * <code>DOUBLE = 4;</code>
+       */
+      DOUBLE(3, 4),
+      /**
+       * <code>FLOAT = 5;</code>
+       */
+      FLOAT(4, 5),
+      /**
+       * <code>BOOL = 6;</code>
+       */
+      BOOL(5, 6),
+      ;
+
+      /**
+       * <code>STRING = 1;</code>
+       */
+      public static final int STRING_VALUE = 1;
+      /**
+       * <code>INT32 = 2;</code>
+       */
+      public static final int INT32_VALUE = 2;
+      /**
+       * <code>INT64 = 3;</code>
+       */
+      public static final int INT64_VALUE = 3;
+      /**
+       * <code>DOUBLE = 4;</code>
+       */
+      public static final int DOUBLE_VALUE = 4;
+      /**
+       * <code>FLOAT = 5;</code>
+       */
+      public static final int FLOAT_VALUE = 5;
+      /**
+       * <code>BOOL = 6;</code>
+       */
+      public static final int BOOL_VALUE = 6;
+
+
+      public final int getNumber() { return value; }
+
+      public static Type valueOf(int value) {
+        switch (value) {
+          case 1: return STRING;
+          case 2: return INT32;
+          case 3: return INT64;
+          case 4: return DOUBLE;
+          case 5: return FLOAT;
+          case 6: return BOOL;
+          default: return null;
+        }
+      }
+
+      public static com.google.protobuf.Internal.EnumLiteMap<Type>
+          internalGetValueMap() {
+        return internalValueMap;
+      }
+      private static com.google.protobuf.Internal.EnumLiteMap<Type>
+          internalValueMap =
+            new com.google.protobuf.Internal.EnumLiteMap<Type>() {
+              public Type findValueByNumber(int number) {
+                return Type.valueOf(number);
+              }
+            };
+
+      public final com.google.protobuf.Descriptors.EnumValueDescriptor
+          getValueDescriptor() {
+        return getDescriptor().getValues().get(index);
+      }
+      public final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptorForType() {
+        return getDescriptor();
+      }
+      public static final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptor() {
+        return com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf.getDescriptor().getEnumTypes().get(0);
+      }
+
+      private static final Type[] VALUES = values();
+
+      public static Type valueOf(
+          com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+        if (desc.getType() != getDescriptor()) {
+          throw new java.lang.IllegalArgumentException(
+            "EnumValueDescriptor is not for this type.");
+        }
+        return VALUES[desc.getIndex()];
+      }
+
+      private final int index;
+      private final int value;
+
+      private Type(int index, int value) {
+        this.index = index;
+        this.value = value;
+      }
+
+      // @@protoc_insertion_point(enum_scope:RamCloudGraph.PropertyProtoBuf.Type)
+    }
+
+    private int bitField0_;
+    // required string key = 1;
+    public static final int KEY_FIELD_NUMBER = 1;
+    private java.lang.Object key_;
+    /**
+     * <code>required string key = 1;</code>
+     */
+    public boolean hasKey() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    /**
+     * <code>required string key = 1;</code>
+     */
+    public java.lang.String getKey() {
+      java.lang.Object ref = key_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          key_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>required string key = 1;</code>
+     */
+    public com.google.protobuf.ByteString
+        getKeyBytes() {
+      java.lang.Object ref = key_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        key_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    // required .RamCloudGraph.PropertyProtoBuf.Type value_type = 2;
+    public static final int VALUE_TYPE_FIELD_NUMBER = 2;
+    private com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf.Type valueType_;
+    /**
+     * <code>required .RamCloudGraph.PropertyProtoBuf.Type value_type = 2;</code>
+     */
+    public boolean hasValueType() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    /**
+     * <code>required .RamCloudGraph.PropertyProtoBuf.Type value_type = 2;</code>
+     */
+    public com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf.Type getValueType() {
+      return valueType_;
+    }
+
+    // optional string string_value = 3;
+    public static final int STRING_VALUE_FIELD_NUMBER = 3;
+    private java.lang.Object stringValue_;
+    /**
+     * <code>optional string string_value = 3;</code>
+     */
+    public boolean hasStringValue() {
+      return ((bitField0_ & 0x00000004) == 0x00000004);
+    }
+    /**
+     * <code>optional string string_value = 3;</code>
+     */
+    public java.lang.String getStringValue() {
+      java.lang.Object ref = stringValue_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          stringValue_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string string_value = 3;</code>
+     */
+    public com.google.protobuf.ByteString
+        getStringValueBytes() {
+      java.lang.Object ref = stringValue_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        stringValue_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    // optional int32 int32_value = 4;
+    public static final int INT32_VALUE_FIELD_NUMBER = 4;
+    private int int32Value_;
+    /**
+     * <code>optional int32 int32_value = 4;</code>
+     */
+    public boolean hasInt32Value() {
+      return ((bitField0_ & 0x00000008) == 0x00000008);
+    }
+    /**
+     * <code>optional int32 int32_value = 4;</code>
+     */
+    public int getInt32Value() {
+      return int32Value_;
+    }
+
+    // optional int64 int64_value = 5;
+    public static final int INT64_VALUE_FIELD_NUMBER = 5;
+    private long int64Value_;
+    /**
+     * <code>optional int64 int64_value = 5;</code>
+     */
+    public boolean hasInt64Value() {
+      return ((bitField0_ & 0x00000010) == 0x00000010);
+    }
+    /**
+     * <code>optional int64 int64_value = 5;</code>
+     */
+    public long getInt64Value() {
+      return int64Value_;
+    }
+
+    // optional double double_value = 6;
+    public static final int DOUBLE_VALUE_FIELD_NUMBER = 6;
+    private double doubleValue_;
+    /**
+     * <code>optional double double_value = 6;</code>
+     */
+    public boolean hasDoubleValue() {
+      return ((bitField0_ & 0x00000020) == 0x00000020);
+    }
+    /**
+     * <code>optional double double_value = 6;</code>
+     */
+    public double getDoubleValue() {
+      return doubleValue_;
+    }
+
+    // optional float float_value = 7;
+    public static final int FLOAT_VALUE_FIELD_NUMBER = 7;
+    private float floatValue_;
+    /**
+     * <code>optional float float_value = 7;</code>
+     */
+    public boolean hasFloatValue() {
+      return ((bitField0_ & 0x00000040) == 0x00000040);
+    }
+    /**
+     * <code>optional float float_value = 7;</code>
+     */
+    public float getFloatValue() {
+      return floatValue_;
+    }
+
+    // optional bool bool_value = 8;
+    public static final int BOOL_VALUE_FIELD_NUMBER = 8;
+    private boolean boolValue_;
+    /**
+     * <code>optional bool bool_value = 8;</code>
+     */
+    public boolean hasBoolValue() {
+      return ((bitField0_ & 0x00000080) == 0x00000080);
+    }
+    /**
+     * <code>optional bool bool_value = 8;</code>
+     */
+    public boolean getBoolValue() {
+      return boolValue_;
+    }
+
+    private void initFields() {
+      key_ = "";
+      valueType_ = com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf.Type.STRING;
+      stringValue_ = "";
+      int32Value_ = 0;
+      int64Value_ = 0L;
+      doubleValue_ = 0D;
+      floatValue_ = 0F;
+      boolValue_ = false;
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized != -1) return isInitialized == 1;
+
+      if (!hasKey()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasValueType()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeBytes(1, getKeyBytes());
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        output.writeEnum(2, valueType_.getNumber());
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        output.writeBytes(3, getStringValueBytes());
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        output.writeInt32(4, int32Value_);
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        output.writeInt64(5, int64Value_);
+      }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        output.writeDouble(6, doubleValue_);
+      }
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+        output.writeFloat(7, floatValue_);
+      }
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
+        output.writeBool(8, boolValue_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(1, getKeyBytes());
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeEnumSize(2, valueType_.getNumber());
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(3, getStringValueBytes());
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(4, int32Value_);
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(5, int64Value_);
+      }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeDoubleSize(6, doubleValue_);
+      }
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(7, floatValue_);
+      }
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(8, boolValue_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
+    public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+    public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+    public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+    public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code RamCloudGraph.PropertyProtoBuf}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder>
+       implements com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBufOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.internal_static_RamCloudGraph_PropertyProtoBuf_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.internal_static_RamCloudGraph_PropertyProtoBuf_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf.class, com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf.Builder.class);
+      }
+
+      // Construct using com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+
+      public Builder clear() {
+        super.clear();
+        key_ = "";
+        bitField0_ = (bitField0_ & ~0x00000001);
+        valueType_ = com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf.Type.STRING;
+        bitField0_ = (bitField0_ & ~0x00000002);
+        stringValue_ = "";
+        bitField0_ = (bitField0_ & ~0x00000004);
+        int32Value_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000008);
+        int64Value_ = 0L;
+        bitField0_ = (bitField0_ & ~0x00000010);
+        doubleValue_ = 0D;
+        bitField0_ = (bitField0_ & ~0x00000020);
+        floatValue_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000040);
+        boolValue_ = false;
+        bitField0_ = (bitField0_ & ~0x00000080);
+        return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.internal_static_RamCloudGraph_PropertyProtoBuf_descriptor;
+      }
+
+      public com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf getDefaultInstanceForType() {
+        return com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf.getDefaultInstance();
+      }
+
+      public com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf build() {
+        com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf buildPartial() {
+        com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf result = new com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        result.key_ = key_;
+        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+          to_bitField0_ |= 0x00000002;
+        }
+        result.valueType_ = valueType_;
+        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
+          to_bitField0_ |= 0x00000004;
+        }
+        result.stringValue_ = stringValue_;
+        if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
+          to_bitField0_ |= 0x00000008;
+        }
+        result.int32Value_ = int32Value_;
+        if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
+          to_bitField0_ |= 0x00000010;
+        }
+        result.int64Value_ = int64Value_;
+        if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
+          to_bitField0_ |= 0x00000020;
+        }
+        result.doubleValue_ = doubleValue_;
+        if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
+          to_bitField0_ |= 0x00000040;
+        }
+        result.floatValue_ = floatValue_;
+        if (((from_bitField0_ & 0x00000080) == 0x00000080)) {
+          to_bitField0_ |= 0x00000080;
+        }
+        result.boolValue_ = boolValue_;
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf) {
+          return mergeFrom((com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf other) {
+        if (other == com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf.getDefaultInstance()) return this;
+        if (other.hasKey()) {
+          bitField0_ |= 0x00000001;
+          key_ = other.key_;
+          onChanged();
+        }
+        if (other.hasValueType()) {
+          setValueType(other.getValueType());
+        }
+        if (other.hasStringValue()) {
+          bitField0_ |= 0x00000004;
+          stringValue_ = other.stringValue_;
+          onChanged();
+        }
+        if (other.hasInt32Value()) {
+          setInt32Value(other.getInt32Value());
+        }
+        if (other.hasInt64Value()) {
+          setInt64Value(other.getInt64Value());
+        }
+        if (other.hasDoubleValue()) {
+          setDoubleValue(other.getDoubleValue());
+        }
+        if (other.hasFloatValue()) {
+          setFloatValue(other.getFloatValue());
+        }
+        if (other.hasBoolValue()) {
+          setBoolValue(other.getBoolValue());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        if (!hasKey()) {
+          
+          return false;
+        }
+        if (!hasValueType()) {
+          
+          return false;
+        }
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
       private int bitField0_;
-      
+
       // required string key = 1;
       private java.lang.Object key_ = "";
+      /**
+       * <code>required string key = 1;</code>
+       */
       public boolean hasKey() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
-      public String getKey() {
+      /**
+       * <code>required string key = 1;</code>
+       */
+      public java.lang.String getKey() {
         java.lang.Object ref = key_;
-        if (!(ref instanceof String)) {
-          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
+        if (!(ref instanceof java.lang.String)) {
+          java.lang.String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
           key_ = s;
           return s;
         } else {
-          return (String) ref;
+          return (java.lang.String) ref;
         }
       }
-      public Builder setKey(String value) {
+      /**
+       * <code>required string key = 1;</code>
+       */
+      public com.google.protobuf.ByteString
+          getKeyBytes() {
+        java.lang.Object ref = key_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          key_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>required string key = 1;</code>
+       */
+      public Builder setKey(
+          java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
@@ -2376,26 +2984,46 @@ public final class RamCloudGraphProtos {
         onChanged();
         return this;
       }
+      /**
+       * <code>required string key = 1;</code>
+       */
       public Builder clearKey() {
         bitField0_ = (bitField0_ & ~0x00000001);
         key_ = getDefaultInstance().getKey();
         onChanged();
         return this;
       }
-      void setKey(com.google.protobuf.ByteString value) {
-        bitField0_ |= 0x00000001;
+      /**
+       * <code>required string key = 1;</code>
+       */
+      public Builder setKeyBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000001;
         key_ = value;
         onChanged();
+        return this;
       }
-      
+
       // required .RamCloudGraph.PropertyProtoBuf.Type value_type = 2;
       private com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf.Type valueType_ = com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf.Type.STRING;
+      /**
+       * <code>required .RamCloudGraph.PropertyProtoBuf.Type value_type = 2;</code>
+       */
       public boolean hasValueType() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
+      /**
+       * <code>required .RamCloudGraph.PropertyProtoBuf.Type value_type = 2;</code>
+       */
       public com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf.Type getValueType() {
         return valueType_;
       }
+      /**
+       * <code>required .RamCloudGraph.PropertyProtoBuf.Type value_type = 2;</code>
+       */
       public Builder setValueType(com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf.Type value) {
         if (value == null) {
           throw new NullPointerException();
@@ -2405,29 +3033,59 @@ public final class RamCloudGraphProtos {
         onChanged();
         return this;
       }
+      /**
+       * <code>required .RamCloudGraph.PropertyProtoBuf.Type value_type = 2;</code>
+       */
       public Builder clearValueType() {
         bitField0_ = (bitField0_ & ~0x00000002);
         valueType_ = com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf.Type.STRING;
         onChanged();
         return this;
       }
-      
+
       // optional string string_value = 3;
       private java.lang.Object stringValue_ = "";
+      /**
+       * <code>optional string string_value = 3;</code>
+       */
       public boolean hasStringValue() {
         return ((bitField0_ & 0x00000004) == 0x00000004);
       }
-      public String getStringValue() {
+      /**
+       * <code>optional string string_value = 3;</code>
+       */
+      public java.lang.String getStringValue() {
         java.lang.Object ref = stringValue_;
-        if (!(ref instanceof String)) {
-          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
+        if (!(ref instanceof java.lang.String)) {
+          java.lang.String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
           stringValue_ = s;
           return s;
         } else {
-          return (String) ref;
+          return (java.lang.String) ref;
         }
       }
-      public Builder setStringValue(String value) {
+      /**
+       * <code>optional string string_value = 3;</code>
+       */
+      public com.google.protobuf.ByteString
+          getStringValueBytes() {
+        java.lang.Object ref = stringValue_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          stringValue_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string string_value = 3;</code>
+       */
+      public Builder setStringValue(
+          java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
@@ -2436,134 +3094,674 @@ public final class RamCloudGraphProtos {
         onChanged();
         return this;
       }
+      /**
+       * <code>optional string string_value = 3;</code>
+       */
       public Builder clearStringValue() {
         bitField0_ = (bitField0_ & ~0x00000004);
         stringValue_ = getDefaultInstance().getStringValue();
         onChanged();
         return this;
       }
-      void setStringValue(com.google.protobuf.ByteString value) {
-        bitField0_ |= 0x00000004;
+      /**
+       * <code>optional string string_value = 3;</code>
+       */
+      public Builder setStringValueBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000004;
         stringValue_ = value;
         onChanged();
+        return this;
       }
-      
+
       // optional int32 int32_value = 4;
       private int int32Value_ ;
+      /**
+       * <code>optional int32 int32_value = 4;</code>
+       */
       public boolean hasInt32Value() {
         return ((bitField0_ & 0x00000008) == 0x00000008);
       }
+      /**
+       * <code>optional int32 int32_value = 4;</code>
+       */
       public int getInt32Value() {
         return int32Value_;
       }
+      /**
+       * <code>optional int32 int32_value = 4;</code>
+       */
       public Builder setInt32Value(int value) {
         bitField0_ |= 0x00000008;
         int32Value_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional int32 int32_value = 4;</code>
+       */
       public Builder clearInt32Value() {
         bitField0_ = (bitField0_ & ~0x00000008);
         int32Value_ = 0;
         onChanged();
         return this;
       }
-      
+
       // optional int64 int64_value = 5;
       private long int64Value_ ;
+      /**
+       * <code>optional int64 int64_value = 5;</code>
+       */
       public boolean hasInt64Value() {
         return ((bitField0_ & 0x00000010) == 0x00000010);
       }
+      /**
+       * <code>optional int64 int64_value = 5;</code>
+       */
       public long getInt64Value() {
         return int64Value_;
       }
+      /**
+       * <code>optional int64 int64_value = 5;</code>
+       */
       public Builder setInt64Value(long value) {
         bitField0_ |= 0x00000010;
         int64Value_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional int64 int64_value = 5;</code>
+       */
       public Builder clearInt64Value() {
         bitField0_ = (bitField0_ & ~0x00000010);
         int64Value_ = 0L;
         onChanged();
         return this;
       }
-      
+
       // optional double double_value = 6;
       private double doubleValue_ ;
+      /**
+       * <code>optional double double_value = 6;</code>
+       */
       public boolean hasDoubleValue() {
         return ((bitField0_ & 0x00000020) == 0x00000020);
       }
+      /**
+       * <code>optional double double_value = 6;</code>
+       */
       public double getDoubleValue() {
         return doubleValue_;
       }
+      /**
+       * <code>optional double double_value = 6;</code>
+       */
       public Builder setDoubleValue(double value) {
         bitField0_ |= 0x00000020;
         doubleValue_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional double double_value = 6;</code>
+       */
       public Builder clearDoubleValue() {
         bitField0_ = (bitField0_ & ~0x00000020);
         doubleValue_ = 0D;
         onChanged();
         return this;
       }
-      
+
       // optional float float_value = 7;
       private float floatValue_ ;
+      /**
+       * <code>optional float float_value = 7;</code>
+       */
       public boolean hasFloatValue() {
         return ((bitField0_ & 0x00000040) == 0x00000040);
       }
+      /**
+       * <code>optional float float_value = 7;</code>
+       */
       public float getFloatValue() {
         return floatValue_;
       }
+      /**
+       * <code>optional float float_value = 7;</code>
+       */
       public Builder setFloatValue(float value) {
         bitField0_ |= 0x00000040;
         floatValue_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional float float_value = 7;</code>
+       */
       public Builder clearFloatValue() {
         bitField0_ = (bitField0_ & ~0x00000040);
         floatValue_ = 0F;
         onChanged();
         return this;
       }
-      
+
       // optional bool bool_value = 8;
       private boolean boolValue_ ;
+      /**
+       * <code>optional bool bool_value = 8;</code>
+       */
       public boolean hasBoolValue() {
         return ((bitField0_ & 0x00000080) == 0x00000080);
       }
+      /**
+       * <code>optional bool bool_value = 8;</code>
+       */
       public boolean getBoolValue() {
         return boolValue_;
       }
+      /**
+       * <code>optional bool bool_value = 8;</code>
+       */
       public Builder setBoolValue(boolean value) {
         bitField0_ |= 0x00000080;
         boolValue_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional bool bool_value = 8;</code>
+       */
       public Builder clearBoolValue() {
         bitField0_ = (bitField0_ & ~0x00000080);
         boolValue_ = false;
         onChanged();
         return this;
       }
-      
+
       // @@protoc_insertion_point(builder_scope:RamCloudGraph.PropertyProtoBuf)
     }
-    
+
     static {
       defaultInstance = new PropertyProtoBuf(true);
       defaultInstance.initFields();
     }
-    
+
     // @@protoc_insertion_point(class_scope:RamCloudGraph.PropertyProtoBuf)
   }
-  
+
+  public interface IndexBlobOrBuilder
+      extends com.google.protobuf.MessageOrBuilder {
+
+    // repeated int64 vertexId = 1;
+    /**
+     * <code>repeated int64 vertexId = 1;</code>
+     */
+    java.util.List<java.lang.Long> getVertexIdList();
+    /**
+     * <code>repeated int64 vertexId = 1;</code>
+     */
+    int getVertexIdCount();
+    /**
+     * <code>repeated int64 vertexId = 1;</code>
+     */
+    long getVertexId(int index);
+  }
+  /**
+   * Protobuf type {@code RamCloudGraph.IndexBlob}
+   */
+  public static final class IndexBlob extends
+      com.google.protobuf.GeneratedMessage
+      implements IndexBlobOrBuilder {
+    // Use IndexBlob.newBuilder() to construct.
+    private IndexBlob(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+      this.unknownFields = builder.getUnknownFields();
+    }
+    private IndexBlob(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final IndexBlob defaultInstance;
+    public static IndexBlob getDefaultInstance() {
+      return defaultInstance;
+    }
+
+    public IndexBlob getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
+    }
+    private IndexBlob(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 8: {
+              if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
+                vertexId_ = new java.util.ArrayList<java.lang.Long>();
+                mutable_bitField0_ |= 0x00000001;
+              }
+              vertexId_.add(input.readInt64());
+              break;
+            }
+            case 10: {
+              int length = input.readRawVarint32();
+              int limit = input.pushLimit(length);
+              if (!((mutable_bitField0_ & 0x00000001) == 0x00000001) && input.getBytesUntilLimit() > 0) {
+                vertexId_ = new java.util.ArrayList<java.lang.Long>();
+                mutable_bitField0_ |= 0x00000001;
+              }
+              while (input.getBytesUntilLimit() > 0) {
+                vertexId_.add(input.readInt64());
+              }
+              input.popLimit(limit);
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        if (((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
+          vertexId_ = java.util.Collections.unmodifiableList(vertexId_);
+        }
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.internal_static_RamCloudGraph_IndexBlob_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.internal_static_RamCloudGraph_IndexBlob_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.IndexBlob.class, com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.IndexBlob.Builder.class);
+    }
+
+    public static com.google.protobuf.Parser<IndexBlob> PARSER =
+        new com.google.protobuf.AbstractParser<IndexBlob>() {
+      public IndexBlob parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new IndexBlob(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<IndexBlob> getParserForType() {
+      return PARSER;
+    }
+
+    // repeated int64 vertexId = 1;
+    public static final int VERTEXID_FIELD_NUMBER = 1;
+    private java.util.List<java.lang.Long> vertexId_;
+    /**
+     * <code>repeated int64 vertexId = 1;</code>
+     */
+    public java.util.List<java.lang.Long>
+        getVertexIdList() {
+      return vertexId_;
+    }
+    /**
+     * <code>repeated int64 vertexId = 1;</code>
+     */
+    public int getVertexIdCount() {
+      return vertexId_.size();
+    }
+    /**
+     * <code>repeated int64 vertexId = 1;</code>
+     */
+    public long getVertexId(int index) {
+      return vertexId_.get(index);
+    }
+
+    private void initFields() {
+      vertexId_ = java.util.Collections.emptyList();
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized != -1) return isInitialized == 1;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      for (int i = 0; i < vertexId_.size(); i++) {
+        output.writeInt64(1, vertexId_.get(i));
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      {
+        int dataSize = 0;
+        for (int i = 0; i < vertexId_.size(); i++) {
+          dataSize += com.google.protobuf.CodedOutputStream
+            .computeInt64SizeNoTag(vertexId_.get(i));
+        }
+        size += dataSize;
+        size += 1 * getVertexIdList().size();
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
+    public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.IndexBlob parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.IndexBlob parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.IndexBlob parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.IndexBlob parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.IndexBlob parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.IndexBlob parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+    public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.IndexBlob parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+    public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.IndexBlob parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+    public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.IndexBlob parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.IndexBlob parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.IndexBlob prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code RamCloudGraph.IndexBlob}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder>
+       implements com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.IndexBlobOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.internal_static_RamCloudGraph_IndexBlob_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.internal_static_RamCloudGraph_IndexBlob_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.IndexBlob.class, com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.IndexBlob.Builder.class);
+      }
+
+      // Construct using com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.IndexBlob.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+
+      public Builder clear() {
+        super.clear();
+        vertexId_ = java.util.Collections.emptyList();
+        bitField0_ = (bitField0_ & ~0x00000001);
+        return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.internal_static_RamCloudGraph_IndexBlob_descriptor;
+      }
+
+      public com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.IndexBlob getDefaultInstanceForType() {
+        return com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.IndexBlob.getDefaultInstance();
+      }
+
+      public com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.IndexBlob build() {
+        com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.IndexBlob result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.IndexBlob buildPartial() {
+        com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.IndexBlob result = new com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.IndexBlob(this);
+        int from_bitField0_ = bitField0_;
+        if (((bitField0_ & 0x00000001) == 0x00000001)) {
+          vertexId_ = java.util.Collections.unmodifiableList(vertexId_);
+          bitField0_ = (bitField0_ & ~0x00000001);
+        }
+        result.vertexId_ = vertexId_;
+        onBuilt();
+        return result;
+      }
+
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.IndexBlob) {
+          return mergeFrom((com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.IndexBlob)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.IndexBlob other) {
+        if (other == com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.IndexBlob.getDefaultInstance()) return this;
+        if (!other.vertexId_.isEmpty()) {
+          if (vertexId_.isEmpty()) {
+            vertexId_ = other.vertexId_;
+            bitField0_ = (bitField0_ & ~0x00000001);
+          } else {
+            ensureVertexIdIsMutable();
+            vertexId_.addAll(other.vertexId_);
+          }
+          onChanged();
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.IndexBlob parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.IndexBlob) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      // repeated int64 vertexId = 1;
+      private java.util.List<java.lang.Long> vertexId_ = java.util.Collections.emptyList();
+      private void ensureVertexIdIsMutable() {
+        if (!((bitField0_ & 0x00000001) == 0x00000001)) {
+          vertexId_ = new java.util.ArrayList<java.lang.Long>(vertexId_);
+          bitField0_ |= 0x00000001;
+         }
+      }
+      /**
+       * <code>repeated int64 vertexId = 1;</code>
+       */
+      public java.util.List<java.lang.Long>
+          getVertexIdList() {
+        return java.util.Collections.unmodifiableList(vertexId_);
+      }
+      /**
+       * <code>repeated int64 vertexId = 1;</code>
+       */
+      public int getVertexIdCount() {
+        return vertexId_.size();
+      }
+      /**
+       * <code>repeated int64 vertexId = 1;</code>
+       */
+      public long getVertexId(int index) {
+        return vertexId_.get(index);
+      }
+      /**
+       * <code>repeated int64 vertexId = 1;</code>
+       */
+      public Builder setVertexId(
+          int index, long value) {
+        ensureVertexIdIsMutable();
+        vertexId_.set(index, value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated int64 vertexId = 1;</code>
+       */
+      public Builder addVertexId(long value) {
+        ensureVertexIdIsMutable();
+        vertexId_.add(value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated int64 vertexId = 1;</code>
+       */
+      public Builder addAllVertexId(
+          java.lang.Iterable<? extends java.lang.Long> values) {
+        ensureVertexIdIsMutable();
+        super.addAll(values, vertexId_);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated int64 vertexId = 1;</code>
+       */
+      public Builder clearVertexId() {
+        vertexId_ = java.util.Collections.emptyList();
+        bitField0_ = (bitField0_ & ~0x00000001);
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:RamCloudGraph.IndexBlob)
+    }
+
+    static {
+      defaultInstance = new IndexBlob(true);
+      defaultInstance.initFields();
+    }
+
+    // @@protoc_insertion_point(class_scope:RamCloudGraph.IndexBlob)
+  }
+
   private static com.google.protobuf.Descriptors.Descriptor
     internal_static_RamCloudGraph_EdgeListProtoBuf_descriptor;
   private static
@@ -2584,7 +3782,12 @@ public final class RamCloudGraphProtos {
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_RamCloudGraph_PropertyProtoBuf_fieldAccessorTable;
-  
+  private static com.google.protobuf.Descriptors.Descriptor
+    internal_static_RamCloudGraph_IndexBlob_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_RamCloudGraph_IndexBlob_fieldAccessorTable;
+
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
     return descriptor;
@@ -2606,9 +3809,9 @@ public final class RamCloudGraphProtos {
       "\024\n\014double_value\030\006 \001(\001\022\023\n\013float_value\030\007 \001" +
       "(\002\022\022\n\nbool_value\030\010 \001(\010\"I\n\004Type\022\n\n\006STRING" +
       "\020\001\022\t\n\005INT32\020\002\022\t\n\005INT64\020\003\022\n\n\006DOUBLE\020\004\022\t\n\005" +
-      "FLOAT\020\005\022\010\n\004BOOL\020\006B>\n\'com.tinkerpop.bluep" +
-      "rints.impls.ramcloudB\023RamCloudGraphProto" +
-      "s"
+      "FLOAT\020\005\022\010\n\004BOOL\020\006\"\035\n\tIndexBlob\022\020\n\010vertex" +
+      "Id\030\001 \003(\003B>\n\'com.tinkerpop.blueprints.imp" +
+      "ls.ramcloudB\023RamCloudGraphProtos"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -2620,33 +3823,31 @@ public final class RamCloudGraphProtos {
           internal_static_RamCloudGraph_EdgeListProtoBuf_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_RamCloudGraph_EdgeListProtoBuf_descriptor,
-              new java.lang.String[] { "Edge", },
-              com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeListProtoBuf.class,
-              com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeListProtoBuf.Builder.class);
+              new java.lang.String[] { "Edge", });
           internal_static_RamCloudGraph_EdgeProtoBuf_descriptor =
             getDescriptor().getMessageTypes().get(1);
           internal_static_RamCloudGraph_EdgeProtoBuf_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_RamCloudGraph_EdgeProtoBuf_descriptor,
-              new java.lang.String[] { "NeighborId", "Outgoing", "Label", },
-              com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf.class,
-              com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf.Builder.class);
+              new java.lang.String[] { "NeighborId", "Outgoing", "Label", });
           internal_static_RamCloudGraph_PropertyListProtoBuf_descriptor =
             getDescriptor().getMessageTypes().get(2);
           internal_static_RamCloudGraph_PropertyListProtoBuf_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_RamCloudGraph_PropertyListProtoBuf_descriptor,
-              new java.lang.String[] { "Property", },
-              com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyListProtoBuf.class,
-              com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyListProtoBuf.Builder.class);
+              new java.lang.String[] { "Property", });
           internal_static_RamCloudGraph_PropertyProtoBuf_descriptor =
             getDescriptor().getMessageTypes().get(3);
           internal_static_RamCloudGraph_PropertyProtoBuf_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_RamCloudGraph_PropertyProtoBuf_descriptor,
-              new java.lang.String[] { "Key", "ValueType", "StringValue", "Int32Value", "Int64Value", "DoubleValue", "FloatValue", "BoolValue", },
-              com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf.class,
-              com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.PropertyProtoBuf.Builder.class);
+              new java.lang.String[] { "Key", "ValueType", "StringValue", "Int32Value", "Int64Value", "DoubleValue", "FloatValue", "BoolValue", });
+          internal_static_RamCloudGraph_IndexBlob_descriptor =
+            getDescriptor().getMessageTypes().get(4);
+          internal_static_RamCloudGraph_IndexBlob_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_RamCloudGraph_IndexBlob_descriptor,
+              new java.lang.String[] { "VertexId", });
           return null;
         }
       };
@@ -2655,6 +3856,6 @@ public final class RamCloudGraphProtos {
         new com.google.protobuf.Descriptors.FileDescriptor[] {
         }, assigner);
   }
-  
+
   // @@protoc_insertion_point(outer_class_scope)
 }
