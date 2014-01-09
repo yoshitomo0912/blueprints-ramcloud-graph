@@ -431,8 +431,12 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    ByteBufferInput input = new ByteBufferInput(byteArray);
 	    ArrayList list = kryo.get().readObject(input, ArrayList.class);
 	    TreeMap map = new TreeMap();
-	    String propVal = indexName.substring(indexName.indexOf('=')+1);
-	    map.put(propVal, list);
+            try {
+                String s = new String(rcKey, "UTF-8");
+	        String propVal = s.substring(s.indexOf('=')+1);
+	        map.put(propVal, list);
+            } catch (UnsupportedEncodingException ex) {
+            }
 	    pm.indexdeser_end("RamCloudIndex convertRcBytesToIndexPropertyMap()");
             if(RamCloudGraph.measureSerializeTimeProp == 1) {
             	long endTime = System.nanoTime();
