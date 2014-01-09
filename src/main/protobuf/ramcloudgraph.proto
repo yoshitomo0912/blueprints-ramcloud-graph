@@ -30,4 +30,8 @@ message PropertyProtoBuf {
   optional double double_value = 6;
   optional float float_value = 7;
   optional bool bool_value = 8;
-} 
+}
+
+message IndexBlob {
+  repeated int64 vertexId = 1;
+}
