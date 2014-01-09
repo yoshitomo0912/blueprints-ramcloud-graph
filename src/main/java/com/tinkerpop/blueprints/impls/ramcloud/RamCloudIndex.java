@@ -437,7 +437,8 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	    TreeMap<Object, List<Object>> map = new TreeMap<Object, List<Object>>();
 	    try {
 		blob = IndexBlob.parseFrom(byteArray);
-		List list = blob.getVertexIdList();
+		List const_list = blob.getVertexIdList();
+		ArrayList list = new ArrayList<>(const_list);
 //		ByteBufferInput input = new ByteBufferInput(byteArray);
 //		ArrayList list = kryo.get().readObject(input, ArrayList.class);
 		map.put(rcKeyToPropName(rcKey), list);
