@@ -452,7 +452,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 		newEdge.create();
 		return newEdge;
 	    } catch (Exception e) {
-		log.warn("Tried to create edge failed: {" + newEdge.toString() + "}: ", e);
+		log.warn("Tried to create edge failed: {" + newEdge + "}: ", e);
 
 		if (e instanceof NoSuchElementException) {
 		    // FIXME raised loglevel for measurent. Was warn

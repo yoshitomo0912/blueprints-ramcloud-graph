@@ -120,13 +120,17 @@ public class RamCloudEdge extends RamCloudElement implements Edge {
 	    edgePropTableEntryExists = false;
 	}
 
-	outVertexEntryExists = outVertex.getEdgeSet().contains(this);
+	// Assume they do not exist on Adj. list.
+	// (Defer the check until Cond. Write)
+	outVertexEntryExists = inVertexEntryExists = false;
 
-	if (!outVertex.equals(inVertex)) {
-	    inVertexEntryExists = inVertex.getEdgeSet().contains(this);
-	} else {
-	    inVertexEntryExists = outVertexEntryExists;
-	}
+//	outVertexEntryExists = outVertex.getEdgeSet().contains(this);
+//
+//	if (!outVertex.equals(inVertex)) {
+//	    inVertexEntryExists = inVertex.getEdgeSet().contains(this);
+//	} else {
+//	    inVertexEntryExists = outVertexEntryExists;
+//	}
 
 	if (edgePropTableEntryExists && outVertexEntryExists && inVertexEntryExists) {
 	    return true;
@@ -148,9 +152,18 @@ public class RamCloudEdge extends RamCloudElement implements Edge {
 		edgeTable.write(graph.edgePropTableId, rcKey, ByteBuffer.allocate(0).array());
 	        pm.write_end("RamCloudEdge create()");
 
-		outVertex.addEdgeToAdjList(this);
+		boolean addSucc = outVertex.addEdgeToAdjList(this);
+		if ( !addSucc ) {
+		    edgeTable.remove(graph.edgePropTableId, rcKey);
+		    throw ExceptionFactory.edgeWithIdAlreadyExist(rcKey);
+		}
 		if (!isLoop()) {
-			inVertex.addEdgeToAdjList(this);
+		    addSucc = inVertex.addEdgeToAdjList(this);
+		    if ( !addSucc ) {
+			edgeTable.remove(graph.edgePropTableId, rcKey);
+			outVertex.removeEdgeFromAdjList(this);
+			throw ExceptionFactory.edgeWithIdAlreadyExist(rcKey);
+		    }
 		}
 	} else {
 	    throw ExceptionFactory.edgeWithIdAlreadyExist(rcKey);
