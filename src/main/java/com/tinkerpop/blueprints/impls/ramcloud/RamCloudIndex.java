@@ -467,8 +467,10 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 
 	pm.indexser_start("RamCloudIndex convertIndexPropertyMapToRcBytes()");
 	Builder builder = IndexBlob.newBuilder();
-	List<Long> vtxIds = (List)map.values().iterator().next();
-	builder.addAllVertexId(vtxIds);
+	if ( map.values().size() != 0 ) {
+		List<Long> vtxIds = (List)map.values().iterator().next();
+		builder.addAllVertexId(vtxIds);
+	}
 	IndexBlob blob = builder.build();
 	bytes = blob.toByteArray();
 //	ByteBufferOutput output = new ByteBufferOutput(1024*1024);
