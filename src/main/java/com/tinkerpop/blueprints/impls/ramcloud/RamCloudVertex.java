@@ -250,6 +250,7 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 				pm.write_start("RAMCloudVertex updateEdgeAdjList()");
 				long updated_version = rcClient.writeRule(graph.vertTableId, rcKey, edgeList.toByteArray(), rules);
 				pm.write_end("RAMCloudVertex updateEdgeAdjList()");
+				//assert(this.cachedAdjEdgeList != null);
 				this.cachedAdjEdgeList.setValue(edgeList, updated_version);
 				return true;
 			} catch (UnsupportedOperationException e) {
@@ -272,8 +273,7 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 				pm.write_condfail("RAMCloudVertex updateEdgeAdjList()");
 				// FIXME Workaround for native method exception declaration bug
 				if ( e instanceof WrongVersionException ) {
-					// FIXME loglevel raised for measurement. Was debug
-					log.error("Conditional Updating EdgeList failed for {} RETRYING {}", this, retry);
+					log.debug("Conditional Updating EdgeList failed for {} RETRYING {}", this, retry);
 					//log.debug("Conditional Updating EdgeList failed for {} modifing {} RETRYING [{}]", this, edgesToModify, retry);
 					updateCachedAdjEdgeList();
 				} else {
