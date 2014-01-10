@@ -174,12 +174,6 @@ public class RamCloudElement implements Element, Serializable {
     }
 
     public void setProperties(Map<String, Object> properties) {
-        Object oldValue;
-        long startTime = 0;
-        if (graph.measureBPTimeProp == 1) {
-            startTime = System.nanoTime();
-        }
-
         Map<String, Object> map = getPropertyMap();
         Map<String, Object> oldValueMap = new HashMap<String, Object>(map.size());
         for (Map.Entry<String, Object> property : properties.entrySet()) {
@@ -210,25 +204,15 @@ public class RamCloudElement implements Element, Serializable {
         setPropertyMap(map);
         for (Map.Entry<String, Object> oldProperty : oldValueMap.entrySet()) {
             String key = oldProperty.getKey();
-            oldValue = oldProperty.getValue();
+            Object oldValue = oldProperty.getValue();
             Object value = map.get(key);
-            boolean ret = false;
             if (this instanceof RamCloudVertex) {
                 RamCloudKeyIndex keyIndex = new RamCloudKeyIndex(graph.kidxVertTableId, key, value, graph, Vertex.class);
-                ret = keyIndex.autoUpdate(key, value, oldValue, this);
+                keyIndex.autoUpdate(key, value, oldValue, this);
             } else {
                 RamCloudKeyIndex keyIndex = new RamCloudKeyIndex(graph.kidxVertTableId, key, value, graph, Edge.class);
                 keyIndex.autoUpdate(key, value, oldValue, this);
             }
-
-            if (graph.measureBPTimeProp == 1) {
-	        long endTime = System.nanoTime();
-	        if (ret) {
-		    log.error("Performance vertex setProperty(key {}) which is index total time {}", key, endTime - startTime);
-	        } else {
-		    log.error("Performance vertex setProperty(key {}) does not index time {}", key, endTime - startTime);
-	        }
-	    }
         }
     }
 
