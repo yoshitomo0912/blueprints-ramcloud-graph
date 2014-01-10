@@ -110,7 +110,7 @@ class JByteArrayReference {
     {
         if (pointer != NULL) {
             env->ReleaseByteArrayElements(jByteArray,
-                                          reinterpret_cast<jbyte*>(pointer),
+                                          (jbyte*)pointer,
                                           JNI_ABORT);
         }
     }
@@ -410,7 +410,7 @@ JNICALL Java_edu_stanford_ramcloud_JRamCloud_multiRead(JNIEnv *env,
     } EXCEPTION_CATCHER(NULL);
     
     const static jclass jc_RcObject = (jclass)env->NewGlobalRef(env->FindClass(PACKAGE_PATH "JRamCloud$Object"));
-    check_null(cls, "FindClass failed");
+    check_null(jc_RcObject, "FindClass failed");
     const static jmethodID jm_init = env->GetMethodID(jc_RcObject,
                                         "<init>",
                                         "(L" PACKAGE_PATH "JRamCloud;[B[BJ)V");
@@ -648,7 +648,7 @@ JNIEXPORT jobject JNICALL Java_edu_stanford_ramcloud_JRamCloud_00024TableEnumera
         jbyteArray jKey = env->NewByteArray(object.getKeyLength());
         jbyteArray jValue = env->NewByteArray(object.getDataLength());
         
-        JByteArrayReference key(env, jKey);
+        JByteArrayGetter key(env, jKey);
         JByteArrayGetter value(env, jValue);
 
         memcpy(key.pointer, object.getKey(), object.getKeyLength());
