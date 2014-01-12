@@ -10,6 +10,7 @@ import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +36,6 @@ import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.DefaultGraphQuery;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
-
 import com.tinkerpop.blueprints.impls.ramcloud.PerfMon;
 
 import edu.stanford.ramcloud.JRamCloud;
@@ -347,7 +348,6 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	    log.error("Performance getVertices(key {}) Calling indexedKeys.contains(key) at {}", key, Tstamp1);
 	}
 
-	int mreadMax = 400;
 
 	if (indexedKeys.contains(key)) {
 	    PerfMon pm = PerfMon.getInstance();
@@ -369,6 +369,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 		return vertices;
 	    }
 
+	    final int mreadMax = 400;
 	    final int size = Math.min(mreadMax, vertexList.size());
 	    JRamCloud.multiReadObject vertPropTableMread[] = new JRamCloud.multiReadObject[size];
 
@@ -382,30 +383,32 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 		    JRamCloud.Object outvertPropTable[] =
 			    vertTable.multiRead(vertPropTableMread);
 		    pm.multiread_end("RamCloudGraph getVertices()");
-		    for (int i = 0; i < vertexNum; i++) {
+		    for (int i = 0; i < outvertPropTable.length; i++) {
 			if (outvertPropTable[i] != null) {
 			    vertices.add(new RamCloudVertex(outvertPropTable[i].key, this));
 			}
 		    }
 		    vertexNum = 0;
+		    continue;
 		}
 		vertexNum++;
 	    }
 
 	    if (vertexNum != 0) {
+		JRamCloud.multiReadObject mread_leftover[] = Arrays.copyOf(vertPropTableMread, vertexNum);
 
 		long startTime2 = 0;
 		if (measureRcTimeProp == 1) {
 		    startTime2 = System.nanoTime();
 		}
 		pm.multiread_start("RamCloudGraph getVertices()");
-		JRamCloud.Object outvertPropTable[] = vertTable.multiRead(vertPropTableMread);
+		JRamCloud.Object outvertPropTable[] = vertTable.multiRead(mread_leftover);
 		pm.multiread_end("RamCloudGraph getVertices()");
 		if (measureRcTimeProp == 1) {
 		    long endTime2 = System.nanoTime();
 		    log.error("Performance index multiread(key {}, number {}) time {}", key, vertexNum, endTime2 - startTime2);
 		}
-		for (int i = 0; i < vertexNum; i++) {
+		for (int i = 0; i < outvertPropTable.length; i++) {
 		    if (outvertPropTable[i] != null) {
 			vertices.add(new RamCloudVertex(outvertPropTable[i].key, this));
 		    }
