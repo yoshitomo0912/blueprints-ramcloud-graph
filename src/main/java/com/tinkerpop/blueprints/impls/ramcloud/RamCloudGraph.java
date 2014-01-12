@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,8 +64,8 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
     private String KIDX_EDGE_TABLE_NAME = "kidx_edge";
     private final String INSTANCE_TABLE_NAME = "instance";
     private long instanceId;
-    private long nextVertexId;
-    private final int INSTANCE_ID_RANGE = 10000;
+    private AtomicLong nextVertexId;
+    private final long INSTANCE_ID_RANGE = 100000;
     private String coordinatorLocation;
     private static final Features FEATURES = new Features();
     public final long measureBPTimeProp = Long.valueOf(System.getProperty("benchmark.measureBP", "0"));
@@ -131,7 +132,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 
 	log.info( "Connected to coordinator at {}", coordinatorLocation);
 	log.debug("VERT_TABLE:{}, VERT_PROP_TABLE:{}, EDGE_PROP_TABLE:{}, IDX_VERT_TABLE:{}, IDX_EDGE_TABLE:{}, KIDX_VERT_TABLE:{}, KIDX_EDGE_TABLE:{}", vertTableId, vertPropTableId, edgePropTableId, idxVertTableId, idxEdgeTableId, kidxVertTableId, kidxEdgeTableId);
-	nextVertexId = 0;
+	nextVertexId = new AtomicLong(-1);
         initInstance();
     }
 
@@ -160,7 +161,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	}
 	Long longId;
 	if (id == null) {
-	    longId = ++nextVertexId;
+	    longId = nextVertexId.incrementAndGet();
 	} else if (id instanceof Integer) {
 	    longId = ((Integer) id).longValue();
 	} else if (id instanceof Long) {
@@ -270,7 +271,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	    }
 	}
 
-	nextVertexId = instanceId * INSTANCE_ID_RANGE;
+	nextVertexId.compareAndSet(-1, instanceId * INSTANCE_ID_RANGE);
     }
 
     @Override
