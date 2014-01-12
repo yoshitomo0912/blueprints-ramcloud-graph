@@ -173,6 +173,9 @@ public class RamCloudElement implements Element, Serializable {
 	return map.keySet();
     }
 
+    public Map<String, Object> getProperties() {
+	return getPropertyMap();
+    }
     public void setProperties(Map<String, Object> properties) {
         Map<String, Object> map = getPropertyMap();
         Map<String, Object> oldValueMap = new HashMap<String, Object>(map.size());
