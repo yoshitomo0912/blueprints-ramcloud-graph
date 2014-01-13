@@ -448,10 +448,6 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 		} catch (Exception e) {
 			// Vertex table entry does not exist
 		        pm.read_end("RamCloudVertex exists()");
-		        if (graph.measureRcTimeProp == 1) {
-			    long endTime = System.nanoTime();
-			    log.error("Performance vertexTable does not exists read total time {}", endTime - startTime);
-		        }
 		}
 
 		try {
