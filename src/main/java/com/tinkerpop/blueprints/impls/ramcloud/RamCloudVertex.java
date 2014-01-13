@@ -495,20 +495,4 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 			System.out.println(edge.toString());
 		}
 	}
-
-	public void testMultiWrite() {
-		JRamCloud vertTable = graph.getRcClient();
-		JRamCloud.RejectRules rules0 = vertTable.new RejectRules();
-		rules0.setDoesntExists();
-		rules0.setLeVersion(111);
-		
-		JRamCloud.MultiWriteObject mWrite0 = new JRamCloud.MultiWriteObject(graph.vertTableId, "v0".getBytes(), "v0".getBytes(), rules0);
-		JRamCloud.RejectRules rules1 = vertTable.new RejectRules();
-		rules1.setExists();
-		rules1.setNeVersion(222);
-
-		JRamCloud.MultiWriteObject mWrite1 = new JRamCloud.MultiWriteObject(graph.vertTableId, "v1".getBytes(), "v1".getBytes(), rules1);
-		JRamCloud.MultiWriteObject[] mWrite = { mWrite0, mWrite1 };
-		vertTable.multiWrite(mWrite);
-	}
 }
