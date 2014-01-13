@@ -10,6 +10,7 @@ import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -18,6 +19,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +37,6 @@ import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.DefaultGraphQuery;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
-
 import com.tinkerpop.blueprints.impls.ramcloud.PerfMon;
 
 import edu.stanford.ramcloud.JRamCloud;
@@ -44,7 +46,6 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 
     private static final ThreadLocal<JRamCloud> RamCloudThreadLocal = new ThreadLocal<JRamCloud>();
 
-    protected JRamCloud rcClient;
     protected long vertTableId; //(vertex_id) --> ( (n,d,ll,l), (n,d,ll,l), ... )
     protected long vertPropTableId; //(vertex_id) -> ( (kl,k,vl,v), (kl,k,vl,v), ... )
     protected long edgePropTableId; //(edge_id) -> ( (kl,k,vl,v), (kl,k,vl,v), ... )
@@ -62,8 +63,8 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
     private String KIDX_EDGE_TABLE_NAME = "kidx_edge";
     private final String INSTANCE_TABLE_NAME = "instance";
     private long instanceId;
-    private long nextVertexId;
-    private final int INSTANCE_ID_RANGE = 10000;
+    private AtomicLong nextVertexId;
+    private final long INSTANCE_ID_RANGE = 100000;
     private String coordinatorLocation;
     private static final Features FEATURES = new Features();
     public final long measureBPTimeProp = Long.valueOf(System.getProperty("benchmark.measureBP", "0"));
@@ -117,7 +118,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
     public RamCloudGraph(String coordinatorLocation) {
 	this.coordinatorLocation = coordinatorLocation;
 
-	rcClient = getRcClient();
+	JRamCloud rcClient = getRcClient();
 
 	vertTableId = rcClient.createTable(VERT_TABLE_NAME);
 	vertPropTableId = rcClient.createTable(VERT_PROP_TABLE_NAME);
@@ -130,12 +131,12 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 
 	log.info( "Connected to coordinator at {}", coordinatorLocation);
 	log.debug("VERT_TABLE:{}, VERT_PROP_TABLE:{}, EDGE_PROP_TABLE:{}, IDX_VERT_TABLE:{}, IDX_EDGE_TABLE:{}, KIDX_VERT_TABLE:{}, KIDX_EDGE_TABLE:{}", vertTableId, vertPropTableId, edgePropTableId, idxVertTableId, idxEdgeTableId, kidxVertTableId, kidxEdgeTableId);
-	nextVertexId = 0;
+	nextVertexId = new AtomicLong(-1);
         initInstance();
     }
 
     public JRamCloud getRcClient() {
-	rcClient = RamCloudThreadLocal.get();
+	JRamCloud rcClient = RamCloudThreadLocal.get();
 	if (rcClient == null) {
 	    rcClient = new JRamCloud(coordinatorLocation);
 	    RamCloudThreadLocal.set(rcClient);
@@ -159,7 +160,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	}
 	Long longId;
 	if (id == null) {
-	    longId = ++nextVertexId;
+	    longId = nextVertexId.incrementAndGet();
 	} else if (id instanceof Integer) {
 	    longId = ((Integer) id).longValue();
 	} else if (id instanceof Long) {
@@ -208,12 +209,13 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
     private final void initInstance() {
         //long incrementValue = 1;
         JRamCloud.Object instanceEntry = null;
+        JRamCloud rcClient = getRcClient();
         try {
-            instanceEntry = getRcClient().read(instanceTableId, "nextInstanceId".getBytes());
+            instanceEntry = rcClient.read(instanceTableId, "nextInstanceId".getBytes());
         } catch (Exception e) {
             if (e instanceof JRamCloud.ObjectDoesntExistException) {
                 instanceId = 0;
-                getRcClient().write(instanceTableId, "nextInstanceId".getBytes(), ByteBuffer.allocate(0).array());
+                rcClient.write(instanceTableId, "nextInstanceId".getBytes(), ByteBuffer.allocate(0).array());
             }
         }
         if (instanceEntry != null) {
@@ -258,18 +260,18 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 		JRamCloud.RejectRules rules = rcClient.new RejectRules();
 		rules.setNeVersion(instanceEntry.version);
 		try {
-		    getRcClient().writeRule(instanceTableId, "nextInstanceId".getBytes(), rcValue, rules);
+		    rcClient.writeRule(instanceTableId, "nextInstanceId".getBytes(), rcValue, rules);
 		    instanceId = curInstanceId;
 		    break;
 		} catch (Exception ex) {
 		    log.debug("Cond. Write increment Vertex property: ", ex);
-		    instanceEntry = getRcClient().read(instanceTableId, "nextInstanceId".getBytes());
+		    instanceEntry = rcClient.read(instanceTableId, "nextInstanceId".getBytes());
 		    continue;
 		}
 	    }
 	}
 
-	nextVertexId = instanceId * INSTANCE_ID_RANGE;
+	nextVertexId.compareAndSet(-1, instanceId * INSTANCE_ID_RANGE);
     }
 
     @Override
@@ -347,7 +349,6 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	    log.error("Performance getVertices(key {}) Calling indexedKeys.contains(key) at {}", key, Tstamp1);
 	}
 
-	int mreadMax = 400;
 
 	if (indexedKeys.contains(key)) {
 	    PerfMon pm = PerfMon.getInstance();
@@ -369,6 +370,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 		return vertices;
 	    }
 
+	    final int mreadMax = 400;
 	    final int size = Math.min(mreadMax, vertexList.size());
 	    JRamCloud.multiReadObject vertPropTableMread[] = new JRamCloud.multiReadObject[size];
 
@@ -382,30 +384,32 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 		    JRamCloud.Object outvertPropTable[] =
 			    vertTable.multiRead(vertPropTableMread);
 		    pm.multiread_end("RamCloudGraph getVertices()");
-		    for (int i = 0; i < vertexNum; i++) {
+		    for (int i = 0; i < outvertPropTable.length; i++) {
 			if (outvertPropTable[i] != null) {
 			    vertices.add(new RamCloudVertex(outvertPropTable[i].key, this));
 			}
 		    }
 		    vertexNum = 0;
+		    continue;
 		}
 		vertexNum++;
 	    }
 
 	    if (vertexNum != 0) {
+		JRamCloud.multiReadObject mread_leftover[] = Arrays.copyOf(vertPropTableMread, vertexNum);
 
 		long startTime2 = 0;
 		if (measureRcTimeProp == 1) {
 		    startTime2 = System.nanoTime();
 		}
 		pm.multiread_start("RamCloudGraph getVertices()");
-		JRamCloud.Object outvertPropTable[] = vertTable.multiRead(vertPropTableMread);
+		JRamCloud.Object outvertPropTable[] = vertTable.multiRead(mread_leftover);
 		pm.multiread_end("RamCloudGraph getVertices()");
 		if (measureRcTimeProp == 1) {
 		    long endTime2 = System.nanoTime();
 		    log.error("Performance index multiread(key {}, number {}) time {}", key, vertexNum, endTime2 - startTime2);
 		}
-		for (int i = 0; i < vertexNum; i++) {
+		for (int i = 0; i < outvertPropTable.length; i++) {
 		    if (outvertPropTable[i] != null) {
 			vertices.add(new RamCloudVertex(outvertPropTable[i].key, this));
 		    }
@@ -535,14 +539,15 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 
     @Override
     public void shutdown() {
-	getRcClient().dropTable(VERT_TABLE_NAME);
-	getRcClient().dropTable(VERT_PROP_TABLE_NAME);
-	getRcClient().dropTable(EDGE_PROP_TABLE_NAME);
-	getRcClient().dropTable(IDX_VERT_TABLE_NAME);
-	getRcClient().dropTable(IDX_EDGE_TABLE_NAME);
-	getRcClient().dropTable(KIDX_VERT_TABLE_NAME);
-	getRcClient().dropTable(KIDX_EDGE_TABLE_NAME);
-	getRcClient().disconnect();
+	JRamCloud rcClient = getRcClient();
+	rcClient.dropTable(VERT_TABLE_NAME);
+	rcClient.dropTable(VERT_PROP_TABLE_NAME);
+	rcClient.dropTable(EDGE_PROP_TABLE_NAME);
+	rcClient.dropTable(IDX_VERT_TABLE_NAME);
+	rcClient.dropTable(IDX_EDGE_TABLE_NAME);
+	rcClient.dropTable(KIDX_VERT_TABLE_NAME);
+	rcClient.dropTable(KIDX_EDGE_TABLE_NAME);
+	rcClient.disconnect();
     }
 
     @Override

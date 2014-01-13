@@ -445,8 +445,8 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 		    startTime = System.nanoTime();
 		}
 
+	        JRamCloud vertTable = graph.getRcClient();
 		try {
-		        JRamCloud vertTable = graph.getRcClient();
 			if (graph.measureRcTimeProp == 1) {
 			    startTime = System.nanoTime();
 			}
@@ -468,7 +468,6 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 		}
 
 		try {
-		        JRamCloud vertTable = graph.getRcClient();
 			if (graph.measureRcTimeProp == 1) {
 			    startTime = System.nanoTime();
 			}

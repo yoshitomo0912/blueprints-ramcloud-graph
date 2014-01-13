@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import com.esotericsoftware.kryo2.Kryo;
 import com.esotericsoftware.kryo2.io.ByteBufferInput;
-import com.esotericsoftware.kryo2.io.ByteBufferOutput;
+import com.esotericsoftware.kryo2.io.Output;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Vertex;
@@ -133,7 +133,8 @@ public class RamCloudElement implements Element, Serializable {
 	    startKryoTime = System.nanoTime();
 	}
 	pm.ser_start("RamCloudElement setPropertyMap()");
-	ByteBufferOutput output = new ByteBufferOutput(1024 * 1024);
+	byte[] rcTemp = new byte[1024*1024];
+	Output output = new Output(rcTemp);
 	kryo.get().writeObject(output, map);
 	long midKryoTime = 0;
 	if(RamCloudGraph.measureSerializeTimeProp == 1) {
@@ -172,6 +173,9 @@ public class RamCloudElement implements Element, Serializable {
 	return map.keySet();
     }
 
+    public Map<String, Object> getProperties() {
+	return getPropertyMap();
+    }
     public void setProperties(Map<String, Object> properties) {
         Object oldValue;
         long startTime = 0;
