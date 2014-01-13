@@ -107,7 +107,6 @@ public class JRamCloud {
             this.status = status;
             this.version = version;
         }
-
         public int getStatus() {
             return status;
         }
@@ -369,13 +368,13 @@ public class JRamCloud {
         ramcloud.write(tableId, "thisIsTheKey", "thisIsTheValue");
         
         long before = System.nanoTime();
-        for (int i = 0; i < 100000; i++) {
+        for (int i = 0; i < 1000; i++) {
             JRamCloud.Object unused = ramcloud.read(tableId, "thisIsTheKey");
         }
         long after = System.nanoTime();
         System.out.println("Avg read latency: " +
-            ((double)(after - before) / 100000 / 1000) + " usec");
-
+            ((double)(after - before) / 1000 / 1000) + " usec");
+        
         // multiRead test
         long tableId4 = ramcloud.createTable("table4");
         ramcloud.write(tableId4, "object1-1", "value:1-1");
@@ -396,11 +395,17 @@ public class JRamCloud {
                     + out[i].getValue() + "], version = " + out[i].version);
         }
         MultiWriteObject mwrite[] = new MultiWriteObject[2];
-        mwrite[0] = new MultiWriteObject(tableId4, "object1-1".getBytes(), "value:1-1".getBytes(), null);
-        mwrite[1] = new MultiWriteObject(tableId5, "object2-1".getBytes(), "value:2-1".getBytes(), null);
-        ramcloud.multiWrite(mwrite);
+        mwrite[0] = new MultiWriteObject(tableId4, "v0".getBytes(), "v0-value".getBytes(), null);
+        mwrite[1] = new MultiWriteObject(tableId5, "v1".getBytes(), "v1".getBytes(), null);
+        MultiWriteRspObject[] rsp = ramcloud.multiWrite(mwrite);
+        if (rsp != null) {
+            for (int i = 0; i < rsp.length; i++) {
+                System.out.println("multi write rsp(" + i + ") status:version " + rsp[i].getStatus() + ":" + rsp[i].getVersion());
+            }
+        }
         ramcloud.dropTable("table4");
         ramcloud.dropTable("table5");
         ramcloud.dropTable("table6");
+        ramcloud.disconnect();
     }
 }

@@ -683,69 +683,65 @@ JNIEXPORT jobjectArray JNICALL Java_edu_stanford_ramcloud_JRamCloud_multiWrite(J
     MultiWriteObject objects[requestNum];
     MultiWriteObject *requests[requestNum];
     RejectRules rules[requestNum];
-    printf("we are here0 %d\n", requestNum);
     const static jclass jc_multiWriteObject = (jclass)env->NewGlobalRef(env->FindClass(PACKAGE_PATH "JRamCloud$MultiWriteObject"));
     const static jclass jc_RejectRules = (jclass)env->NewGlobalRef(env->FindClass(PACKAGE_PATH "JRamCloud$RejectRules"));
     const static jfieldID jf_tableId = env->GetFieldID(jc_multiWriteObject, "tableId", "J");
     const static jfieldID jf_key = env->GetFieldID(jc_multiWriteObject, "key", "[B");
     const static jfieldID jf_value = env->GetFieldID(jc_multiWriteObject, "value", "[B");
     const static jfieldID jf_reject_rules = env->GetFieldID(jc_multiWriteObject, "rules", "L" PACKAGE_PATH "JRamCloud$RejectRules;");
-    printf("we are here1 %d %s\n", requestNum, "L" PACKAGE_PATH "JRamCloud$MultiWriteObject$RejectRules;");
+
+    const static jfieldID jf_doesntExist = env->GetFieldID(jc_RejectRules, "doesntExist", "Z");
+    check_null(jf_doesntExist, "doesentExist field id is null");
+    const static jfieldID jf_exists = env->GetFieldID(jc_RejectRules, "exists", "Z");
+    check_null(jf_exists, "exists field id is null");
+    const static jfieldID jf_givenVersion = env->GetFieldID(jc_RejectRules, "givenVersion", "J");
+    check_null(jf_givenVersion, "givenVersion field id is null");
+    const static jfieldID jf_versionLeGiven = env->GetFieldID(jc_RejectRules, "versionLeGiven", "Z");
+    check_null(jf_versionLeGiven, "versionLeGiven field id is null");
+    const static jfieldID jf_versionNeGiven = env->GetFieldID(jc_RejectRules, "versionNeGiven", "Z");
+    check_null(jf_versionNeGiven, "versionNeGiven field id is null");
 
     for (int i = 0; i < requestNum; i++) {
         jobject obj = env->GetObjectArrayElement(jmultiWriteArray, i);
         check_null(obj, "multi write GetObjectArrayElement failed");
 
         objects[i].tableId = env->GetLongField(obj, jf_tableId);
-        printf("table id: %ld\n", objects[i].tableId);
 
         jbyteArray jKey = (jbyteArray)env->GetObjectField(obj, jf_key);
         jbyte* data = env->GetByteArrayElements(jKey, NULL);
         objects[i].key = data;
         objects[i].keyLength = env->GetArrayLength(jKey);
-        printf("key length: %d\n", objects[i].keyLength);
 
         jbyteArray jValue = (jbyteArray)env->GetObjectField(obj, jf_value);
         data = env->GetByteArrayElements(jValue, NULL);
         objects[i].value = data;
         objects[i].valueLength = env->GetArrayLength(jValue);
-        printf("value length: %d\n", objects[i].valueLength);
 
         jobject jRejectRules = env->GetObjectField(obj, jf_reject_rules);
-	printf("reject rules object obtained\n");
         rules[i] = {};
 
-        jfieldID fid = env->GetFieldID(jc_RejectRules, "doesntExist", "Z");
-        rules[i].doesntExist = (uint8_t) env->GetBooleanField(jRejectRules, fid);
-	printf("reject rules[%d] doesntExist: %d\n", i, rules[i].doesntExist);
+        if (jRejectRules != NULL) {
+            jboolean ruleBool;
 
-        fid = env->GetFieldID(jc_RejectRules, "exists", "Z");
-        rules[i].exists = (uint8_t) env->GetBooleanField(jRejectRules, fid);
-	printf("reject rules[%d] exists: %d\n", i, rules[i].exists);
+            ruleBool = env->GetBooleanField(jRejectRules, jf_doesntExist);
+            rules[i].doesntExist = ruleBool ? 1 : 0;
 
-        fid = env->GetFieldID(jc_RejectRules, "givenVersion", "J");
-        rules[i].givenVersion = env->GetLongField(jRejectRules, fid);
-	printf("reject rules[%d] givenVersion: %ld\n", i, rules[i].givenVersion);
+            ruleBool = env->GetBooleanField(jRejectRules, jf_exists);
+            rules[i].exists = ruleBool ? 1 : 0;
 
-        fid = env->GetFieldID(jc_RejectRules, "versionLeGiven", "Z");
-        rules[i].versionLeGiven = (uint8_t) env->GetBooleanField(jRejectRules, fid);
-	printf("reject rules[%d] versionLeGiven: %d\n", i, rules[i].versionLeGiven);
+            rules[i].givenVersion = env->GetLongField(jRejectRules, jf_givenVersion);
 
-        fid = env->GetFieldID(jc_RejectRules, "versionNeGiven", "Z");
-        rules[i].versionNeGiven = (uint8_t) env->GetBooleanField(jRejectRules, fid);
-	printf("reject rules[%d] versionNeGiven: %d\n", i, rules[i].versionNeGiven);
+            ruleBool = env->GetBooleanField(jRejectRules, jf_versionLeGiven);
+            rules[i].versionLeGiven = ruleBool ? 1 : 0;
 
+            ruleBool = env->GetBooleanField(jRejectRules, jf_versionNeGiven);
+            rules[i].versionNeGiven = ruleBool ? 1 : 0;
+        }
 	objects[i].rejectRules = &rules[i];
-
         requests[i] = &objects[i];
-        printf("inside the request loop %d\n", i);
     }
     try {
-        printf("calling multiwrite\n");
         ramcloud->multiWrite(requests, requestNum);
-        for(int i = 0; i < requestNum; i++) {
-            printf("after multiwrite object status:version(%d:%ld)\n", requests[i]->status, requests[i]->version);
-        }
     } EXCEPTION_CATCHER(NULL);
  
     const static jclass jc_RcObject = (jclass)env->NewGlobalRef(env->FindClass(PACKAGE_PATH "JRamCloud$MultiWriteRspObject"));
