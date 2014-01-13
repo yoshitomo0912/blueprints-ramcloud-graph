@@ -28,7 +28,7 @@ import edu.stanford.ramcloud.JRamCloud;
 public class RamCloudIndex<T extends Element> implements Index<T>, Serializable {
 
     private final static Logger log = LoggerFactory.getLogger(RamCloudGraph.class);
-    private RamCloudGraph graph;
+    protected RamCloudGraph graph;
     private long tableId;
     private String indexName;
     protected byte[] rcKey;
