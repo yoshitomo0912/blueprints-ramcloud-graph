@@ -61,17 +61,9 @@ public class RamCloudElement implements Element, Serializable {
 	PerfMon pm = PerfMon.getInstance();
 	try {
 	    JRamCloud vertTable = graph.getRcClient();
-	    long startTime = 0;
-	    if (graph.measureRcTimeProp == 1) {
-		startTime = System.nanoTime();
-	    }
 	    pm.read_start("RamCloudElement getPropertyMap()");
 	    propTableEntry = vertTable.read(rcPropTableId, rcPropTableKey);
 	    pm.read_end("RamCloudElement getPropertyMap()");
-	    if (graph.measureRcTimeProp == 1) {
-		long endTime = System.nanoTime();
-		log.error("Performance getPropertyMap read time {}", endTime - startTime);
-	    }
 	    if (propTableEntry.value.length > 1024 * 1024 * 0.9) {
 		log.warn("Element[id={}] property map size is near 1MB limit!", new String(rcPropTableKey));
 	    }
