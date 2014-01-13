@@ -46,7 +46,6 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 
     private static final ThreadLocal<JRamCloud> RamCloudThreadLocal = new ThreadLocal<JRamCloud>();
 
-    protected JRamCloud rcClient;
     protected long vertTableId; //(vertex_id) --> ( (n,d,ll,l), (n,d,ll,l), ... )
     protected long vertPropTableId; //(vertex_id) -> ( (kl,k,vl,v), (kl,k,vl,v), ... )
     protected long edgePropTableId; //(edge_id) -> ( (kl,k,vl,v), (kl,k,vl,v), ... )
@@ -119,7 +118,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
     public RamCloudGraph(String coordinatorLocation) {
 	this.coordinatorLocation = coordinatorLocation;
 
-	rcClient = getRcClient();
+	JRamCloud rcClient = getRcClient();
 
 	vertTableId = rcClient.createTable(VERT_TABLE_NAME);
 	vertPropTableId = rcClient.createTable(VERT_PROP_TABLE_NAME);
@@ -137,7 +136,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
     }
 
     public JRamCloud getRcClient() {
-	rcClient = RamCloudThreadLocal.get();
+	JRamCloud rcClient = RamCloudThreadLocal.get();
 	if (rcClient == null) {
 	    rcClient = new JRamCloud(coordinatorLocation);
 	    RamCloudThreadLocal.set(rcClient);
@@ -210,12 +209,13 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
     private final void initInstance() {
         //long incrementValue = 1;
         JRamCloud.Object instanceEntry = null;
+        JRamCloud rcClient = getRcClient();
         try {
-            instanceEntry = getRcClient().read(instanceTableId, "nextInstanceId".getBytes());
+            instanceEntry = rcClient.read(instanceTableId, "nextInstanceId".getBytes());
         } catch (Exception e) {
             if (e instanceof JRamCloud.ObjectDoesntExistException) {
                 instanceId = 0;
-                getRcClient().write(instanceTableId, "nextInstanceId".getBytes(), ByteBuffer.allocate(0).array());
+                rcClient.write(instanceTableId, "nextInstanceId".getBytes(), ByteBuffer.allocate(0).array());
             }
         }
         if (instanceEntry != null) {
@@ -260,12 +260,12 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 		JRamCloud.RejectRules rules = rcClient.new RejectRules();
 		rules.setNeVersion(instanceEntry.version);
 		try {
-		    getRcClient().writeRule(instanceTableId, "nextInstanceId".getBytes(), rcValue, rules);
+		    rcClient.writeRule(instanceTableId, "nextInstanceId".getBytes(), rcValue, rules);
 		    instanceId = curInstanceId;
 		    break;
 		} catch (Exception ex) {
 		    log.debug("Cond. Write increment Vertex property: ", ex);
-		    instanceEntry = getRcClient().read(instanceTableId, "nextInstanceId".getBytes());
+		    instanceEntry = rcClient.read(instanceTableId, "nextInstanceId".getBytes());
 		    continue;
 		}
 	    }
@@ -539,14 +539,15 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 
     @Override
     public void shutdown() {
-	getRcClient().dropTable(VERT_TABLE_NAME);
-	getRcClient().dropTable(VERT_PROP_TABLE_NAME);
-	getRcClient().dropTable(EDGE_PROP_TABLE_NAME);
-	getRcClient().dropTable(IDX_VERT_TABLE_NAME);
-	getRcClient().dropTable(IDX_EDGE_TABLE_NAME);
-	getRcClient().dropTable(KIDX_VERT_TABLE_NAME);
-	getRcClient().dropTable(KIDX_EDGE_TABLE_NAME);
-	getRcClient().disconnect();
+	JRamCloud rcClient = getRcClient();
+	rcClient.dropTable(VERT_TABLE_NAME);
+	rcClient.dropTable(VERT_PROP_TABLE_NAME);
+	rcClient.dropTable(EDGE_PROP_TABLE_NAME);
+	rcClient.dropTable(IDX_VERT_TABLE_NAME);
+	rcClient.dropTable(IDX_EDGE_TABLE_NAME);
+	rcClient.dropTable(KIDX_VERT_TABLE_NAME);
+	rcClient.dropTable(KIDX_EDGE_TABLE_NAME);
+	rcClient.disconnect();
     }
 
     @Override

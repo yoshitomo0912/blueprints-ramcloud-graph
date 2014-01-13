@@ -68,32 +68,20 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
     }
 
     public boolean exists() {
-	long startTime = 0;
 	PerfMon pm = PerfMon.getInstance();
 
 	try {
 	    JRamCloud.Object vertTableEntry;
 	    JRamCloud vertTable = graph.getRcClient();
 
-	    if (graph.measureRcTimeProp == 1) {
-		startTime = System.nanoTime();
-	    }
 	    //vertTableEntry = graph.getRcClient().read(tableId, rcKey);
 	    pm.indexread_start("RamCloudIndex exists()");
 	    vertTableEntry = vertTable.read(tableId, rcKey);
 	    pm.indexread_end("RamCloudIndex exists()");
-	    if (graph.measureRcTimeProp == 1) {
-		long endTime = System.nanoTime();
-		log.error("Performance index exists(indexName {}) read time {}", indexName, endTime - startTime);
-	    }
 	    indexVersion = vertTableEntry.version;
 	    return true;
 	} catch (Exception e) {
 	    pm.indexread_end("RamCloudIndex exists()");
-	    if (graph.measureRcTimeProp == 1) {
-		long endTime = System.nanoTime();
-		log.error("Performance index exists(indexName {}) exception read time {}", indexName, endTime - startTime);
-	    }
 	    log.debug("IndexTable entry for {} does not exists(): {}@{} [{}]", indexName, new String(rcKey), tableId, this);
 	    return false;
 	}
@@ -107,18 +95,10 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 		JRamCloud.RejectRules rules = rcClient.new RejectRules();
 		rules.setExists();
 
-		long startTime = 0;
-		if (graph.measureRcTimeProp == 1) {
-		    startTime = System.nanoTime();
-		}
 		//graph.getRcClient().writeRule(tableId, rcKey, ByteBuffer.allocate(0).array(), rules);
 		pm.indexwrite_start("RamCloudIndex create()");
 		rcClient.writeRule(tableId, rcKey, ByteBuffer.allocate(0).array(), rules);
 		pm.indexwrite_end("RamCloudIndex create()");
-		if (graph.measureRcTimeProp == 1) {
-		    long endTime = System.nanoTime();
-		    log.error("Performance index create(indexName {}) write time {}", indexName, endTime - startTime);
-		}
 	    } catch (Exception e) {
 		pm.indexwrite_end("RamCloudIndex create()");
 		log.info(toString() + ": Write create index list: ", e);
@@ -483,7 +463,7 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
         pm.indexser_end("RamCloudIndex convertIndexPropertyMapToRcBytes()");
 	if(RamCloudGraph.measureSerializeTimeProp == 1) {
         	long endTime = System.nanoTime();
-        	log.error("Performance index kryo serialization {}", endTime - startTime);
+		log.error("Performance index ProtoBuff serialization {}, size={}", endTime - startTime, bytes);
 	}
 	return bytes;
     }
@@ -504,17 +484,9 @@ public class RamCloudIndex<T extends Element> implements Index<T>, Serializable 
 	PerfMon pm = PerfMon.getInstance();
 	try {
 	    JRamCloud vertTable = graph.getRcClient();
-	    long startTime = 0;
-	    if (graph.measureRcTimeProp == 1) {
-		startTime = System.nanoTime();
-	    }
 	    pm.indexwrite_start("RamCloudIndex writeWithRules()");
 	    vertTable.writeRule(tableId, rcKey, rcValue, rules);
 	    pm.indexwrite_end("RamCloudIndex writeWithRules()");
-	    if (graph.measureRcTimeProp == 1) {
-		long endTime = System.nanoTime();
-		log.error("Performance writeWithRules(indexName {}) write time {}", rcKeyToIndexName(rcKey), endTime - startTime);
-	    }
 	} catch (Exception e) {
             pm.indexwrite_end("RamCloudIndex writeWithRules()");
             pm.indexwrite_condfail("RamCloudIndex writeWithRules()");

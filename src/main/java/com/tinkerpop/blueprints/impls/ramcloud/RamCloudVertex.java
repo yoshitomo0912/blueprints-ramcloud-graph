@@ -439,54 +439,25 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 		boolean vertPropTableEntryExists = false;
 
 		PerfMon pm = PerfMon.getInstance();
-		long startTime = 0;
-
-		if (graph.measureRcTimeProp == 1) {
-		    startTime = System.nanoTime();
-		}
-
+	        JRamCloud vertTable = graph.getRcClient();
 		try {
-		        JRamCloud vertTable = graph.getRcClient();
-			if (graph.measureRcTimeProp == 1) {
-			    startTime = System.nanoTime();
-			}
 		        pm.read_start("RamCloudVertex exists()");
 			vertTable.read(graph.vertTableId, rcKey);
 			pm.read_end("RamCloudVertex exists()");
-			if (graph.measureRcTimeProp == 1) {
-			    long endTime = System.nanoTime();
-			    log.error("Performance vertexTable exists read total time {}", endTime - startTime);
-			}
 			vertTableEntryExists = true;
 		} catch (Exception e) {
 			// Vertex table entry does not exist
 		        pm.read_end("RamCloudVertex exists()");
-		        if (graph.measureRcTimeProp == 1) {
-			    long endTime = System.nanoTime();
-			    log.error("Performance vertexTable does not exists read total time {}", endTime - startTime);
-		        }
 		}
 
 		try {
-		        JRamCloud vertTable = graph.getRcClient();
-			if (graph.measureRcTimeProp == 1) {
-			    startTime = System.nanoTime();
-			}
 			pm.read_start("RamCloudVertex exists()");
 			vertTable.read(graph.vertPropTableId, rcKey);
 		        pm.read_end("RamCloudVertex exists()");
-			if (graph.measureRcTimeProp == 1) {
-			    long endTime = System.nanoTime();
-			    log.error("Performance vertexPropTable exists read total time {}", endTime - startTime);
-			}
 			vertPropTableEntryExists = true;
 		} catch (Exception e) {
 			// Vertex property table entry does not exist
 		        pm.read_end("RamCloudVertex exists()");
-		    	if (graph.measureRcTimeProp == 1) {
-		            long endTime = System.nanoTime();
-			    log.error("Performance vertexPropTable does not exists read total time {}", endTime - startTime);
-		    	}
 		}
 
 		if (vertTableEntryExists && vertPropTableEntryExists) {
@@ -504,10 +475,6 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 		if (!exists()) {
 			PerfMon pm = PerfMon.getInstance();
 			JRamCloud vertTable = graph.getRcClient();
-			long startTime = 0;
-			if (graph.measureRcTimeProp == 1) {
-			    startTime = System.nanoTime();
-			}
 			pm.write_start("RamCloudVertex create()");
 			vertTable.write(graph.vertTableId, rcKey, ByteBuffer.allocate(0).array());
 			pm.write_end("RamCloudVertex create()");
@@ -515,10 +482,6 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 			pm.write_start("RamCloudVertex create()");
 			vertTable.write(graph.vertPropTableId, rcKey, ByteBuffer.allocate(0).array());
 			pm.write_end("RamCloudVertex create()");
-			if (graph.measureRcTimeProp == 1) {
-			    long endTime = System.nanoTime();
-			    log.error("Performance vertex/vertexPropTable initial total time {}", endTime - startTime);
-			}
 		} else {
 			throw ExceptionFactory.vertexWithIdAlreadyExists(id);
 		}
