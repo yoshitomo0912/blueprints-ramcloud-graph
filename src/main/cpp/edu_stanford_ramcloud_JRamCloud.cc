@@ -671,3 +671,96 @@ JNIEXPORT jobject JNICALL Java_edu_stanford_ramcloud_JRamCloud_00024TableEnumera
     } else 
         return NULL;
 }
+
+/*
+ * Class:     edu_stanford_ramcloud_JRamCloud
+ * Method:    multiWrite
+ * Signature: ([Ledu/stanford/ramcloud/JRamCloud/MultiWriteObject;)[Ledu/stanford/ramcloud/JRamCloud/MultiWriteRspObject;
+ */
+JNIEXPORT jobjectArray JNICALL Java_edu_stanford_ramcloud_JRamCloud_multiWrite(JNIEnv *env, jobject jRamCloud, jobjectArray jmultiWriteArray) {
+    jint requestNum = env->GetArrayLength(jmultiWriteArray);
+    RamCloud* ramcloud = getRamCloud(env, jRamCloud);
+    MultiWriteObject objects[requestNum];
+    MultiWriteObject *requests[requestNum];
+    RejectRules rules[requestNum];
+    printf("we are here0 %d\n", requestNum);
+    const static jclass jc_multiWriteObject = (jclass)env->NewGlobalRef(env->FindClass(PACKAGE_PATH "JRamCloud$MultiWriteObject"));
+    const static jclass jc_RejectRules = (jclass)env->NewGlobalRef(env->FindClass(PACKAGE_PATH "JRamCloud$RejectRules"));
+    const static jfieldID jf_tableId = env->GetFieldID(jc_multiWriteObject, "tableId", "J");
+    const static jfieldID jf_key = env->GetFieldID(jc_multiWriteObject, "key", "[B");
+    const static jfieldID jf_value = env->GetFieldID(jc_multiWriteObject, "value", "[B");
+    const static jfieldID jf_reject_rules = env->GetFieldID(jc_multiWriteObject, "rules", "L" PACKAGE_PATH "JRamCloud$RejectRules;");
+    printf("we are here1 %d %s\n", requestNum, "L" PACKAGE_PATH "JRamCloud$MultiWriteObject$RejectRules;");
+
+    for (int i = 0; i < requestNum; i++) {
+        jobject obj = env->GetObjectArrayElement(jmultiWriteArray, i);
+        check_null(obj, "multi write GetObjectArrayElement failed");
+
+        objects[i].tableId = env->GetLongField(obj, jf_tableId);
+        printf("table id: %ld\n", objects[i].tableId);
+
+        jbyteArray jKey = (jbyteArray)env->GetObjectField(obj, jf_key);
+        jbyte* data = env->GetByteArrayElements(jKey, NULL);
+        objects[i].key = data;
+        objects[i].keyLength = env->GetArrayLength(jKey);
+        printf("key length: %d\n", objects[i].keyLength);
+
+        jbyteArray jValue = (jbyteArray)env->GetObjectField(obj, jf_value);
+        data = env->GetByteArrayElements(jValue, NULL);
+        objects[i].value = data;
+        objects[i].valueLength = env->GetArrayLength(jValue);
+        printf("value length: %d\n", objects[i].valueLength);
+
+        jobject jRejectRules = env->GetObjectField(obj, jf_reject_rules);
+	printf("reject rules object obtained\n");
+        rules[i] = {};
+
+        jfieldID fid = env->GetFieldID(jc_RejectRules, "doesntExist", "Z");
+        rules[i].doesntExist = (uint8_t) env->GetBooleanField(jRejectRules, fid);
+	printf("reject rules[%d] doesntExist: %d\n", i, rules[i].doesntExist);
+
+        fid = env->GetFieldID(jc_RejectRules, "exists", "Z");
+        rules[i].exists = (uint8_t) env->GetBooleanField(jRejectRules, fid);
+	printf("reject rules[%d] exists: %d\n", i, rules[i].exists);
+
+        fid = env->GetFieldID(jc_RejectRules, "givenVersion", "J");
+        rules[i].givenVersion = env->GetLongField(jRejectRules, fid);
+	printf("reject rules[%d] givenVersion: %ld\n", i, rules[i].givenVersion);
+
+        fid = env->GetFieldID(jc_RejectRules, "versionLeGiven", "Z");
+        rules[i].versionLeGiven = (uint8_t) env->GetBooleanField(jRejectRules, fid);
+	printf("reject rules[%d] versionLeGiven: %d\n", i, rules[i].versionLeGiven);
+
+        fid = env->GetFieldID(jc_RejectRules, "versionNeGiven", "Z");
+        rules[i].versionNeGiven = (uint8_t) env->GetBooleanField(jRejectRules, fid);
+	printf("reject rules[%d] versionNeGiven: %d\n", i, rules[i].versionNeGiven);
+
+	objects[i].rejectRules = &rules[i];
+
+        requests[i] = &objects[i];
+        printf("inside the request loop %d\n", i);
+    }
+    try {
+        printf("calling multiwrite\n");
+        ramcloud->multiWrite(requests, requestNum);
+        for(int i = 0; i < requestNum; i++) {
+            printf("after multiwrite object status:version(%d:%ld)\n", requests[i]->status, requests[i]->version);
+        }
+    } EXCEPTION_CATCHER(NULL);
+ 
+    const static jclass jc_RcObject = (jclass)env->NewGlobalRef(env->FindClass(PACKAGE_PATH "JRamCloud$MultiWriteRspObject"));
+    check_null(jc_RcObject, "FindClass failed");
+    const static jmethodID jm_init = env->GetMethodID(jc_RcObject,
+                                        "<init>",
+                                        "(L" PACKAGE_PATH "JRamCloud;IJ)V");
+
+    jobjectArray outJNIArray = env->NewObjectArray(requestNum, jc_RcObject , NULL);
+    check_null(outJNIArray, "NewObjectArray failed");
+    
+    for (int i = 0 ; i < requestNum ; i++) {
+        jobject obj = env->NewObject(jc_RcObject, jm_init, jRamCloud, objects[i].status, objects[i].version);
+        check_null(obj, "NewObject failed");
+        env->SetObjectArrayElement(outJNIArray, i, obj);
+    }
+    return outJNIArray;
+}

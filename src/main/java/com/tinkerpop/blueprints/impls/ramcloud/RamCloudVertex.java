@@ -25,10 +25,10 @@ import com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeListProto
 import com.tinkerpop.blueprints.impls.ramcloud.RamCloudGraphProtos.EdgeProtoBuf;
 import com.tinkerpop.blueprints.util.DefaultVertexQuery;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
-
 import com.tinkerpop.blueprints.impls.ramcloud.PerfMon;
 
 import edu.stanford.ramcloud.JRamCloud;
+import edu.stanford.ramcloud.JRamCloud.RejectRules;
 import edu.stanford.ramcloud.JRamCloud.WrongVersionException;
 
 public class RamCloudVertex extends RamCloudElement implements Vertex, Serializable {
@@ -494,5 +494,21 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 		for (RamCloudEdge edge : edgeList) {
 			System.out.println(edge.toString());
 		}
+	}
+
+	public void testMultiWrite() {
+		JRamCloud vertTable = graph.getRcClient();
+		JRamCloud.RejectRules rules0 = vertTable.new RejectRules();
+		rules0.setDoesntExists();
+		rules0.setLeVersion(111);
+		
+		JRamCloud.MultiWriteObject mWrite0 = new JRamCloud.MultiWriteObject(graph.vertTableId, "v0".getBytes(), "v0".getBytes(), rules0);
+		JRamCloud.RejectRules rules1 = vertTable.new RejectRules();
+		rules1.setExists();
+		rules1.setNeVersion(222);
+
+		JRamCloud.MultiWriteObject mWrite1 = new JRamCloud.MultiWriteObject(graph.vertTableId, "v1".getBytes(), "v1".getBytes(), rules1);
+		JRamCloud.MultiWriteObject[] mWrite = { mWrite0, mWrite1 };
+		vertTable.multiWrite(mWrite);
 	}
 }

@@ -85,6 +85,38 @@ public class JRamCloud {
         }
     }
     
+    public static class MultiWriteObject {
+        long tableId;
+        byte[] key;
+        byte[] value;
+        RejectRules rules;
+
+        public MultiWriteObject(long tableId, byte[] key, byte[] value, RejectRules rules) {
+            this.tableId = tableId;
+            this.key = key;
+            this.value = value;
+            this.rules = rules;
+        }
+    }
+
+    public class MultiWriteRspObject {
+        private int status;
+        private long version;
+
+        public MultiWriteRspObject(int status, long version) {
+            this.status = status;
+            this.version = version;
+        }
+
+        public int getStatus() {
+            return status;
+        }
+
+        public long getVersion() {
+            return version;
+        }
+    }
+
     /**
      * This class is returned by Read operations. It encapsulates the entire
      * object, including the key, value, and version.
@@ -260,6 +292,7 @@ public class JRamCloud {
     public native long write(long tableId, byte[] key, byte[] value);
     public native long write(long tableId, byte[] key, byte[] value, RejectRules rules);
     public native long writeRule(long tableId, byte[] key, byte[] value, RejectRules rules);
+    public native MultiWriteRspObject[] multiWrite(MultiWriteObject[] mwrite);
 
     /*
      * The following exceptions may be thrown by the JNI functions:
@@ -362,6 +395,10 @@ public class JRamCloud {
             System.out.println("multi read object: key = [" + out[i].getKey() + "], value = ["
                     + out[i].getValue() + "], version = " + out[i].version);
         }
+        MultiWriteObject mwrite[] = new MultiWriteObject[2];
+        mwrite[0] = new MultiWriteObject(tableId4, "object1-1".getBytes(), "value:1-1".getBytes(), null);
+        mwrite[1] = new MultiWriteObject(tableId5, "object2-1".getBytes(), "value:2-1".getBytes(), null);
+        ramcloud.multiWrite(mwrite);
         ramcloud.dropTable("table4");
         ramcloud.dropTable("table5");
         ramcloud.dropTable("table6");

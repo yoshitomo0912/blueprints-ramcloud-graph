@@ -14,16 +14,12 @@ import com.tinkerpop.blueprints.Element;
  * @author yoshitomo
  */
 public class RamCloudKeyIndex<T extends RamCloudElement> extends RamCloudIndex<T> implements Serializable {
-    private RamCloudGraph graph;
-	
     public RamCloudKeyIndex(long tableId, String indexName, Object propValue, RamCloudGraph graph, Class<T> indexClass) {
 	super(tableId, indexName, propValue, graph, indexClass);
-	this.graph = graph;
     }
     
     public RamCloudKeyIndex(long tableId, byte[] rcKey, RamCloudGraph graph, Class<T> indexClass) {
 	super(tableId, rcKey, graph, indexClass);
-	this.graph = graph;
     }
 
     public boolean autoUpdate(final String key, final Object newValue, final Object oldValue, final T element) {
@@ -57,5 +53,4 @@ public class RamCloudKeyIndex<T extends RamCloudElement> extends RamCloudIndex<T
 	}
 	return counter;
     }
-    
 }
