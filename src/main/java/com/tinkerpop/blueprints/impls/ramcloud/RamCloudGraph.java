@@ -213,7 +213,8 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	}
     }
 
-    public Iterable<Vertex> addVertices(List<Object> ids) {
+    public List<Vertex> addVertices(List<Object> ids) {
+	log.info("addVertices start");
 	List<Vertex> vertices = new LinkedList<Vertex>();
 
 	for (Object id: ids) {
@@ -223,14 +224,21 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	    vertices.add(new RamCloudVertex(longId, this));
 	}
 	try {
-	    // optimize this loop using multi-write
+	    // TODO WIP: use multi-write
 	    for (Vertex v: vertices) {
-		((RamCloudVertex)v).create();
+		RamCloudVertex rv = (RamCloudVertex)v;
+		try {
+		    rv.create();
+		    log.info("ramcloud vertex id: {} is created", rv.getId());
+		} catch (IllegalArgumentException e) {
+		    log.info("ramcloud vertex id: {} already exists", rv.getId());
+		}
 	    }
 	} catch (IllegalArgumentException e) {
 	    log.error("Tried to create vertices failed {}", e);
 	    return null;
 	}
+	log.info("addVertices end (success)");
 	return vertices;
     }
 
@@ -493,6 +501,26 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	    }
 	}
 	return null;
+    }
+
+    public List<Edge> addEdges(List<RamCloudEdgeEntity> edgeEntities) throws IllegalArgumentException {
+	//TODO WIP: need multi-write
+	log.info("addEdges start");
+	ArrayList<Edge> edges = new ArrayList<Edge>();
+	for (RamCloudEdgeEntity entity: edgeEntities) {
+	    edges.add(addEdge(null, entity.outVertex, entity.inVertex, entity.label));
+	}
+	log.info("addVertices end");
+	return edges;
+    }
+
+    public void setProperties(Map<RamCloudVertex, Map<String, Object>> properties) {
+	// TODO WIP: need multi-write
+	log.info("setProperties start");
+	for (Map.Entry<RamCloudVertex, Map<String, Object>> e: properties.entrySet()) {
+	    e.getKey().setProperties(e.getValue());
+	}
+	log.info("setProperties end");
     }
 
     @Override
