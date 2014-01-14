@@ -198,6 +198,7 @@ public class RamCloudElement implements Element, Serializable {
         }
         setPropertyMap(map);
 
+        // TODO use multi-write
         for (Map.Entry<String, Object> oldProperty : oldValueMap.entrySet()) {
             String key = oldProperty.getKey();
             Object oldValue = oldProperty.getValue();
