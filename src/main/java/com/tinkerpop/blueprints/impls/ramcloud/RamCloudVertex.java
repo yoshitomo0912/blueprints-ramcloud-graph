@@ -28,6 +28,7 @@ import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.impls.ramcloud.PerfMon;
 
 import edu.stanford.ramcloud.JRamCloud;
+import edu.stanford.ramcloud.JRamCloud.MultiWriteObject;
 import edu.stanford.ramcloud.JRamCloud.RejectRules;
 import edu.stanford.ramcloud.JRamCloud.WrongVersionException;
 
@@ -476,11 +477,10 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 			PerfMon pm = PerfMon.getInstance();
 			JRamCloud vertTable = graph.getRcClient();
 			pm.write_start("RamCloudVertex create()");
-			vertTable.write(graph.vertTableId, rcKey, ByteBuffer.allocate(0).array());
-			pm.write_end("RamCloudVertex create()");
-
-			pm.write_start("RamCloudVertex create()");
-			vertTable.write(graph.vertPropTableId, rcKey, ByteBuffer.allocate(0).array());
+			MultiWriteObject[] mwo = new MultiWriteObject[2];
+			mwo[0] = new MultiWriteObject(graph.vertTableId, rcKey, ByteBuffer.allocate(0).array(), null);
+			mwo[1] = new MultiWriteObject(graph.vertPropTableId, rcKey, ByteBuffer.allocate(0).array(), null);
+			vertTable.multiWrite(mwo);
 			pm.write_end("RamCloudVertex create()");
 		} else {
 			throw ExceptionFactory.vertexWithIdAlreadyExists(id);

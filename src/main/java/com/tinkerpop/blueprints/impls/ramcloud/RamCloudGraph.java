@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sun.jersey.core.util.Base64;
+import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Features;
@@ -40,6 +41,7 @@ import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.impls.ramcloud.PerfMon;
 
 import edu.stanford.ramcloud.JRamCloud;
+import edu.stanford.ramcloud.JRamCloud.MultiWriteObject;
 
 public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, TransactionalGraph, Serializable {
     private final static Logger log = LoggerFactory.getLogger(RamCloudGraph.class);
@@ -213,28 +215,31 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	}
     }
 
-    public List<Vertex> addVertices(List<Object> ids) {
+    public List<RamCloudVertex> addVertices(Iterable<Object> ids) {
 	log.info("addVertices start");
-	List<Vertex> vertices = new LinkedList<Vertex>();
+	List<RamCloudVertex> vertices = new LinkedList<RamCloudVertex>();
 
 	for (Object id: ids) {
 	    Long longId = parseVertexId(id);
 	    if (longId == null)
 		return null;
-	    vertices.add(new RamCloudVertex(longId, this));
+	    RamCloudVertex v = new RamCloudVertex(longId, this);
+	    if (v.exists()) {
+		log.error("ramcloud vertex id: {} already exists", v.getId());
+		throw ExceptionFactory.vertexWithIdAlreadyExists(v.getId());
+	    }
+	    vertices.add(v);
+	}
+	MultiWriteObject multiWriteObjects[] = new MultiWriteObject[vertices.size() * 2];
+	for (int i=0; i < vertices.size(); i++) {
+	    RamCloudVertex v = vertices.get(i);
+	    multiWriteObjects[i*2] = new MultiWriteObject(vertTableId, v.rcKey, ByteBuffer.allocate(0).array(), null);
+	    multiWriteObjects[i*2+1] = new MultiWriteObject(vertPropTableId, v.rcKey, ByteBuffer.allocate(0).array(), null);
 	}
 	try {
-	    // TODO WIP: use multi-write
-	    for (Vertex v: vertices) {
-		RamCloudVertex rv = (RamCloudVertex)v;
-		try {
-		    rv.create();
-		    log.info("ramcloud vertex id: {} is created", rv.getId());
-		} catch (IllegalArgumentException e) {
-		    log.info("ramcloud vertex id: {} already exists", rv.getId());
-		}
-	    }
-	} catch (IllegalArgumentException e) {
+	    getRcClient().multiWrite(multiWriteObjects);
+	    log.info("ramcloud vertices are created");
+	} catch (Exception e) {
 	    log.error("Tried to create vertices failed {}", e);
 	    return null;
 	}
@@ -503,12 +508,12 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	return null;
     }
 
-    public List<Edge> addEdges(List<RamCloudEdgeEntity> edgeEntities) throws IllegalArgumentException {
+    public List<Edge> addEdges(Iterable<Edge> edgeEntities) throws IllegalArgumentException {
 	//TODO WIP: need multi-write
 	log.info("addEdges start");
 	ArrayList<Edge> edges = new ArrayList<Edge>();
-	for (RamCloudEdgeEntity entity: edgeEntities) {
-	    edges.add(addEdge(null, entity.outVertex, entity.inVertex, entity.label));
+	for (Edge edge: edgeEntities) {
+	    edges.add(addEdge(null, edge.getVertex(Direction.OUT), edge.getVertex(Direction.IN), edge.getLabel()));
 	}
 	log.info("addVertices end");
 	return edges;
