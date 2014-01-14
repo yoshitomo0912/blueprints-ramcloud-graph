@@ -149,15 +149,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	return FEATURES;
     }
 
-    @Override
-    public Vertex addVertex(Object id) {
-	long startTime = 0;
-	long Tstamp1 = 0;
-	long Tstamp2 = 0;
-
-	if (measureBPTimeProp == 1) {
-	    startTime = System.nanoTime();
-	}
+    private Long parseVertexId(Object id) {
 	Long longId;
 	if (id == null) {
 	    longId = nextVertexId.incrementAndGet();
@@ -183,6 +175,21 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	    log.warn("ID argument {} of type {} is not supported. Returning null.", id, id.getClass());
 	    return null;
 	}
+	return longId;
+    }
+
+    @Override
+    public Vertex addVertex(Object id) {
+	long startTime = 0;
+	long Tstamp1 = 0;
+	long Tstamp2 = 0;
+
+	if (measureBPTimeProp == 1) {
+	    startTime = System.nanoTime();
+	}
+	Long longId = parseVertexId(id);
+	if (longId == null)
+	    return null;
 	if (measureBPTimeProp == 1) {
 	    Tstamp1 = System.nanoTime();
 	}
@@ -204,6 +211,27 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	    log.error("Tried to create vertex failed {" + newVertex + "}", e);
 	    return null;
 	}
+    }
+
+    public Iterable<Vertex> addVertices(List<Object> ids) {
+	List<Vertex> vertices = new LinkedList<Vertex>();
+
+	for (Object id: ids) {
+	    Long longId = parseVertexId(id);
+	    if (longId == null)
+		return null;
+	    vertices.add(new RamCloudVertex(longId, this));
+	}
+	try {
+	    // optimize this loop using multi-write
+	    for (Vertex v: vertices) {
+		((RamCloudVertex)v).create();
+	    }
+	} catch (IllegalArgumentException e) {
+	    log.error("Tried to create vertices failed {}", e);
+	    return null;
+	}
+	return vertices;
     }
 
     private final void initInstance() {
