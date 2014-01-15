@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sun.jersey.core.util.Base64;
+import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Features;
@@ -40,6 +41,7 @@ import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.impls.ramcloud.PerfMon;
 
 import edu.stanford.ramcloud.JRamCloud;
+import edu.stanford.ramcloud.JRamCloud.MultiWriteObject;
 
 public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, TransactionalGraph, Serializable {
     private final static Logger log = LoggerFactory.getLogger(RamCloudGraph.class);
@@ -149,15 +151,7 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	return FEATURES;
     }
 
-    @Override
-    public Vertex addVertex(Object id) {
-	long startTime = 0;
-	long Tstamp1 = 0;
-	long Tstamp2 = 0;
-
-	if (measureBPTimeProp == 1) {
-	    startTime = System.nanoTime();
-	}
+    private Long parseVertexId(Object id) {
 	Long longId;
 	if (id == null) {
 	    longId = nextVertexId.incrementAndGet();
@@ -183,6 +177,21 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	    log.warn("ID argument {} of type {} is not supported. Returning null.", id, id.getClass());
 	    return null;
 	}
+	return longId;
+    }
+
+    @Override
+    public Vertex addVertex(Object id) {
+	long startTime = 0;
+	long Tstamp1 = 0;
+	long Tstamp2 = 0;
+
+	if (measureBPTimeProp == 1) {
+	    startTime = System.nanoTime();
+	}
+	Long longId = parseVertexId(id);
+	if (longId == null)
+	    return null;
 	if (measureBPTimeProp == 1) {
 	    Tstamp1 = System.nanoTime();
 	}
@@ -204,6 +213,38 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	    log.error("Tried to create vertex failed {" + newVertex + "}", e);
 	    return null;
 	}
+    }
+
+    public List<RamCloudVertex> addVertices(Iterable<Object> ids) {
+	log.info("addVertices start");
+	List<RamCloudVertex> vertices = new LinkedList<RamCloudVertex>();
+
+	for (Object id: ids) {
+	    Long longId = parseVertexId(id);
+	    if (longId == null)
+		return null;
+	    RamCloudVertex v = new RamCloudVertex(longId, this);
+	    if (v.exists()) {
+		log.error("ramcloud vertex id: {} already exists", v.getId());
+		throw ExceptionFactory.vertexWithIdAlreadyExists(v.getId());
+	    }
+	    vertices.add(v);
+	}
+	MultiWriteObject multiWriteObjects[] = new MultiWriteObject[vertices.size() * 2];
+	for (int i=0; i < vertices.size(); i++) {
+	    RamCloudVertex v = vertices.get(i);
+	    multiWriteObjects[i*2] = new MultiWriteObject(vertTableId, v.rcKey, ByteBuffer.allocate(0).array(), null);
+	    multiWriteObjects[i*2+1] = new MultiWriteObject(vertPropTableId, v.rcKey, ByteBuffer.allocate(0).array(), null);
+	}
+	try {
+	    getRcClient().multiWrite(multiWriteObjects);
+	    log.info("ramcloud vertices are created");
+	} catch (Exception e) {
+	    log.error("Tried to create vertices failed {}", e);
+	    return null;
+	}
+	log.info("addVertices end (success)");
+	return vertices;
     }
 
     private final void initInstance() {
@@ -465,6 +506,26 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	    }
 	}
 	return null;
+    }
+
+    public List<Edge> addEdges(Iterable<Edge> edgeEntities) throws IllegalArgumentException {
+	//TODO WIP: need multi-write
+	log.info("addEdges start");
+	ArrayList<Edge> edges = new ArrayList<Edge>();
+	for (Edge edge: edgeEntities) {
+	    edges.add(addEdge(null, edge.getVertex(Direction.OUT), edge.getVertex(Direction.IN), edge.getLabel()));
+	}
+	log.info("addVertices end");
+	return edges;
+    }
+
+    public void setProperties(Map<RamCloudVertex, Map<String, Object>> properties) {
+	// TODO WIP: need multi-write
+	log.info("setProperties start");
+	for (Map.Entry<RamCloudVertex, Map<String, Object>> e: properties.entrySet()) {
+	    e.getKey().setProperties(e.getValue());
+	}
+	log.info("setProperties end");
     }
 
     @Override
