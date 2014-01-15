@@ -476,12 +476,12 @@ public class RamCloudVertex extends RamCloudElement implements Vertex, Serializa
 		if (!exists()) {
 			PerfMon pm = PerfMon.getInstance();
 			JRamCloud vertTable = graph.getRcClient();
-			pm.write_start("RamCloudVertex create()");
 			MultiWriteObject[] mwo = new MultiWriteObject[2];
 			mwo[0] = new MultiWriteObject(graph.vertTableId, rcKey, ByteBuffer.allocate(0).array(), null);
 			mwo[1] = new MultiWriteObject(graph.vertPropTableId, rcKey, ByteBuffer.allocate(0).array(), null);
+			pm.multiwrite_start("RamCloudVertex create()");
 			vertTable.multiWrite(mwo);
-			pm.write_end("RamCloudVertex create()");
+			pm.multiwrite_end("RamCloudVertex create()");
 		} else {
 			throw ExceptionFactory.vertexWithIdAlreadyExists(id);
 		}
