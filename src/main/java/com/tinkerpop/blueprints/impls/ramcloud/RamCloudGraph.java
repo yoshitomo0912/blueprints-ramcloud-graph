@@ -237,7 +237,10 @@ public class RamCloudGraph implements IndexableGraph, KeyIndexableGraph, Transac
 	    multiWriteObjects[i*2+1] = new MultiWriteObject(vertPropTableId, v.rcKey, ByteBuffer.allocate(0).array(), null);
 	}
 	try {
+		PerfMon pm = PerfMon.getInstance();
+		pm.multiwrite_start("RamCloudVertex create()");
 	    getRcClient().multiWrite(multiWriteObjects);
+		pm.multiwrite_end("RamCloudVertex create()");
 	    log.info("ramcloud vertices are created");
 	} catch (Exception e) {
 	    log.error("Tried to create vertices failed {}", e);
