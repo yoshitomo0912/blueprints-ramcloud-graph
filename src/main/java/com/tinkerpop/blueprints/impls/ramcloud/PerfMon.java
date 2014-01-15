@@ -25,6 +25,10 @@ public final class PerfMon {
    private long multiread_latency_cnt;
    private int multiread_flag;
 
+   private long multiwrite_latency_sum;
+   private long multiwrite_latency_cnt;
+   private int multiwrite_flag;
+
    private long indexread_latency_sum;
    private long indexread_latency_cnt;
    private int indexread_flag;
@@ -79,6 +83,7 @@ public final class PerfMon {
    private long protodeser_time;
 
    private long write_time;
+   private long multiwrite_time;
    private long write_condfails;
    private long indexwrite_time;
    private long indexwrite_condfails;
@@ -98,6 +103,8 @@ public final class PerfMon {
    	read_latency_cnt=0L;
 	multiread_latency_sum=0L;
    	multiread_latency_cnt=0L;
+	multiwrite_latency_sum=0L;
+   	multiwrite_latency_cnt=0L;
    	indexread_latency_sum=0L;
    	indexread_latency_cnt=0L;
 	write_latency_sum=0L;
@@ -446,6 +453,32 @@ public final class PerfMon {
 	}
 	multiread_flag = 0;
    }
+   public void multiwrite_start(String key){
+       if(measureAllTimeProp==0)
+		return;
+	if ( debug==1 )
+           log.error("multiwrite_start {}", key);
+	if ( multiwrite_flag != 0){
+           log.error("multiwrite_start called twice");
+	}
+	multiwrite_flag = 1;
+
+	multiwrite_time=System.nanoTime();
+  }
+  public void multiwrite_end(String key){
+       if(measureAllTimeProp==0)
+		return;
+
+	multiwrite_latency_sum += System.nanoTime() - multiwrite_time;
+       multiwrite_latency_cnt ++;
+
+	if ( debug==1 )
+           log.error("multiwrite_end {}", key);
+       if ( multiwrite_flag != 1){
+           log.error("multiwrite_end called before multiwrite_start");
+	}
+	multiwrite_flag = 0;
+  }
    public void indexread_start(String key){
         if(measureAllTimeProp==0)
 		return;
