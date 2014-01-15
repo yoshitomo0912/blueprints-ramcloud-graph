@@ -680,7 +680,7 @@ JNIEXPORT jobject JNICALL Java_edu_stanford_ramcloud_JRamCloud_00024TableEnumera
 JNIEXPORT jobjectArray JNICALL Java_edu_stanford_ramcloud_JRamCloud_multiWrite(JNIEnv *env, jobject jRamCloud, jobjectArray jmultiWriteArray) {
     jint requestNum = env->GetArrayLength(jmultiWriteArray);
     RamCloud* ramcloud = getRamCloud(env, jRamCloud);
-    MultiWriteObject objects[requestNum];
+    Tub<MultiWriteObject> objects[requestNum];
     MultiWriteObject *requests[requestNum];
     RejectRules rules[requestNum];
     const static jclass jc_multiWriteObject = (jclass)env->NewGlobalRef(env->FindClass(PACKAGE_PATH "JRamCloud$MultiWriteObject"));
@@ -705,17 +705,15 @@ JNIEXPORT jobjectArray JNICALL Java_edu_stanford_ramcloud_JRamCloud_multiWrite(J
         jobject obj = env->GetObjectArrayElement(jmultiWriteArray, i);
         check_null(obj, "multi write GetObjectArrayElement failed");
 
-        objects[i].tableId = env->GetLongField(obj, jf_tableId);
+        uint64_t tableId = env->GetLongField(obj, jf_tableId);
 
         jbyteArray jKey = (jbyteArray)env->GetObjectField(obj, jf_key);
-        jbyte* data = env->GetByteArrayElements(jKey, NULL);
-        objects[i].key = data;
-        objects[i].keyLength = env->GetArrayLength(jKey);
+        jbyte* keyData = env->GetByteArrayElements(jKey, NULL);
+        uint16_t keyLength = env->GetArrayLength(jKey);
 
         jbyteArray jValue = (jbyteArray)env->GetObjectField(obj, jf_value);
-        data = env->GetByteArrayElements(jValue, NULL);
-        objects[i].value = data;
-        objects[i].valueLength = env->GetArrayLength(jValue);
+        jbyte* valueData = env->GetByteArrayElements(jValue, NULL);
+        uint32_t valueLength = env->GetArrayLength(jValue);
 
         jobject jRejectRules = env->GetObjectField(obj, jf_reject_rules);
         rules[i] = {};
@@ -737,8 +735,8 @@ JNIEXPORT jobjectArray JNICALL Java_edu_stanford_ramcloud_JRamCloud_multiWrite(J
             ruleBool = env->GetBooleanField(jRejectRules, jf_versionNeGiven);
             rules[i].versionNeGiven = ruleBool ? 1 : 0;
         }
-	objects[i].rejectRules = &rules[i];
-        requests[i] = &objects[i];
+        objects[i].construct(tableId, keyData, keyLength, valueData, valueLength, &rules[i]);
+        requests[i] = objects[i].get();
     }
     try {
         ramcloud->multiWrite(requests, requestNum);
@@ -754,7 +752,7 @@ JNIEXPORT jobjectArray JNICALL Java_edu_stanford_ramcloud_JRamCloud_multiWrite(J
     check_null(outJNIArray, "NewObjectArray failed");
     
     for (int i = 0 ; i < requestNum ; i++) {
-        jobject obj = env->NewObject(jc_RcObject, jm_init, jRamCloud, objects[i].status, objects[i].version);
+        jobject obj = env->NewObject(jc_RcObject, jm_init, jRamCloud, objects[i]->status, objects[i]->version);
         check_null(obj, "NewObject failed");
         env->SetObjectArrayElement(outJNIArray, i, obj);
     }
