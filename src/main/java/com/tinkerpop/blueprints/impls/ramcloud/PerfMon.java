@@ -153,6 +153,7 @@ public final class PerfMon {
         	+ " multiread {} ({})"
         	+ " index_read {} ({})"
         	+ " write {} ({})"
+        	+ " multiwrite {} ({})"
         	+ " index_write {} ({})"
         	+ " serialize {} ({})"
         	+ " indexserialize {} ({})"
@@ -167,6 +168,7 @@ public final class PerfMon {
 	       multiread_latency_sum, multiread_latency_cnt,
 	       indexread_latency_sum, indexread_latency_cnt,
 	       write_latency_sum, write_latency_cnt,
+	       multiwrite_latency_sum, multiwrite_latency_cnt,
 	       indexwrite_latency_sum, indexwrite_latency_cnt,
 	       serialize_latency_sum, serialize_latency_cnt,
 	       indexserialize_latency_sum, indexserialize_latency_cnt,
@@ -201,6 +203,7 @@ public final class PerfMon {
         	+ " multiread {} ({})"
         	+ " index_read {} ({})"
         	+ " write {} ({})"
+        	+ " multiwrite {} ({})"
         	+ " index_write {} ({})"
         	+ " serialize {} ({})"
         	+ " indexserialize {} ({})"
@@ -215,6 +218,7 @@ public final class PerfMon {
 	       multiread_latency_sum, multiread_latency_cnt,
 	       indexread_latency_sum, indexread_latency_cnt,
 	       write_latency_sum, write_latency_cnt,
+	       multiwrite_latency_sum, multiwrite_latency_cnt,
 	       indexwrite_latency_sum, indexwrite_latency_cnt,
 	       serialize_latency_sum, serialize_latency_cnt,
 	       indexserialize_latency_sum, indexserialize_latency_cnt,
@@ -243,6 +247,7 @@ public final class PerfMon {
         	+ " multiread {} ({})"
         	+ " index_read {} ({})"
         	+ " write {} ({})"
+        	+ " multiwrite {} ({})"
         	+ " index_write {} ({})"
         	+ " serialize {} ({})"
         	+ " indexserialize {} ({})"
@@ -257,6 +262,7 @@ public final class PerfMon {
 	       multiread_latency_sum, multiread_latency_cnt,
 	       indexread_latency_sum, indexread_latency_cnt,
 	       write_latency_sum, write_latency_cnt,
+	       multiwrite_latency_sum, multiwrite_latency_cnt,
 	       indexwrite_latency_sum, indexwrite_latency_cnt,
 	       serialize_latency_sum, serialize_latency_cnt,
 	       indexserialize_latency_sum, indexserialize_latency_cnt,
@@ -284,6 +290,7 @@ public final class PerfMon {
         	+ " multiread {} ({})"
         	+ " index_read {} ({})"
         	+ " write {} ({})"
+        	+ " multiwrite {} ({})"
         	+ " index_write {} ({})"
         	+ " serialize {} ({})"
         	+ " indexserialize {} ({})"
@@ -298,6 +305,7 @@ public final class PerfMon {
 	       multiread_latency_sum, multiread_latency_cnt,
 	       indexread_latency_sum, indexread_latency_cnt,
 	       write_latency_sum, write_latency_cnt,
+	       multiwrite_latency_sum, multiwrite_latency_cnt,
 	       indexwrite_latency_sum, indexwrite_latency_cnt,
 	       serialize_latency_sum, serialize_latency_cnt,
 	       indexserialize_latency_sum, indexserialize_latency_cnt,
@@ -331,6 +339,7 @@ public final class PerfMon {
         	+ " multiread {} ({})"
         	+ " index_read {} ({})"
         	+ " write {} ({})"
+        	+ " multiwrite {} ({})"
         	+ " index_write {} ({})"
         	+ " serialize {} ({})"
         	+ " indexserialize {} ({})"
@@ -345,6 +354,7 @@ public final class PerfMon {
 	       multiread_latency_sum, multiread_latency_cnt,
 	       indexread_latency_sum, indexread_latency_cnt,
 	       write_latency_sum, write_latency_cnt,
+	       multiwrite_latency_sum, multiwrite_latency_cnt,
 	       indexwrite_latency_sum, indexwrite_latency_cnt,
 	       serialize_latency_sum, serialize_latency_cnt,
 	       indexserialize_latency_sum, indexserialize_latency_cnt,
@@ -375,6 +385,7 @@ public final class PerfMon {
         	+ " multiread {} ({})"
         	+ " index_read {} ({})"
         	+ " write {} ({})"
+        	+ " multiwrite {} ({})"
         	+ " index_write {} ({})"
         	+ " serialize {} ({})"
         	+ " indexserialize {} ({})"
@@ -389,6 +400,7 @@ public final class PerfMon {
 	       multiread_latency_sum, multiread_latency_cnt,
 	       indexread_latency_sum, indexread_latency_cnt,
 	       write_latency_sum, write_latency_cnt,
+	       multiwrite_latency_sum, multiwrite_latency_cnt,
 	       indexwrite_latency_sum, indexwrite_latency_cnt,
 	       serialize_latency_sum, serialize_latency_cnt,
 	       indexserialize_latency_sum, indexserialize_latency_cnt,
