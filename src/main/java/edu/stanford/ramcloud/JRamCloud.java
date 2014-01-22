@@ -377,30 +377,49 @@ public class JRamCloud {
         
         // multiRead test
         long tableId4 = ramcloud.createTable("table4");
+        System.out.println("table4 id " + tableId4);
         ramcloud.write(tableId4, "object1-1", "value:1-1");
         ramcloud.write(tableId4, "object1-2", "value:1-2");
         ramcloud.write(tableId4, "object1-3", "value:1-3");
         long tableId5 = ramcloud.createTable("table5");
+        System.out.println("table5 id " + tableId5);
         ramcloud.write(tableId5, "object2-1", "value:2-1");
         long tableId6 = ramcloud.createTable("table6");
         ramcloud.write(tableId6, "object3-1", "value:3-1");
         ramcloud.write(tableId6, "object3-2", "value:3-2");
 
         multiReadObject mread[] = new multiReadObject[2];
+        //for (int k = 0; k < 2000; k++) {
         mread[0] = new multiReadObject(tableId4, "object1-1".getBytes());
         mread[1] = new multiReadObject(tableId5, "object2-1".getBytes());
         JRamCloud.Object out[] = ramcloud.multiRead(mread);
         for (int i = 0 ; i < 2 ; i++){
             System.out.println("multi read object: key = [" + out[i].getKey() + "], value = ["
-                    + out[i].getValue() + "], version = " + out[i].version);
+                    + out[i].getValue() + "]");
+        //}
         }
         MultiWriteObject mwrite[] = new MultiWriteObject[2];
-        mwrite[0] = new MultiWriteObject(tableId4, "v0".getBytes(), "v0-value".getBytes(), null);
-        mwrite[1] = new MultiWriteObject(tableId5, "v1".getBytes(), "v1".getBytes(), null);
-        MultiWriteRspObject[] rsp = ramcloud.multiWrite(mwrite);
-        if (rsp != null) {
-            for (int i = 0; i < rsp.length; i++) {
-                System.out.println("multi write rsp(" + i + ") status:version " + rsp[i].getStatus() + ":" + rsp[i].getVersion());
+        for (int i = 0; i < 1000; i++) {
+            String key1 = "key1" + new Integer(i).toString();
+            String key2 = "key2" + new Integer(i).toString();
+      
+            mwrite[0] = new MultiWriteObject(tableId4, key1.getBytes(), "v0-value".getBytes(), null);
+            mwrite[1] = new MultiWriteObject(tableId5, key2.getBytes(), "v1".getBytes(), null);
+            MultiWriteRspObject[] rsp = ramcloud.multiWrite(mwrite);
+            if (rsp != null) {
+                for (int j = 0; j < rsp.length; j++) {
+                    System.out.println("multi write rsp(" + j + ") status:version " + rsp[j].getStatus() + ":" + rsp[j].getVersion());
+                }
+            }
+        }
+        for (int i = 0; i < 1000; i++) {
+            String key1 = "key1" + new Integer(i).toString();
+            String key2 = "key2" + new Integer(i).toString();
+            mread[0] = new multiReadObject(tableId4, key1.getBytes());
+            mread[1] = new multiReadObject(tableId5, key2.getBytes());
+            out = ramcloud.multiRead(mread);
+            for (int j = 0; j < 2; j++) {
+                System.out.println("multi read object: key = [" + out[j].getKey() + "], value = [" + out[j].getValue() + "]");
             }
         }
         ramcloud.dropTable("table4");
