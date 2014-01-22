@@ -683,6 +683,9 @@ JNIEXPORT jobjectArray JNICALL Java_edu_stanford_ramcloud_JRamCloud_multiWrite(J
     Tub<MultiWriteObject> objects[requestNum];
     MultiWriteObject *requests[requestNum];
     RejectRules rules[requestNum];
+    jbyteArray jKey[requestNum];
+    jbyteArray jValue[requestNum];
+    
     const static jclass jc_multiWriteObject = (jclass)env->NewGlobalRef(env->FindClass(PACKAGE_PATH "JRamCloud$MultiWriteObject"));
     const static jclass jc_RejectRules = (jclass)env->NewGlobalRef(env->FindClass(PACKAGE_PATH "JRamCloud$RejectRules"));
     const static jfieldID jf_tableId = env->GetFieldID(jc_multiWriteObject, "tableId", "J");
@@ -707,13 +710,13 @@ JNIEXPORT jobjectArray JNICALL Java_edu_stanford_ramcloud_JRamCloud_multiWrite(J
 
         uint64_t tableId = env->GetLongField(obj, jf_tableId);
 
-        jbyteArray jKey = (jbyteArray)env->GetObjectField(obj, jf_key);
-        jbyte* keyData = env->GetByteArrayElements(jKey, NULL);
-        uint16_t keyLength = env->GetArrayLength(jKey);
+        jKey[i] = (jbyteArray)env->GetObjectField(obj, jf_key);
+        jbyte* keyData = env->GetByteArrayElements(jKey[i], NULL);
+        uint16_t keyLength = env->GetArrayLength(jKey[i]);
 
-        jbyteArray jValue = (jbyteArray)env->GetObjectField(obj, jf_value);
-        jbyte* valueData = env->GetByteArrayElements(jValue, NULL);
-        uint32_t valueLength = env->GetArrayLength(jValue);
+        jValue[i] = (jbyteArray)env->GetObjectField(obj, jf_value);
+        jbyte* valueData = env->GetByteArrayElements(jValue[i], NULL);
+        uint32_t valueLength = env->GetArrayLength(jValue[i]);
 
         jobject jRejectRules = env->GetObjectField(obj, jf_reject_rules);
         rules[i] = {};
@@ -755,6 +758,9 @@ JNIEXPORT jobjectArray JNICALL Java_edu_stanford_ramcloud_JRamCloud_multiWrite(J
         jobject obj = env->NewObject(jc_RcObject, jm_init, jRamCloud, objects[i]->status, objects[i]->version);
         check_null(obj, "NewObject failed");
         env->SetObjectArrayElement(outJNIArray, i, obj);
+        env->ReleaseByteArrayElements(jKey[i], (jbyte *)requests[i]->key, JNI_ABORT);
+        env->ReleaseByteArrayElements(jValue[i], (jbyte *)requests[i]->value, JNI_ABORT);
+        objects[i].destroy();
     }
     return outJNIArray;
 }
